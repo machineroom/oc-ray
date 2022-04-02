@@ -1,6 +1,5 @@
 dosbox -c "mount D /home/james"\
-       -c "mount E /home/james/d7205a/install"\
-       -c "PATH=Z:;E:\D7205\ITOOLS;e:\d7205\iserver"\
+       -c "mount E /home/james/d7305a/install"\
+       -c "PATH=Z:;e:\d7305a\tools"\
        -c "D:" -c "cd /occam-~1/raytra~1"
 
-#       -c "set ISERVER=ISVRB08.EXE"\
