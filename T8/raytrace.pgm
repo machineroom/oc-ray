@@ -50,9 +50,9 @@ MAPPING
 
 --{{{  Code
 #INCLUDE "hostio.inc"
-#USE "framebufT8.c8h"
-#USE "cntlsysT8.c8h"
-#USE "raytraceT8.c8h"
+#USE "framebuf.c8h"
+#USE "cntlsys.c8h"
+#USE "raytrace.c8h"
 
 CONFIG
   CHAN OF SP frame.in, frame.out :
