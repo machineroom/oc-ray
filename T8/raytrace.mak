@@ -28,35 +28,35 @@ DB=dosbox\
 
 ##### IMAKEF CUT #####
 
-raytrace.btl : raytrace.cfb 
-	$(DB) -c "$(COLLECT) raytrace.cfb /o raytrace.btl $(COLLECTOPT) > 1.out" -c "exit"
+RAYTRACE.BTL : RAYTRACE.CFB 
+	$(DB) -c "$(COLLECT) RAYTRACE.CFB /o RAYTRACE.BTL $(COLLECTOPT) > 1.out" -c "exit"
 	cat 1.OUT
 
-raytrace.cfb : raytrace.pgm framebuf.c8h cntlsys.c8h raytrace.c8h 
-	$(DB) -c "$(OCONFIG) raytrace.pgm /o raytrace.cfb $(OCONFOPT) > 2.out" -c "exit"
+RAYTRACE.CFB : RAYTRACE.PGM FRAMEBUF.C8H CNTLSYS.C8H RAYTRACE.C8H 
+	$(DB) -c "$(OCONFIG) RAYTRACE.PGM /o RAYTRACE.CFB $(OCONFOPT) > 2.out" -c "exit"
 	cat 2.OUT
 
-framebuf.c8h : framebuf.l8h framebuf.t8h 
-	$(DB) -c "$(LINK) /f framebuf.l8h /t8 /h /o framebuf.c8h $(LINKOPT) > 3.out" -c "exit"
+FRAMEBUF.C8H : FRAMEBUF.L8H FRAMEBUF.T8H 
+	$(DB) -c "$(LINK) /f FRAMEBUF.L8H /t8 /h /o FRAMEBUF.C8H $(LINKOPT) > 3.out" -c "exit"
 	cat 3.OUT
 
-framebuf.t8h : framebuf.occ
-	$(DB) -c "$(OCCAM) framebuf /t8 /h /o framebuf.t8h $(OCCOPT) > 4.out" -c "exit"
+FRAMEBUF.T8H : FRAMEBUF.OCC
+	$(DB) -c "$(OCCAM) FRAMEBUF /t8 /h /o FRAMEBUF.T8H $(OCCOPT) > 4.out" -c "exit"
 	cat 4.OUT
 
-cntlsys.c8h : cntlsys.l8h cntlsys.t8h 
-	$(DB) -c "$(LINK) /f cntlsys.l8h /t8 /h /o cntlsys.c8h $(LINKOPT) > 5.out" -c "exit"
+CNTLSYS.C8H : CNTLSYS.L8H CNTLSYS.T8H 
+	$(DB) -c "$(LINK) /f CNTLSYS.L8H /t8 /h /o CNTLSYS.C8H $(LINKOPT) > 5.out" -c "exit"
 	cat 5.OUT
 
-cntlsys.t8h : cntlsys.occ
-	$(DB) -c "$(OCCAM) cntlsys /t8 /h /o cntlsys.t8h $(OCCOPT) > 6.out" -c "exit"
+CNTLSYS.T8H : CNTLSYS.OCC
+	$(DB) -c "$(OCCAM) CNTLSYS /t8 /h /o CNTLSYS.T8H $(OCCOPT) > 6.out" -c "exit"
 	cat 6.OUT
 
-raytrace.c8h : raytrace.l8h raytrace.t8h 
-	$(DB) -c "$(LINK) /f raytrace.l8h /t8 /h /o raytrace.c8h $(LINKOPT) > 7.out" -c "exit"
+RAYTRACE.C8H : RAYTRACE.L8H RAYTRACE.T8H 
+	$(DB) -c "$(LINK) /f rAYTRACE.L8H /t8 /h /o RAYTRACE.C8H $(LINKOPT) > 7.out" -c "exit"
 	cat 7.OUT
 
-raytrace.t8h : raytrace.occ
-	$(DB) -c "$(OCCAM) raytrace /t8 /h /o raytrace.t8h $(OCCOPT) > 8.out" -c "exit"
+RAYTRACE.T8H : RAYTRACE.OCC
+	$(DB) -c "$(OCCAM) RAYTRACE /t8 /h /o RAYTRACE.T8H $(OCCOPT) > 8.out" -c "exit"
 	cat 8.OUT
 
