@@ -1,4 +1,4 @@
-PROC rayTraceT4   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
+PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     VAL INT propogate, me )
 
   #USE "occama.lib"     --T414 math library
