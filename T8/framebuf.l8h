@@ -1,0 +1,11 @@
+--
+-- imakef : Version 3.79, 08 December 1992
+--
+-- linker command file "framebuf.l8h"
+--
+framebuf.t8h
+hostio.lib
+convert.lib
+streamio.lib
+occam8.lib
+#INCLUDE occam8.lnk
