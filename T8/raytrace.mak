@@ -18,7 +18,8 @@ F77OPT=
 
 D7305A=$(HOME)/d7305a/install/D7305A
 
-#	$(shell echo $1 $2)
+#note that D7205A toolset runs much of toolchain on a transputer.... I dont have a DOS PC with B008 so this won't work!
+#D7305A is almost all PC hosted but objects to the Occam code. /A cmd line switch disables the offending checks (I assume this enables "D7205 mode")
 DB=dosbox\
 	-c "mount D $(shell pwd)"\
 	-c "mount E $(D7305A)"\
@@ -49,7 +50,7 @@ CNTLSYS.C8H : CNTLSYS.L8H CNTLSYS.T8H
 	cat 5.OUT
 
 CNTLSYS.T8H : CNTLSYS.OCC
-	$(DB) -c "$(OCCAM) CNTLSYS /t8 /h /o CNTLSYS.T8H $(OCCOPT) > 6.out" -c "exit"
+	$(DB) -c "$(OCCAM) CNTLSYS /A /t8 /h /o CNTLSYS.T8H $(OCCOPT) > 6.out" -c "exit"
 	cat 6.OUT
 
 RAYTRACE.C8H : RAYTRACE.L8H RAYTRACE.T8H 
@@ -57,6 +58,6 @@ RAYTRACE.C8H : RAYTRACE.L8H RAYTRACE.T8H
 	cat 7.OUT
 
 RAYTRACE.T8H : RAYTRACE.OCC
-	$(DB) -c "$(OCCAM) RAYTRACE /t8 /h /o RAYTRACE.T8H $(OCCOPT) > 8.out" -c "exit"
+	$(DB) -c "$(OCCAM) RAYTRACE /A /t8 /h /o RAYTRACE.T8H $(OCCOPT) > 8.out" -c "exit"
 	cat 8.OUT
 
