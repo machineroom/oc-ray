@@ -593,6 +593,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
           command = c.stop
             fromRenderer ! command
     SEQ
+      so.write.string.nl(fs,ts,"JCW TESTING")
       ---------------------------- MAX COLOUR ------------------------------
       [512] BYTE line :
       SEQ

@@ -3038,7 +3038,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   [4][256] INT buffers :
 
   WHILE TRUE
-    renderer   ( feedPixels, pixelsOut, pixelTrigger )
+    renderer ( feedPixels, pixelsOut, pixelTrigger )
 :
 
 

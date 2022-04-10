@@ -13,7 +13,7 @@ VAL number.of.transputers IS 1 :
 VAL processors IS 1 :
 --}}}
 
---{{{  hardware description -  T425s everywhere!
+--{{{  hardware description -  single T425
 
 [number.of.transputers]NODE System:
 ARC Hostlink:
