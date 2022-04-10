@@ -1,3 +1,5 @@
+(as root)
+
 export ICONDB=/home/james/modern_iserver/CONNECT/c011.dat
 export PATH=$PATH:/home/james/modern_iserver/build/iserver/iserver
 iserver -SL c011 -SB RAYTRACE.BTL -SZ2
