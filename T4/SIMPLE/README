@@ -1,0 +1,64 @@
+SUBDIRECTORY simple
+
+The examples in this subdirectory are those used in the Getting Started
+Chapter of the User Manual.
+
+simple.occ	The basic example program
+simple.pgm	A configuration for T425, 1MByte, boot down link 0
+simple2.pgm	Similar configuration, but for use with imakef
+simple3.occ	Basic example program for non-configured case
+
+The basic example may be built by typing
+
+	oc simple -t425
+	ilink simple.tco hostio.lib -f occama.lnk -t425
+	occonf simple.pgm
+	icollect simple.cfb
+
+When using an MS-DOS or VMS system, replace '-' by '/'
+
+You may need to edit the file 'simple.pgm' to reflect a different
+amount of memory, or if you transputer is booted down a different link.
+
+imakef requires the use of a standard set of filename extensions.
+'simple2.pgm' is identical to 'simple.pgm' except that it uses the
+suffix '.c5h' for the linked unit, to indicate that it is compiled
+for a T425, in HALT mode. You can use imakef to generate a makefile
+as follows:
+
+	imakef simple2.btl
+	make -f simple2.mak
+
+When using an MS-DOS or VMS system, replace '-' by '/'
+
+Single transputer programs may be generated directly without configuring.
+However, they must have a standard procedure interface.
+'simple3.occ' is identical to 'simple.occ' except that it has the required
+standard procedure interface. This can be built as follows:
+
+	oc simple3 -t425
+	ilink simple3.tco hostio.lib -f occama.lnk -t425
+	icollect simple3.lku -t
+
+When using an MS-DOS or VMS system, replace '-' by '/'
+
+All of these examples can be executed on a T425 with at least
+1MByte of memory, booted from link 0.
+
+The transputer simulator, isim, which is supplied with the toolset
+emulates this, so it can be used instead, in `batch quiet' mode:
+
+Basic example:
+
+	isim -bq simple.btl
+
+imakef example:
+
+	isim -bq simple2.btl
+
+Non-configured example:
+
+	isim -bq simple3.btl
+
+When using an MS-DOS or VMS system, replace '-' by '/'
+

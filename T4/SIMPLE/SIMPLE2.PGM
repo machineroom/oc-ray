@@ -1,0 +1,17 @@
+NODE p :
+ARC hostarc :
+NETWORK
+  DO
+    SET p(type, memsize := "T425", 1024 * 1024)
+    CONNECT p[link][0] TO HOST WITH hostarc
+:
+
+#INCLUDE "hostio.inc"
+#USE "simple.c5h"
+
+CONFIG
+  CHAN OF SP fs, ts :
+  PLACE fs, ts ON hostarc :
+  PROCESSOR p
+    simple(fs, ts)
+:
