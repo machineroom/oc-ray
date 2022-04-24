@@ -3038,7 +3038,13 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   [4][256] INT buffers :
 
   WHILE TRUE
-    renderer ( feedPixels, pixelsOut, pixelTrigger )
+    PRI PAR
+      PAR
+        throughPut  ( buffers [0],
+                      fromPrev, toNext, feedPixels, pixelTrigger,
+                      propogate )
+        pixelBypass ( [ buffers FROM 0 FOR 3], toPrev, fromNext,  pixelsOut )
+      renderer   ( feedPixels, pixelsOut, pixelTrigger )
 :
 
 
