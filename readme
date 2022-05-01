@@ -17,10 +17,11 @@ export PATH=$PATH:/home/james/modern_iserver/build/iserver/iserver
 export ICONDB=/home/james/modern_iserver/CONNECT/c011.dat 
 iserver -SL c011 -SB RAYTRACE.BTL
 
--- Scene 1 perf:
+-- Single CPU performance:
 (@runtime x=[128,376])
-T425/1MB >1h
-T805/4MB 736s
+				1		2		3		4		5
+T425/1MB 		>1h		?		?		?		?
+T805/4MB 		736s	?		200s	145s	89s
 
 
 -------------------

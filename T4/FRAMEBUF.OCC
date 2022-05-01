@@ -541,6 +541,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       so.write.string.nl(fs,ts,"               <2>  14 Sphere Image                        ")
       so.write.string.nl(fs,ts,"               <3>  Cone, Ellipsoid Image                  ")
       so.write.string.nl(fs,ts,"               <4>  Cylinder, Sphere Image                 ")
+      so.write.string.nl(fs,ts,"               <5>  (small) Cylinder, Sphere Image         ")
       so.write.string.nl(fs,ts,"                                                           ")
       so.write.string   (fs,ts," Your Selection ")                      
 
@@ -551,7 +552,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
             (Result = spr.ok)
               SEQ
                 IF
-                  ((InKey >= '1') AND (InKey <= '4'))
+                  ((InKey >= '1') AND (InKey <= '5'))
                     SEQ
                       image ! (INT InKey) - (INT '0')
                       so.write.int(fs, ts, (INT InKey) - (INT '0'), 1)
