@@ -1,8 +1,8 @@
 PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     VAL INT propogate, me )
 
-  -- #USE "occama.lib"     --T414 math library
-  #USE "occam8.lib"     --T8xx math library
+  #USE "occama.lib"     --T414 math library
+  --#USE "occam8.lib"     --T8xx math library
 
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- render; x0; y0

@@ -4,5 +4,7 @@
 -- linker command file "raytrace.l4h"
 --
 raytrace.t4h
-occam8.lib
-#INCLUDE occam8.lnk
+--occam8.lib
+--#INCLUDE occam8.lnk
+occama.lib
+#INCLUDE occama.lnk

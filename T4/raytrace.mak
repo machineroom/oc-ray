@@ -27,8 +27,8 @@ DB=dosbox\
 	-c "SET ISEARCH=e:\libs\\"\
 	-c "D:"
 
-#CPU=/T425
-CPU=/T8
+CPU=/T425
+#CPU=/T8
 ##### IMAKEF CUT #####
 
 DEBUG: 

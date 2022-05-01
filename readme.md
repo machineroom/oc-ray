@@ -13,7 +13,7 @@ The T4 directory can build or either T425 or T805. To switch modify the followin
 |raytrace.pgm|T425|T805|
 |*.l4h|occama|occam8|
 |raytrace.mak|CPU=T425|CPU=T8|
-|raytrace.occ|occama|occam|
+|raytrace.occ|occama|occam8|
 
 ## Build
 ```
