@@ -1,32 +1,49 @@
+# JamesW notes in 2022:
 
-JamesW notes in 2022:
+|   |   |
+| - | - |
+|14 spheres - scene 2|![](images/14spheres.jpg)|
+|10 spheres - scene 1|![](images/10spheres.jpg)|
 
--- Select processor type:
-The T4 directory can build or either T425 or T805. To switch modify the following (and do a `git clean -df .`)
-					T4 					T8
-	raytrace.pgm    T425				T805
-	*.l4h     		occama				occam8
-	raytrace.mak	CPU=T425			CPU=T8
-	raytrace.occ	occama				occam
+## Select processor type:
+The T4 directory can build or either T425 or T805. To switch modify the following (and do a `git clean -df .`)  
 
--- Build:
+|file|T4|T8|
+|----|--|----|
+|raytrace.pgm|T425|T805|
+|*.l4h|occama|occam8|
+|raytrace.mak|CPU=T425|CPU=T8|
+|raytrace.occ|occama|occam|
+
+## Build
+```
 make -f raytrace.mak RAYTRACE.BTL
+```
 
--- Run (as root with rpi/c011 interface):
+## Run (as root with rpi/c011 interface)
+```
 export PATH=$PATH:/home/james/modern_iserver/build/iserver/iserver
 export ICONDB=/home/james/modern_iserver/CONNECT/c011.dat 
-iserver -SL c011 -SB RAYTRACE.BTL
+iserver -SL c011 -SB RAYTRACE.BTL`
+```
 
--- Single CPU performance:
+## MTV file conversion
+```
+mtvtoppm ray.mtv > ray.ppm
+ppmtojpeg ray.ppm > ray.jpg
+```
+
+## Single CPU performance:
 (@runtime x=[128,376])
-				1		2		3		4		5
-T425/1MB 		>1h		?		?		?		?
-T805/4MB 		736s	?		200s	145s	89s
+|Configuration|1|2|3|4|5|
+|--|--|--|--|--|--|
+|T425/1MB|>1h|?|?|?|?|
+|T805/4MB|736s|662s|200s|145s|89s|
 
+<br>
 
--------------------
------OLD STUFF-----
--------------------
+# OLD stuff...
+<pre>
 
 Compiling the Raytracer
 
@@ -61,3 +78,4 @@ On a Sun4, the program "/usr/bin/X11/mtvtoppm" creates a ppm-format file. Use
 a program such as "xv" to view this.
 
 	eg. mtvtoppm <ray.mtv | xv
+</pre>
