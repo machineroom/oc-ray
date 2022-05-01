@@ -61,7 +61,7 @@ CONFIG
     PROCESSOR cntlsys.p
       controlSystem (forward, back, graphics, image, processors)
     PROCESSOR raytrace.p
-      rayTrace (forward, back, b, f, false, 0)
+      rayTrace (forward, back, soft, soft, false, 0)
 :
 --}}}
   
