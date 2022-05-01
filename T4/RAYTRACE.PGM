@@ -20,7 +20,7 @@ ARC Hostlink:
 
 NETWORK
   DO
-    SET System[0] (type, memsize := "T425", 1*M)
+    SET System[0] (type, memsize := "T805", 4*M)
     CONNECT System[0][link][0] TO HOST WITH Hostlink
 :
 --}}}
