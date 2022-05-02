@@ -3,6 +3,8 @@
 - Make environment for Lnux using dosbox
 - Configuration created for [Rpi/C011 interface](https://github.com/machineroom/rpi_c011) and Whitecross WX9020 T425 system. This system has a T425 on the system controller card (512KB), with link 1 to host and 2,3 to the transputer ring (T425, 16MB), all @ 20Mbps
 
+*note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
+
 ## Samples
 |   |   |
 | - | - |
