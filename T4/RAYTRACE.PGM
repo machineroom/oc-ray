@@ -9,7 +9,7 @@ VAL LOW IS 1:
 --}}}
 
 --{{{  problem size. `processors` is total number of nodes in the net. `workers` is number of raytracer nodes (processors-2)
-VAL processors IS 13 :
+VAL processors IS 49 :
 VAL workers IS (processors-2) :
 --}}}
 
@@ -27,13 +27,82 @@ NETWORK
       SET System[i] (type, memsize := "T425", 16*M)
 
     CONNECT System[0][link][1] TO HOST WITH Hostlink
-    CONNECT System[1][link][0] TO System[0][link][3]
-    -- the first ring
-    DO i = 2 FOR 5
-      CONNECT System[i][link][0] TO System[i-1][link][2]
-    -- branches to other rings
-    DO i = 1 FOR 6
-      CONNECT System[i+6][link][1] TO System[i][link][1]
+    CONNECT System[1][link][2] TO System[0][link][2]
+    CONNECT System[2][link][0] TO System[0][link][3]
+    CONNECT System[3][link][1] TO System[10][link][1]
+    CONNECT System[3][link][2] TO System[1][link][0]
+    CONNECT System[3][link][3] TO System[11][link][2]
+    CONNECT System[4][link][1] TO System[1][link][1]
+    CONNECT System[4][link][2] TO System[12][link][2]
+    CONNECT System[4][link][3] TO System[12][link][3]
+    CONNECT System[5][link][0] TO System[13][link][0]
+    CONNECT System[5][link][1] TO System[12][link][1]
+    CONNECT System[5][link][2] TO System[1][link][3]
+    CONNECT System[5][link][3] TO System[4][link][0]
+    CONNECT System[6][link][1] TO System[2][link][1]
+    CONNECT System[6][link][2] TO System[14][link][2]
+    CONNECT System[6][link][3] TO System[14][link][3]
+    CONNECT System[7][link][0] TO System[2][link][2]
+    CONNECT System[7][link][1] TO System[15][link][1]
+    CONNECT System[7][link][2] TO System[16][link][0]
+    CONNECT System[7][link][3] TO System[17][link][2]
+    CONNECT System[8][link][0] TO System[18][link][0]
+    CONNECT System[8][link][1] TO System[14][link][1]
+    CONNECT System[8][link][2] TO System[2][link][3]
+    CONNECT System[8][link][3] TO System[6][link][0]
+    CONNECT System[9][link][0] TO System[16][link][2]
+    CONNECT System[9][link][1] TO System[19][link][1]
+    CONNECT System[9][link][2] TO System[3][link][0]
+    CONNECT System[9][link][3] TO System[20][link][2]
+    CONNECT System[11][link][3] TO System[10][link][0]
+    CONNECT System[17][link][3] TO System[15][link][0]
+    CONNECT System[20][link][3] TO System[19][link][0]
+    CONNECT System[21][link][1] TO System[11][link][1]
+    CONNECT System[21][link][2] TO System[10][link][2]
+    CONNECT System[21][link][3] TO System[10][link][3]
+    CONNECT System[22][link][0] TO System[12][link][0]
+    CONNECT System[23][link][2] TO System[13][link][2]
+    CONNECT System[24][link][3] TO System[13][link][3]
+    CONNECT System[25][link][0] TO System[14][link][0]
+    CONNECT System[26][link][1] TO System[17][link][1]
+    CONNECT System[26][link][2] TO System[15][link][2]
+    CONNECT System[26][link][3] TO System[15][link][3]
+    CONNECT System[27][link][1] TO System[16][link][1]
+    CONNECT System[28][link][2] TO System[16][link][3]
+    CONNECT System[28][link][3] TO System[27][link][0]
+    CONNECT System[29][link][1] TO System[18][link][1]
+    CONNECT System[29][link][3] TO System[24][link][1]
+    CONNECT System[30][link][2] TO System[18][link][2]
+    CONNECT System[31][link][3] TO System[18][link][3]
+    CONNECT System[32][link][1] TO System[20][link][1]
+    CONNECT System[32][link][2] TO System[19][link][2]
+    CONNECT System[32][link][3] TO System[19][link][3]
+    CONNECT System[33][link][1] TO System[22][link][1]
+    CONNECT System[34][link][2] TO System[22][link][2]
+    CONNECT System[35][link][3] TO System[22][link][3]
+    CONNECT System[36][link][1] TO System[23][link][1]
+    CONNECT System[36][link][3] TO System[34][link][3]
+    CONNECT System[37][link][0] TO System[24][link][0]
+    CONNECT System[37][link][1] TO System[35][link][1]
+    CONNECT System[38][link][0] TO System[35][link][0]
+    CONNECT System[38][link][1] TO System[25][link][1]
+    CONNECT System[39][link][2] TO System[25][link][2]
+    CONNECT System[40][link][3] TO System[25][link][3]
+    CONNECT System[41][link][1] TO System[28][link][1]
+    CONNECT System[41][link][2] TO System[27][link][2]
+    CONNECT System[41][link][3] TO System[27][link][3]
+    CONNECT System[42][link][0] TO System[29][link][0]
+    CONNECT System[42][link][2] TO System[38][link][2]
+    CONNECT System[43][link][2] TO System[29][link][2]
+    CONNECT System[43][link][3] TO System[38][link][3]
+    CONNECT System[44][link][1] TO System[30][link][1]
+    CONNECT System[44][link][3] TO System[39][link][3]
+    CONNECT System[45][link][0] TO System[31][link][0]
+    CONNECT System[45][link][1] TO System[40][link][1]
+    CONNECT System[46][link][2] TO System[33][link][2]
+    CONNECT System[47][link][3] TO System[33][link][3]
+    CONNECT System[48][link][0] TO System[46][link][0]
+    CONNECT System[48][link][2] TO System[47][link][2]
 
 :
 --}}}
