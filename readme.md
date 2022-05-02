@@ -37,7 +37,7 @@ ppmtojpeg ray.ppm > ray.jpg
 (@runtime x=[128,376])
 |Configuration|1|2|3|4|5|
 |--|--|--|--|--|--|
-|T425/1MB|>1h|?|?|?|?|
+|T425/1MB|>1h|?|?|?|272s|
 |T805/4MB|736s|662s|200s|145s|89s|
 
 <br>

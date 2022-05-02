@@ -8,20 +8,25 @@ VAL HIGH IS 0:
 VAL LOW IS 1:
 --}}}
 
---{{{  problem size (keep it simple for now!)
-VAL number.of.transputers IS 1 :
-VAL processors IS 1 :
+--{{{  problem size. `processors` is total number of nodes in the net. `workers` is number of raytracer nodes (processors-2)
+VAL processors IS 3 :
+VAL workers IS 1 :
 --}}}
 
---{{{  hardware description -  single T425
+--{{{  hardware description -  *3 T425
 
-[number.of.transputers]NODE System:
+[processors]NODE System:
 ARC Hostlink:
 
 NETWORK
   DO
-    SET System[0] (type, memsize := "T425", 1*M)
-    CONNECT System[0][link][0] TO HOST WITH Hostlink
+    SET System[0] (type, memsize := "T425", 512*K)
+    SET System[1] (type, memsize := "T425", 16*M)
+    SET System[2] (type, memsize := "T425", 16*M)
+    CONNECT System[0][link][1] TO HOST WITH Hostlink
+    CONNECT System[1][link][0] TO System[0][link][3]
+    CONNECT System[2][link][0] TO System[1][link][2]
+
 :
 --}}}
 
@@ -33,8 +38,8 @@ NODE raytrace.p :
 MAPPING
   DO
     MAP framebuf.p ONTO System[0]
-    MAP cntlsys.p ONTO System[0]
-    MAP raytrace.p ONTO System[0]
+    MAP cntlsys.p ONTO System[1]
+    MAP raytrace.p ONTO System[2]
 :
 --}}}
 
@@ -57,9 +62,9 @@ CONFIG
 
   PAR
     PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, image, processors, 50, 34500, 0, 25000000)
+      frameBuffer (frame.in, frame.out, graphics, image, workers, 50, 34500, 0, 25000000)
     PROCESSOR cntlsys.p
-      controlSystem (forward, back, graphics, image, processors)
+      controlSystem (forward, back, graphics, image, workers)
     PROCESSOR raytrace.p
       rayTrace (forward, back, soft, soft, false, 0)
 :

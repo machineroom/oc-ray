@@ -447,7 +447,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     BYTE FileResult, WriteStatus, CloseStatus :
 
     SEQ  
-      so.write.string    (fs, ts, " Open file ")
       so.open (fs, ts, OutFileName, OutFileType, OutFileMode, OutFileId, FileResult)
       IF
         (FileResult = spr.operation.failed)
