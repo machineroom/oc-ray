@@ -21,6 +21,7 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |5|T425/16MB|1009s|TBC|256s|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
 |11|T425/16MB|532s|TBC|137s|TBC|TBC|
 |47|T425/16MB|187s|TBC|TBC|TBC|TBC|
+|71|T425/16MB|158s|TBC|TBC|TBC|TBC|
 
 ## Select processor type:
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
@@ -34,6 +35,7 @@ The T4 directory is where the action happens and can fairly easily build for eit
 
 ## Build
 ```
+(optionally) ispy | ./ispy_to_network.py then copy paste the network definition into RAYTRACE.PGM
 make -f raytrace.mak RAYTRACE.BTL
 ```
 
