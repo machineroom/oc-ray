@@ -8,42 +8,46 @@ VAL HIGH IS 0:
 VAL LOW IS 1:
 --}}}
 
---{{{  problem size
-VAL number.of.transputers IS 43 :
-VAL processors IS 9 :
+--{{{  problem size. `processors` is total number of nodes in the net. `workers` is number of raytracer nodes (processors-2)
+VAL processors IS 13 :
+VAL workers IS (processors-2) :
 --}}}
 
---{{{  hardware description - 3 T8s on the first B012, 8 T8s on the next,
---{{{				and 40 T4s on the next 4
+--{{{  hardware description -  WX9020 T425 array
+-- First processor (on system controller) is 512K, all others are 16MB
 
-[number.of.transputers]NODE System:
+[processors]NODE System:
 ARC Hostlink:
 
 NETWORK
   DO
-    SET System[0] (type, memsize := "T425", 4*M)
-    SET System[1] (type, memsize := "T425", 2*M)
-    SET System[2] (type, memsize := "T425", 1*M)
-    DO i = 3 FOR 8
-      SET System[i] (type, memsize := "T425", 1*M)
-    DO i = 11 FOR 32
-      SET System[i] (type, memsize := "T414", 1*M)
-    CONNECT System[0][link][0] TO HOST WITH Hostlink
-    DO i = 1 FOR 42
-      CONNECT System[i-1][link][2] TO System[i][link][1]
+    SET System[0] (type, memsize := "T425", 512*K)
+    SET System[1] (type, memsize := "T425", 16*M)
+    DO i = 2 FOR workers
+      SET System[i] (type, memsize := "T425", 16*M)
+
+    CONNECT System[0][link][1] TO HOST WITH Hostlink
+    CONNECT System[1][link][0] TO System[0][link][3]
+    -- the first ring
+    DO i = 2 FOR 5
+      CONNECT System[i][link][0] TO System[i-1][link][2]
+    -- branches to other rings
+    DO i = 1 FOR 6
+      CONNECT System[i+6][link][1] TO System[i][link][1]
+
 :
 --}}}
 
 --{{{  Mapping
 NODE framebuf.p :
 NODE cntlsys.p :
-[processors]NODE raytrace.p :
+[workers]NODE raytrace.p :
 
 MAPPING
   DO
     MAP framebuf.p ONTO System[0]
     MAP cntlsys.p ONTO System[1]
-    DO i = 0 FOR processors
+    DO i = 0 FOR workers
       MAP raytrace.p[i] ONTO System[i+2]
 :
 --}}}
@@ -57,7 +61,8 @@ MAPPING
 CONFIG
   CHAN OF SP frame.in, frame.out :
   PLACE frame.in, frame.out ON Hostlink :
-  [processors]CHAN OF ANY forward, back :
+  [workers]CHAN OF ANY forward, back :
+  CHAN OF ANY f,b :
   CHAN OF ANY graphics, soft :
   CHAN OF INT image :
 
@@ -66,15 +71,16 @@ CONFIG
 
   PAR
     PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, image, processors, 50, 34500, 0, 25000000)
+      frameBuffer (frame.in, frame.out, graphics, image, workers, 50, 34500, 0, 25000000)
     PROCESSOR cntlsys.p
-      controlSystem (forward[0], back[0], graphics, image, processors)
-    PAR i = 0 FOR processors - 1
+      controlSystem (forward[0], back[0], graphics, image, workers)
+    PAR i = 0 FOR workers-1
       PROCESSOR raytrace.p[i]
         rayTrace (forward[i], back[i], back[i+1], forward[i+1], true, i)
-    VAL i IS processors - 1 :
+    VAL i IS workers - 1 :
     PROCESSOR raytrace.p[i]
       rayTrace (forward [i], back[i], soft, soft, false, i)
+
 :
 --}}}
   

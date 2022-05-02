@@ -9,3 +9,5 @@ convert.lib
 streamio.lib
 occama.lib
 #INCLUDE occama.lnk
+--occam8.lib
+--#INCLUDE occam8.lnk

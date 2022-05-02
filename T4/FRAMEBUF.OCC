@@ -540,6 +540,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       so.write.string.nl(fs,ts,"               <2>  14 Sphere Image                        ")
       so.write.string.nl(fs,ts,"               <3>  Cone, Ellipsoid Image                  ")
       so.write.string.nl(fs,ts,"               <4>  Cylinder, Sphere Image                 ")
+      so.write.string.nl(fs,ts,"               <5>  (small) Cylinder, Sphere Image         ")
       so.write.string.nl(fs,ts,"                                                           ")
       so.write.string   (fs,ts," Your Selection ")                      
 
@@ -550,7 +551,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
             (Result = spr.ok)
               SEQ
                 IF
-                  ((InKey >= '1') AND (InKey <= '4'))
+                  ((InKey >= '1') AND (InKey <= '5'))
                     SEQ
                       image ! (INT InKey) - (INT '0')
                       so.write.int(fs, ts, (INT InKey) - (INT '0'), 1)
@@ -625,8 +626,11 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                 INT x, y, size :
                 [16][16] INT patch :
                 SEQ
-                  so.write.string (fs, ts, " p ")
                   fromRenderer ? x; y; size
+                  so.write.string (fs, ts, " p x=")
+                  so.write.int (fs, ts, x, 2)
+                  so.write.string (fs, ts, ",y=")
+                  so.write.int (fs, ts, y, 2)
                   SEQ i = 0 FOR size
                     fromRenderer ? [ patch [i] FROM 0 FOR size ]
                   displayPatch ( x, y, size, patch )

@@ -6,3 +6,5 @@
 cntlsys.t4h
 occama.lib
 #INCLUDE occama.lnk
+--occam8.lib
+--#INCLUDE occam8.lnk

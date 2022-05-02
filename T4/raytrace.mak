@@ -27,7 +27,12 @@ DB=dosbox\
 	-c "SET ISEARCH=e:\libs\\"\
 	-c "D:"
 
+CPU=/T425
+#CPU=/T8
 ##### IMAKEF CUT #####
+
+DEBUG: 
+	$(DB)
 
 RAYTRACE.BTL : RAYTRACE.CFB 
 	$(DB) -c "$(COLLECT) RAYTRACE.CFB /o RAYTRACE.BTL $(COLLECTOPT) > 1.out" -c "exit"
@@ -38,26 +43,26 @@ RAYTRACE.CFB : RAYTRACE.PGM FRAMEBUF.C4H CNTLSYS.C4H RAYTRACE.C4H
 	cat 2.OUT
 
 FRAMEBUF.C4H : FRAMEBUF.L4H FRAMEBUF.T4H 
-	$(DB) -c "$(LINK) /f FRAMEBUF.L4H /t425 /h /o FRAMEBUF.C4H $(LINKOPT) > 3.out" -c "exit"
+	$(DB) -c "$(LINK) /f FRAMEBUF.L4H $(CPU) /h /o FRAMEBUF.C4H $(LINKOPT) > 3.out" -c "exit"
 	cat 3.OUT
 
 FRAMEBUF.T4H : FRAMEBUF.OCC
-	$(DB) -c "$(OCCAM) FRAMEBUF /t425 /h /o FRAMEBUF.T4H $(OCCOPT) > 4.out" -c "exit"
+	$(DB) -c "$(OCCAM) FRAMEBUF $(CPU) /h /o FRAMEBUF.T4H $(OCCOPT) > 4.out" -c "exit"
 	cat 4.OUT
 
 CNTLSYS.C4H : CNTLSYS.L4H CNTLSYS.T4H 
-	$(DB) -c "$(LINK) /f CNTLSYS.L4H /t425 /h /o CNTLSYS.C4H $(LINKOPT) > 5.out" -c "exit"
+	$(DB) -c "$(LINK) /f CNTLSYS.L4H $(CPU) /h /o CNTLSYS.C4H $(LINKOPT) > 5.out" -c "exit"
 	cat 5.OUT
 
 CNTLSYS.T4H : CNTLSYS.OCC
-	$(DB) -c "$(OCCAM) CNTLSYS /A /t425 /h /o CNTLSYS.T4H $(OCCOPT) > 6.out" -c "exit"
+	$(DB) -c "$(OCCAM) CNTLSYS /A $(CPU) /h /o CNTLSYS.T4H $(OCCOPT) > 6.out" -c "exit"
 	cat 6.OUT
 
 RAYTRACE.C4H : RAYTRACE.L4H RAYTRACE.T4H 
-	$(DB) -c "$(LINK) /f rAYTRACE.L4H /t425 /h /o RAYTRACE.C4H $(LINKOPT) > 7.out" -c "exit"
+	$(DB) -c "$(LINK) /f RAYTRACE.L4H $(CPU) /h /o RAYTRACE.C4H $(LINKOPT) > 7.out" -c "exit"
 	cat 7.OUT
 
 RAYTRACE.T4H : RAYTRACE.OCC
-	$(DB) -c "$(OCCAM) RAYTRACE /A /t425 /h /o RAYTRACE.T4H $(OCCOPT) > 8.out" -c "exit"
+	$(DB) -c "$(OCCAM) RAYTRACE /A $(CPU) /h /o RAYTRACE.T4H $(OCCOPT) > 8.out" -c "exit"
 	cat 8.OUT
 
