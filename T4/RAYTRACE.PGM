@@ -9,11 +9,12 @@ VAL LOW IS 1:
 --}}}
 
 --{{{  problem size. `processors` is total number of nodes in the net. `workers` is number of raytracer nodes (processors-2)
-VAL processors IS 7 :
+VAL processors IS 13 :
 VAL workers IS (processors-2) :
 --}}}
 
---{{{  hardware description -  *4 T425
+--{{{  hardware description -  WX9020 T425 array
+-- First processor (on system controller) is 512K, all others are 16MB
 
 [processors]NODE System:
 ARC Hostlink:
@@ -27,8 +28,13 @@ NETWORK
 
     CONNECT System[0][link][1] TO HOST WITH Hostlink
     CONNECT System[1][link][0] TO System[0][link][3]
-    DO i = 2 FOR workers
+    -- the first ring
+    DO i = 2 FOR 5
       CONNECT System[i][link][0] TO System[i-1][link][2]
+    -- branches to other rings
+    DO i = 1 FOR 6
+      CONNECT System[i+6][link][1] TO System[i][link][1]
+
 :
 --}}}
 

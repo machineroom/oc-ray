@@ -1,12 +1,26 @@
-# JamesW notes in 2022:
+# JamesW updated for 2022
+- Code obtained from [Ram's transputer pages](https://www.classiccmp.org/transputer/software/graphics/occam-raytracer.tar.gz)
+- Make environment for Lnux using dosbox
+- Configuration created for [Rpi/C011 interface](https://github.com/machineroom/rpi_c011) and Whitecross WX9020 T425 system. This system has a T425 on the system controller card (512KB), with link 1 to host and 2,3 to the transputer ring (T425, 16MB), all @ 20Mbps
 
+## Samples
 |   |   |
 | - | - |
-|14 spheres - scene 2|![](images/14spheres.jpg)|
 |10 spheres - scene 1|![](images/10spheres.jpg)|
+|14 spheres - scene 2|![](images/14spheres.jpg)|
+|Cone, Ellipsoid - scene 3|![](images/scene3.jpg)|
+
+## Performance:
+(@runtime x,y=[128,376])
+Workers|Type|Scene 1|2|3|4|5|notes|
+|--|--|--|--|--|--|--|--|
+|1|T805/4MB|736s|662s|200s|145s|89s|SMT211B TRAM (all procs on single transputer)
+|1|T425/1MB|>1h|TBC|TBC|TBC|272s|TTM3A TRAM (all procs on single transputer)
+|5|T425/16MB|1009s|TBC|256s|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
+|11|T425/16MB|532s|TBC|137s|TBC|TBC|
 
 ## Select processor type:
-The T4 directory can build or either T425 or T805. To switch modify the following (and do a `git clean -df .`)  
+The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
 
 |file|T4|T8|
 |----|--|----|
@@ -33,16 +47,9 @@ mtvtoppm ray.mtv > ray.ppm
 ppmtojpeg ray.ppm > ray.jpg
 ```
 
-## Single CPU performance:
-(@runtime x=[128,376])
-|Configuration|1|2|3|4|5|
-|--|--|--|--|--|--|
-|T425/1MB|>1h|?|?|?|272s|
-|T805/4MB|736s|662s|200s|145s|89s|
-
 <br>
 
-# OLD stuff...
+# The original Inmos readme
 <pre>
 
 Compiling the Raytracer
