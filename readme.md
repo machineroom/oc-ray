@@ -1,5 +1,5 @@
 # JamesW updated for 2022
-- Code obtained from [Ram's transputer pages](https://www.classiccmp.org/transputer/software/graphics/occam-raytracer.tar.gz)
+- Code obtained from [Ram's transputer pages](https://www.classiccmp.org/transputer/software/graphics/occam-raytracer.tar.gz) and thanks to Stefan Fennek (https://www.youtube.com/channel/UCauhcBH8yzUS7qwp2pN37tQ, https://github.com/DigiFennek) for pointers in the right direction :)
 - Make environment for Linux using dosbox
 - Configuration created for [Rpi/C011 interface](https://github.com/machineroom/rpi_c011) and Whitecross WX9020 T425 system. This system has a T425 on the system controller card (512KB), with link 1 to host and 2,3 to the transputer ring (T425, 16MB), all @ 20Mbps
 
