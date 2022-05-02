@@ -20,11 +20,11 @@ for line in sys.stdin:
             if link == "...":
                 pass
             elif link == "HOST":
-                print (f"CONNECT System[{processor}][link][{index}] TO HOST WITH Hostlink")
+                print (f"    CONNECT System[{processor}][link][{index}] TO HOST WITH Hostlink")
             else:
                 target_processor = link.split(":")[0]
                 target_link = link.split(":")[1]
                 if target_processor <= processor:
                     # only connect "backwards" else occam tools complain about duplicated connections
-                    print (f"CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
+                    print (f"    CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
         
