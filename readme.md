@@ -34,8 +34,12 @@ The T4 directory is where the action happens and can fairly easily build for eit
 |raytrace.occ|occama|occam8|
 
 ## Build
+Generate the network map for the current system
 ```
-(optionally) ispy | ./ispy_to_network.py then copy paste the network definition into RAYTRACE.PGM
+sudo /home/james/INMOS_ispy_c011/ispy | ./ispy_to_network.py > network.inc
+```
+Make the code
+```
 make -f raytrace.mak RAYTRACE.BTL
 ```
 
@@ -51,6 +55,9 @@ iserver -SL c011 -SB RAYTRACE.BTL`
 mtvtoppm ray.mtv > ray.ppm
 ppmtojpeg ray.ppm > ray.jpg
 ```
+
+## TODO
+- Discover the network (like T-Mandel does) at run-time rather than having to build for the specific network. The BTL also grows in size as more nodes are added (12 nodes= ~100KB, 120+ nodes= ~0.5MB!)
 
 <br>
 
