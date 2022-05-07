@@ -29,6 +29,7 @@ print ("      SET System[i] (type, memsize := \"T425\", 16*M)")
 
 
 for line in ispy_output:
+    targets = []
     line = line.strip()
     # strip any headers
     if (line.startswith(tuple(string.digits))):
@@ -48,10 +49,12 @@ for line in ispy_output:
                 print (f"    CONNECT System[{processor}][link][{index}] TO HOST WITH Hostlink")
             else:
                 target_processor = link.split(":")[0]
-                target_link = link.split(":")[1]
-                if int(target_processor) < int(processor):
-                    # only connect "backwards" else occam tools complain about duplicated connections
-                    # this also removes links connected on the same processor (that ispy reports twice and occam tools bitch about)
-                    print (f"    CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
+                if target_processor not in targets:
+                    targets.append(target_processor)
+                    target_link = link.split(":")[1]
+                    if int(target_processor) < int(processor):
+                        # only connect "backwards" else occam tools complain about duplicated connections
+                        # this also removes links connected on the same processor (that ispy reports twice and occam tools bitch about)
+                        print (f"    CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
         
 print (":")
