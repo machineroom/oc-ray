@@ -12,19 +12,20 @@
 |14 spheres - scene 2|![](images/14spheres.jpg)|
 |Cone, Ellipsoid - scene 3|![](images/scene3.jpg)|
 
-## Performance:
+## Performance
 (@runtime x,y=[128,376])
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
 |1|T805/4MB|736s|662s|200s|145s|89s|SMT211B TRAM (all procs on single transputer)
-|1|T425/1MB|>1h|TBC|TBC|TBC|272s|TTM3A TRAM (all procs on single transputer)
+|1|T425/1MB|3630s|TBC|TBC|TBC|272s|TTM3A TRAM (all procs on single transputer)
 |5|T425/16MB|1009s|TBC|256s|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
 |11|T425/16MB|532s|TBC|137s|TBC|TBC|
 |17|T425/16MB|333s|TBC|137s|TBC|TBC|
+|23|T425/16MB|s|TBC|137s|TBC|TBC|
 |47|T425/16MB|187s|TBC|TBC|TBC|TBC|
 |71|T425/16MB|158s|TBC|TBC|TBC|TBC|
 
-## Select processor type:
+## Select processor type
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
 
 |file|T4|T8|
@@ -58,7 +59,7 @@ ppmtojpeg ray.ppm > ray.jpg
 ```
 
 ## TODO
-- Discover the network (like T-Mandel does) at run-time rather than having to build for the specific network. The BTL also grows in size as more nodes are added (12 nodes= ~100KB, 120+ nodes= ~0.5MB!)
+- Discover the network (like ispy or T-Mandel does) at run-time rather than having to build for the specific network. The BTL also grows in size as more nodes are added (12 nodes= ~100KB, 120+ nodes= ~0.5MB!)
 
 <br>
 
