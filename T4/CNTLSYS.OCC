@@ -364,7 +364,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [    s.y] := y
               ftemp [    s.z] := z
               out ! c.object; s.size; [ temp FROM 0 FOR s.size ]
-            writes ( "*N*C sent 3 spheres", buffer)
+            writes ( "CNTLSYS sent 3 spheres", buffer)
             VAL rad IS 102.0 (REAL32) :
             VAL y  IS    5.0 (REAL32) :
             VAL z  IS 3910.0 (REAL32) :
@@ -408,7 +408,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [    s.y] := y
               ftemp [    s.z] := z
               out ! c.object; s.size; [ temp FROM 0 FOR s.size ]
-            writes ( "*N*C sent 3 spheres", buffer)
+            writes ( "CNTLSYS sent 3 spheres", buffer)
             VAL rad IS 102.0 (REAL32) :
             VAL y  IS  210.0 (REAL32) :
             VAL z  IS 3910.0 (REAL32) :
@@ -450,7 +450,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [    s.y] := y
               ftemp [    s.z] := z
               out ! c.object; s.size; [ temp FROM 0 FOR s.size ]
-            writes ( "*N*C sent 3 spheres", buffer)
+            writes ( "CNTLSYS sent 3 spheres", buffer)
             temp  [ o.type] := o.sphere
             temp  [ o.attr] := a.spec \/ a.frac
 
@@ -474,7 +474,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
             ftemp [    s.y] :=  -80.0 (REAL32)
             ftemp [    s.z] := 3100.0 (REAL32)
             out ! c.object; s.size; [ temp FROM 0 FOR s.size ]
-            writes ( "*N*C sent glass sphere", buffer)
+            writes ( "CNTLSYS sent glass sphere", buffer)
         (model = 2)       --14 sphere selection
           SEQ
             VAL r          IS 300.0 (REAL32) :
@@ -564,7 +564,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [  e.rady] := r + 200.0 (REAL32)
               ftemp [  e.radz] := r
               out ! c.object; e.size; [ temp FROM 0 FOR e.size ]
-              writes ( "*N*C sent 14 spheres", buffer)
+              writes ( "CNTLSYS sent 14 spheres", buffer)
         (model = 3)                           --cone and ellipsoid image
           SEQ
             VAL root.2  IS  1.414213562 (REAL32) :
@@ -639,7 +639,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [ p.sizeu] :=  1500.0        (REAL32)
               ftemp [ p.sizev] :=  1500.0        (REAL32)
               out ! c.object; p.size; [ temp FROM 0 FOR  p.size ]
-              writes ( "*N*C sent a Cone and an Ellipsoid", buffer)
+              writes ( "CNTLSYS sent a Cone and an Ellipsoid", buffer)
         (model = 4)                               -- cylinder and sphere image
           SEQ
             temp  [ o.type] := o.cylinder
@@ -696,7 +696,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [ pxy.sizex] :=  2000.0        (REAL32)
               ftemp [ pxy.sizey] :=  1000.0        (REAL32)
               out ! c.object; pxy.size; [ temp FROM 0 FOR  pxy.size ]
-              writes ( "*N*C sent a Cylinder and a Sphere", buffer)
+              writes ( "CNTLSYS sent a Cylinder and a Sphere", buffer)
         (model = 5)                               -- SMALL cylinder and sphere image for TESTING
           SEQ
             temp  [ o.type] := o.cylinder
@@ -735,7 +735,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               ftemp [ pxy.sizex] :=  2000.0        (REAL32)
               ftemp [ pxy.sizey] :=  1000.0        (REAL32)
               out ! c.object; pxy.size; [ temp FROM 0 FOR  pxy.size ]
-              writes ( "*N*C sent a tiny Cylinder", buffer)        
+              writes ( "CNTLSYS sent a tiny Cylinder", buffer)        
         TRUE
           SKIP 
       IF
@@ -754,7 +754,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
             ftemp [pxz.sizex] :=  4000.0 (REAL32)
             ftemp [pxz.sizez] :=  3000.0 (REAL32)
             out ! c.object; pxz.size; [ temp FROM 0 FOR pxz.size ]
-            writes ( "*N*C a plane", buffer)
+            writes ( "CNTLSYS a plane", buffer)
         TRUE
           SKIP         
       ftemp [ l.ir] := 780.8 (REAL32)  -- a yellow sun
@@ -766,7 +766,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       ftemp [ l.dz] :=  -0.9 (REAL32)
 
       out ! c.light; l.size; [ temp FROM 0 FOR l.size ]
-      writes ( "*N*C a light", buffer)
+      writes ( "CNTLSYS a light", buffer)
       ftemp [ l.ir] := 780.8 (REAL32)  -- a yellow sun
       ftemp [ l.ig] := 780.8 (REAL32)
       ftemp [ l.ib] := 710.7 (REAL32)
@@ -776,7 +776,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       ftemp [ l.dz] :=  -0.3 (REAL32)
 
       out ! c.light; l.size; [ temp FROM 0 FOR l.size ]
-      writes ( "*N*C a light", buffer)
+      writes ( "CNTLSYS a light", buffer)
       VAL cosTheta IS 0.93969 (REAL32) :
       VAL sinTheta IS 0.34202 (REAL32) :
       VAL sin.256  IS sinTheta * 256.0 (REAL32) :
@@ -846,7 +846,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       --  pinhole   [2] := offZ + 1024.0 (REAL32) -- (1024.0 (REAL32) * cosTheta)
 
       --  out ! c.runData; 20; [ runData FROM 0 FOR 20 ]
-      writes ( "*N*C run data", buffer)
+      writes ( "CNTLSYS run data", buffer)
   :
 
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
@@ -874,13 +874,13 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               command = c.render
                 INT x, y :
                 SEQ
-                  writes ( "*N*C S c.render to system", buffer)
+                  writes ( "CNTLSYS S c.render to system", buffer)
                   in  ? x; y
                   out ! command; x; y
                   free := free - 1
               command = c.stop
                 SEQ
-                  writes ( "*N*C R c.stop from pumper", buffer)
+                  writes ( "CNTLSYS R c.stop from pumper", buffer)
                   out ! c.stop
                   passActive := FALSE
           return ? command
@@ -888,13 +888,15 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               command = c.patch
                 INT x, y, size :
                 SEQ
-                  writes ( "*N*C R patch", buffer)
+                  writes ( "CNTLSYS R patch", buffer)
                   return   ? x; y; size
+                  writes ( "CNTLSYS R patch got x,y,size", buffer)
                   graphics ! command; x; y; size
                   SEQ i = 0 FOR size
                     SEQ
                       return   ? [ buffer FROM 0 FOR size ]
                       graphics ! [ buffer FROM 0 FOR size ]
+                  writes ( "CNTLSYS R patch sent x,y,size", buffer)
                   free := free + 1
               command = c.message
                 INT size :
@@ -904,7 +906,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               command = c.stop
                 SEQ
                   farmActive := FALSE
-                  writes ( "*N*C received c.stop", buffer)
+                  writes ( "CNTLSYS received c.stop", buffer)
       graphics ! c.stop
   :
 

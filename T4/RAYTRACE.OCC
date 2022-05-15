@@ -2978,15 +2978,17 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
               INT x0, y0 :
               SEQ
                 workIn ? x0; y0
-                IF
-                  renderingMode = m.adaptive
-                    initWORDvec ( rawSamples, notRendered, gridSize * gridSize )
-                  TRUE
-                    SKIP
-                SEQ x = 0 FOR runPatchSize
-                  SEQ y = 0 FOR runPatchSize
-                    renderPixels ( x0, y0, x, y, samples, colours [y][x],
-                                   runPatchSize, renderingMode, (x=0) AND (y=0))
+                writef ( "Worker %I starting on %I %I", me, x0, y0, 0 )
+                --IF
+                --  renderingMode = m.adaptive
+                --    initWORDvec ( rawSamples, notRendered, gridSize * gridSize )
+                --  TRUE
+                --    SKIP
+                --SEQ x = 0 FOR runPatchSize
+                --  SEQ y = 0 FOR runPatchSize
+                --    renderPixels ( x0, y0, x, y, samples, colours [y][x],
+                --                   runPatchSize, renderingMode, (x=0) AND (y=0))
+                writef ( "Worker %I done on %I %I", me, x0, y0, 0 )
                 pixelsOut ! c.patch; x0; y0; runPatchSize
                 SEQ y = 0 FOR runPatchSize
                   pixelsOut ! [ colours [y] FROM 0 FOR runPatchSize ]
@@ -3013,7 +3015,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 worldModel [ world.p] := nil
             TRUE
               SEQ
-                writef ( "*N*C received garbage command %I", command, 0,0,0)
+                writef ( "Worker %I received garbage command %I", me, command, 0,0)
                 STOP
           INT now, delay :
           SEQ
@@ -3028,9 +3030,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
               TRUE
                 SKIP
           workIn ? command
-      writef ( "*N*C Worker %I DONE in %I seconds, scene of %I objects",
+      writef ( "Worker %I DONE in %I seconds, scene of %I objects",
         me, secs, nobj, 0 )
-      writef ( "*N*C %I lights traced %I rays", nlight, nrays, 0, 0 )
+      writef ( "Worker %I, %I lights traced %I rays", me, nlight, nrays, 0 )
       pixelsOut ! command
   :
 
