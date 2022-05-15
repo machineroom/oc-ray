@@ -21,9 +21,14 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |5|T425/16MB|1009s|TBC|256s|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
 |11|T425/16MB|532s|585s|137s|88s|50s| 2 cards in system controller rack
 |17|T425/16MB|333s|TBC|137s|TBC|TBC|
-|23|T425/16MB|TBC|TBC|137s|TBC|TBC|
-|47|T425/16MB|187s|TBC|TBC|TBC|TBC|
+|41|T425/16MB|186s|TBC|TBC|TBC|TBC|
+|47|T425/16MB|183s|TBC|TBC|TBC|TBC|
 |71|T425/16MB|158s|TBC|TBC|TBC|TBC|
+
+53 doesn't start (no patches)
+59 starts but errors or locks
+65 starts but errors or locks
+
 
 ## Select processor type
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
