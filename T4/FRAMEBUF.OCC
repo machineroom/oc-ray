@@ -644,7 +644,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                   fromRenderer ? size; [ chars FROM 0 FOR size ]
                   SEQ i = 0 FOR size   
                     OutString[i] := BYTE (chars[i] /\ #FF)
-                  so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
+                  so.write.string (fs, ts, [OutString FROM 0 FOR size])
               TRUE
                 SEQ
                   so.write.string.nl (fs, ts," GARBAGE COMMAND")
