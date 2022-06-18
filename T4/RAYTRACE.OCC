@@ -115,115 +115,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL s.uoffs    IS  first + 5 :  -- offsets for u and v in map
   VAL s.voffs    IS  first + 6 :
   VAL s.size     IS  first + 7 :
-  VAL first   IS o.specific:
-  VAL e.x     IS first + 0:       -- center of the ellipsoid
-  VAL e.y     IS first + 1:
-  VAL e.z     IS first + 2:
-  VAL e.a11   IS first + 3:       -- transformation matrix of the ellipsoid
-  VAL e.a12   IS first + 4:       -- from gobal to local coord.
-  VAL e.a13   IS first + 5:
-  VAL e.a21   IS first + 6:
-  VAL e.a22   IS first + 7:
-  VAL e.a23   IS first + 8:
-  VAL e.a31   IS first + 9:
-  VAL e.a32   IS first + 10:
-  VAL e.a33   IS first + 11:
-  VAL e.radx  IS first + 12:      -- size on x axis ( of the new system )
-  VAL e.rady  IS first + 13:      -- size on y axis ( of the new system )
-  VAL e.radz  IS first + 14:      -- size on z axis ( of the new system )
-  VAL e.size  IS first + 15:
-  VAL first   IS o.specific:
-  VAL co.x     IS first + 0:       -- center of the circle
-  VAL co.y     IS first + 1:       --  at the beginnig of the cone
-  VAL co.z     IS first + 2:
-  VAL co.a11   IS first + 3:       -- transformation matrix of the cone
-  VAL co.a12   IS first + 4:       -- from gobal to local coord.
-  VAL co.a13   IS first + 5:
-  VAL co.a21   IS first + 6:
-  VAL co.a22   IS first + 7:
-  VAL co.a23   IS first + 8:
-  VAL co.a31   IS first + 9:
-  VAL co.a32   IS first + 10:
-  VAL co.a33   IS first + 11:
-  VAL co.rada  IS first + 12:      -- size of the circle at the beginning
-  VAL co.radb  IS first + 13:      -- size of the circle at the end
-  VAL co.len   IS first + 14:      -- length of the cone on new z axis
-  VAL co.size  IS first + 15:
-  VAL first   IS o.specific:
-  VAL c.x     IS first + 0:       -- center of the circle
-  VAL c.y     IS first + 1:       --  at the beginnig of the cylinder
-  VAL c.z     IS first + 2:
-  VAL c.a11   IS first + 3:       -- transformation matrix of the cylinder
-  VAL c.a12   IS first + 4:       -- from gobal to local coord.
-  VAL c.a13   IS first + 5:
-  VAL c.a21   IS first + 6:
-  VAL c.a22   IS first + 7:
-  VAL c.a23   IS first + 8:
-  VAL c.a31   IS first + 9:
-  VAL c.a32   IS first + 10:
-  VAL c.a33   IS first + 11:
-  VAL c.rad   IS first + 12:      -- size of the circle
-  VAL c.len   IS first + 13:      -- length of the cylinder
-  VAL c.size  IS first + 14:
-
-  VAL first      IS o.specific :
-
-  VAL p.x        IS first + 1  :
-  VAL p.y        IS first + 2  :
-  VAL p.z        IS first + 3  :
-  VAL p.ux       IS first + 4  :
-  VAL p.uy       IS first + 5  :
-  VAL p.uz       IS first + 6  :
-  VAL p.vx       IS first + 7  :
-  VAL p.vy       IS first + 8  :
-  VAL p.vz       IS first + 9  :
-  VAL p.wx       IS first + 10 :
-  VAL p.wy       IS first + 11 :
-  VAL p.wz       IS first + 12 :
-  VAL p.sizeu    IS first + 13 :
-  VAL p.sizev    IS first + 14 :
-
-  VAL p.map      IS first + 15 :  -- which map ( texture or bump)
-  VAL p.uoffs    IS first + 16 :  -- offsets for u and v in map
-  VAL p.voffs    IS first + 17 :
-  VAL p.size     IS first + 18 :
-
-  VAL first      IS o.specific :
-
-  VAL pxy.x        IS first + 0 : -- origin x of the plane
-  VAL pxy.y        IS first + 1 : -- origin y of the plane
-  VAL pxy.z        IS first + 2 : -- origin z of the plane
-  VAL pxy.sizex    IS first + 3 : -- bounding on x axis
-  VAL pxy.sizey    IS first + 4 : -- bounding on y axis
-  VAL pxy.map      IS first + 5 :  -- which map ( texture or bump)
-  VAL pxy.uoffs    IS first + 6 :  -- offsets for u and v in map
-  VAL pxy.voffs    IS first + 7 :
-  VAL pxy.size     IS first + 8 :
-
-  VAL first      IS o.specific :
-
-  VAL pxz.x        IS first + 0 : -- origin x of the plane
-  VAL pxz.y        IS first + 1 : -- origin y of the plane
-  VAL pxz.z        IS first + 2 : -- origin z of the plane
-  VAL pxz.sizex    IS first + 3 : -- bounding on x axis
-  VAL pxz.sizez    IS first + 4 : -- bounding on z axis
-  VAL pxz.map      IS first + 5 :  -- which map ( texture or bump)
-  VAL pxz.uoffs    IS first + 6 :  -- offsets for u and v in map
-  VAL pxz.voffs    IS first + 7 :
-  VAL pxz.size     IS first + 8 :
-
-  VAL first      IS o.specific :
-
-  VAL pyz.x        IS first + 0 : -- origin x of the plane
-  VAL pyz.y        IS first + 1 : -- origin y of the plane
-  VAL pyz.z        IS first + 2 : -- origin z of the plane
-  VAL pyz.sizey    IS first + 3 : -- bounding on y axis
-  VAL pyz.sizez    IS first + 4 : -- bounding on z axis
-  VAL pyz.map      IS first + 5 :  -- which map ( texture or bump)
-  VAL pyz.uoffs    IS first + 6 :  -- offsets for u and v in map
-  VAL pyz.voffs    IS first + 7 :
-  VAL pyz.size     IS first + 8 :
-
   VAL sizeWorld IS 1800 :  -- a sphere = 17 words + nextPtr,
                            -- giving 100 spheres
 
@@ -427,44 +318,13 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   :
 
 
-  -- note the declaration of big vectors OUTSIDE the scope of the
-  -- proc, pulling its variables down into internal RAM.
-  -- this also frees internal RAM for throughPut and pixelBypass
-
-  --
-  -- run data is a vector of
-  --
-  --  runData [0] ->  ambient R
-  --           1      ambient G
-  --           2      ambient B
-  --           3      rendering mode  -- m.adaptive / m.dumb / m.stochastic
-  --           4      patch size
-  --           5      scale factor    -- 1 2 or 4
-  --           6      screenOrg x
-  --           7                y
-  --           8                z
-  --           9      screen  dxX
-  --           10             dyX
-  --           11             dzX
-  --           12     screen  dxY
-  --           13             dyY
-  --           14             dzY
-  --           15     pinhole  x
-  --           16     pinhole  y
-  --           17     pinhole  z
-  --
-
+  
   [20] INT grunData :
-
-
-  [maxNodes][nodeSize] INT cleanTree :    -- for 5 this is 5 kbytes
 
 
   [sizeWorld] INT    gworldModel :
 
   [sizeLights] INT glights :
-  [gridSize][gridSize]  INT gsamples :
-
   [patchSize][patchSize] INT gcolours : -- these are the AREA-AVERAGED colours
                                         -- returned to the grafix cards,
                                         -- not the point samples
@@ -474,32 +334,15 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
     [20] INT runData IS grunData :
 
-    [3] REAL32 ambient RETYPES [ runData FROM 0 FOR 3 ] :
-
-    renderingMode IS runData [3] :
     runPatchSize  IS runData [4] :
-    scaleFactor   IS runData [5] :
 
-    [3] REAL32 screenOrg RETYPES [ runData FROM  6 FOR 3 ] :
-    [3] REAL32 screendX  RETYPES [ runData FROM  9 FOR 3 ] :
-    [3] REAL32 screendY  RETYPES [ runData FROM 12 FOR 3 ] :
-    [3] REAL32 pinhole   RETYPES [ runData FROM 15 FOR 3 ] :
-    [ treeSize] INT    tree  RETYPES cleanTree :
-
-    [ treeSize] REAL32 ftree RETYPES tree :
-
-    INT freeNode :
     [sizeWorld] INT worldModel IS gworldModel :
-    [sizeWorld] REAL32 fworld RETYPES worldModel : -- for floating point access
 
     INT world.p :  -- pointer used during construction of model
     [sizeLights] INT lights IS glights :
     [sizeLights] REAL32 flights RETYPES lights :
 
     INT light.p :  -- pointer used during construction of model
-
-    [gridSize ][gridSize] INT samples IS gsamples :
-    [gridSize * gridSize] INT rawSamples RETYPES samples :
 
     [patchSize][patchSize] INT colours IS gcolours :
 
