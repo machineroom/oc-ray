@@ -311,13 +311,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       graphics ! c.message; SIZE s; [ buffer FROM 0 FOR SIZE s ]
   :
 
-  PROC pumpWorldModels ( CHAN OF ANY out, CHAN OF INT image, VAL INT patchEdge, [256] INT buffer )
-    INT model :
-
-    SEQ
-      image ? model
-  :
-
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
     VAL patchesWide IS 256 / patchEdge :
     SEQ
@@ -425,7 +418,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
   CHAN OF ANY a, b, c :
   WHILE TRUE
     SEQ
-      pumpWorldModels ( out, image, patchEdge, buffer [0] )
       PAR
         sendPatches  ( a, patchEdge, buffer[3])
         outputBuffer ( b, out  )

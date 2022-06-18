@@ -21,40 +21,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
 
   VAL patchSize IS 16 :
 
-  PROC MenuSelection (CHAN OF INT image)
-    BYTE InKey, Result :
-    BOOL Selected :
-
-    SEQ
-      Selected := FALSE
-      so.write.string.nl(fs,ts,"                                                           ")
-      so.write.string.nl(fs,ts,"               RayTracer Image Selection                   ")
-      so.write.string.nl(fs,ts,"               =========================                   ")
-      so.write.string.nl(fs,ts,"                                                           ")
-      so.write.string.nl(fs,ts,"               <5>  (small) Cylinder, Sphere Image         ")
-      so.write.string.nl(fs,ts,"                                                           ")
-      so.write.string   (fs,ts," Your Selection ")                      
-
-      WHILE NOT (Selected)
-        SEQ
-          so.getkey(fs,ts,InKey,Result)
-          IF
-            (Result = spr.ok)
-              SEQ
-                IF
-                  ((InKey >= '1') AND (InKey <= '5'))
-                    SEQ
-                      image ! (INT InKey) - (INT '0')
-                      so.write.int(fs, ts, (INT InKey) - (INT '0'), 1)
-                      so.write.nl (fs, ts)
-                      Selected := TRUE
-                  TRUE
-                    SKIP
-            TRUE
-              SKIP
-  :
-                       
-
   ---------------------------- COMMANDS PROTOCOL -----------------------------
 
   VAL ticksPerSecond IS 625000 / 64 :  -- lo priority
@@ -97,7 +63,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       VAL ticks IS REAL32 TRUNC iticks :
       INT command :
       SEQ
-        MenuSelection(image)
         so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
         clock ? start
         fromRenderer ? command
