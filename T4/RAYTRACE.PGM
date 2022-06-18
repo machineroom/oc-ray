@@ -38,16 +38,15 @@ CONFIG
   PLACE frame.in, frame.out ON Hostlink :
   [workers]CHAN OF ANY forward, back :
   CHAN OF ANY graphics, soft :
-  CHAN OF INT image :
 
   VAL true      IS #FFFF :
   VAL false     IS #0000 :
 
   PAR
     PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, image, workers, 50, 34500, 0, 25000000)
+      frameBuffer (frame.in, frame.out, graphics, workers)
     PROCESSOR cntlsys.p
-      controlSystem (forward[0], back[0], graphics, image, workers)
+      controlSystem (forward[0], back[0], graphics, workers)
     PAR i = 0 FOR workers-1
       PROCESSOR raytrace.p[i]
         rayTrace (forward[i], back[i], back[i+1], forward[i+1], true, i)

@@ -4,9 +4,7 @@
 #USE "hostio.lib"
 #USE "streamio.lib"
 
-PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image, 
-                  VAL INT processors,
-                  VAL INT frameRate, lineFreq, interLace, pixelClock )
+PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
   

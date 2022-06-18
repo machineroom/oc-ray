@@ -1,4 +1,4 @@
-PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT machines )
+PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
   VAL c.stop        IS 0 :
