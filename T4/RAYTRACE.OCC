@@ -205,7 +205,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
     [20] INT runData IS grunData :
 
-    runPatchSize  IS runData [4] :
+    VAL runPatchSize IS 8 :
 
     [sizeWorld] INT worldModel IS gworldModel :
 
@@ -339,24 +339,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ y = 0 FOR runPatchSize
                   pixelsOut ! [ colours [y] FROM 0 FOR runPatchSize ]
                 done ! 42
-            command = c.object
-              SEQ
-                nobj := nobj + 1
-                workIn ? worldModel [ world.p];
-                       [ worldModel FROM world.p + 1 FOR worldModel [ world.p]]
-                world.p := world.p + (worldModel [ world.p] + 1)
-            command = c.light
-              REAL32 hyp :
-              SEQ
-                nlight := nlight + 1
-                workIn ? lights [ light.p] ;
-                       [ lights FROM light.p + 1 FOR lights [ light.p]]
-            command = c.runData
-              INT size :
-              SEQ
-                workIn ? size; [ runData FROM 0 FOR size ]
-                lights     [ light.p] := nil
-                worldModel [ world.p] := nil
             TRUE
               SEQ
                 writef ( "Worker %I received garbage command %I", me, command, 0,0)
