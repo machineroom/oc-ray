@@ -61,10 +61,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                   return   ? x; y; size
                   writes ( "CNTLSYS R patch got x,y,size", buffer)
                   graphics ! command; x; y; size
-                  SEQ i = 0 FOR size
-                    SEQ
-                      return   ? [ buffer FROM 0 FOR size ]
-                      graphics ! [ buffer FROM 0 FOR size ]
                   writes ( "CNTLSYS R patch sent x,y,size", buffer)
                   free := free + 1
               command = c.message
@@ -107,10 +103,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               SEQ
                 in  ? x; y; size
                 out ! command; x; y; size
-                SEQ i = 0 FOR size
-                  SEQ
-                    in  ? [ buffer FROM 0 FOR size ]
-                    out ! [ buffer FROM 0 FOR size ]
             command = c.message
               INT size :
               SEQ

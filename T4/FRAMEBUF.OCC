@@ -35,11 +35,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
             [16][16] INT patch :
             SEQ
               in ? x; y; size
-              SEQ i = 0 FOR size
-                in ? [ patch [i] FROM 0 FOR size ]
               fromRenderer ! command; x; y; size
-              SEQ i = 0 FOR size
-                fromRenderer ! [ patch [i] FROM 0 FOR size ]
           command = c.message
             INT size :
             [256] INT chars :
@@ -51,18 +47,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
     SEQ
       ---------------------------- DO THE ACTION ---------------------------
 
-      TIMER clock :
-      INT start, end :
-
-      REAL32 realTime, realTicks :
-
-      VAL uSecsPerTick IS 64 :
-      VAL iticks       IS 1000000 / 64 :
-      VAL ticks IS REAL32 TRUNC iticks :
       INT command :
       SEQ
         so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
-        clock ? start
         fromRenderer ? command
         WHILE command <> c.stop
           SEQ
@@ -79,17 +66,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
                   so.write.string (fs, ts, ",size=")
                   so.write.int (fs, ts, size, 1)
                   so.write.string.nl (fs, ts, "")
-                  SEQ i = 0 FOR size
-                    fromRenderer ? [ patch [i] FROM 0 FOR size ]
               command = c.message
                 INT size :
                 [256] INT chars :
                 [256] BYTE OutString : 
                 SEQ
                   fromRenderer ? size; [ chars FROM 0 FOR size ]
-                  --so.write.string (fs, ts, "FB cmd fsize ")
-                  --so.write.int (fs, ts, size, 1)
-                  --so.write.string.nl (fs, ts, "")
                   SEQ i = 0 FOR size   
                     OutString[i] := BYTE (chars[i] /\ #FF)
                   so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
@@ -97,20 +79,10 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
                 SEQ
                   so.write.string.nl (fs, ts,"FB GARBAGE COMMAND")
                   STOP
-            --so.write.string.nl (fs, ts, "FB await command")
             fromRenderer ? command
-        clock ? end
         SEQ
-          realTicks := REAL32 TRUNC (end MINUS start)
-          realTime  := realTicks / ticks
+          so.write.string (fs, ts, " DONE!!!! ")
           so.write.nl (fs, ts)
-          so.write.string (fs, ts, " DONE, took ")
-          so.write.real32 (fs,ts, realTime, 5, 2)
-          so.write.string (fs,ts, " seconds on ")
-          so.write.int (fs,ts, processors, 2)
-          so.write.string.nl (fs, ts, " processors.")
-        clock ? start
-        clock ? AFTER (start PLUS (20 * iticks))
 
       INT32 Status :
       SEQ

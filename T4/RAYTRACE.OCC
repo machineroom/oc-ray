@@ -101,10 +101,10 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   in  ? x; y; size
                   out ! command; x; y; size
-                  SEQ i = 0 FOR size
-                    SEQ
-                      in  ? [ pixels FROM 0 FOR size ]
-                      out ! [ pixels FROM 0 FOR size ]
+                  --SEQ i = 0 FOR size
+                  --  SEQ
+                  --    in  ? [ pixels FROM 0 FOR size ]
+                  --    out ! [ pixels FROM 0 FOR size ]
               command = c.message
                 SEQ
                   in  ? size; [ pixels FROM 0 FOR size ]
@@ -143,7 +143,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     SEQ
                       fromOther ? x; y; size
                       out ! command; x; y; size
-                      pass ( fromOther, out )
                   command = c.stop
                     state := state >< lubOther
             fromThis ? command
@@ -157,7 +156,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     SEQ
                       fromThis ? x; y; size
                       out ! command; x; y; size
-                      pass ( fromThis, out )
                   command = c.stop
                     state := state >< lubThis
         out ! c.stop
@@ -289,8 +287,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 workIn ? x0; y0
                 writef ( "Worker %I done on %I %I", me, x0, y0, 0 )
                 pixelsOut ! c.patch; x0; y0; runPatchSize
-                SEQ y = 0 FOR runPatchSize
-                  pixelsOut ! [ colours [y] FROM 0 FOR runPatchSize ]
                 done ! 42
             TRUE
               SEQ
