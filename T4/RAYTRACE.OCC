@@ -15,24 +15,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   VAL nil       IS -1 :
 
-  -- the attribute word contains gross attributes of the object as
-  -- bits. The relevant words in the object descriptor expand upon these
-
-  VAL sizeWorld IS 1800 :  -- a sphere = 17 words + nextPtr,
-                           -- giving 100 spheres
-
-  VAL l.dx   IS 3 :   -- light direction cosines x y z
-  
-  VAL l.size IS 6 :
-
-  -- each light is |nextPtr|r|g|b|dx|dy|dz
-
-  VAL sizeLight  IS  7 :
-
-  VAL maxLights  IS 10 :   -- any more than 2 is hell to shade !!
-
-  VAL sizeLights IS sizeLight * maxLights :
-
   PROC throughPut ( [256] INT work,
                     CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
                     VAL INT propogate )
@@ -187,15 +169,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       buffer ( buffers [1], fromThis, lubThis)
       mix    ( buffers [2], lubOther, lubThis, toPrev)
   :
-
-
   
-  [20] INT grunData :
-
-
-  [sizeWorld] INT    gworldModel :
-
-  [sizeLights] INT glights :
   [patchSize][patchSize] INT gcolours : -- these are the AREA-AVERAGED colours
                                         -- returned to the grafix cards,
                                         -- not the point samples
@@ -203,17 +177,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
 
   PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
-    [20] INT runData IS grunData :
-
     VAL runPatchSize IS 8 :
-
-    [sizeWorld] INT worldModel IS gworldModel :
-
-    INT world.p :  -- pointer used during construction of model
-    [sizeLights] INT lights IS glights :
-    [sizeLights] REAL32 flights RETYPES lights :
-
-    INT light.p :  -- pointer used during construction of model
 
     [patchSize][patchSize] INT colours IS gcolours :
 
@@ -314,8 +278,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     INT command :
     SEQ
       command := 0         -- clear command for when i move to bytes
-      world.p := 0         -- empty world model
-      light.p := 0         -- and lights list
       mess.p  := 0         -- clear debug message
       workIn ? command     -- (eventually) pull in 1 byte
       WHILE command <> c.stop
