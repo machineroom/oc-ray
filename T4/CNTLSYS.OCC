@@ -312,87 +312,10 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
   :
 
   PROC pumpWorldModels ( CHAN OF ANY out, CHAN OF INT image, VAL INT patchEdge, [256] INT buffer )
-    [30] INT temp :
-    [30] REAL32 ftemp RETYPES temp :
-    VAL root.2 IS 1.414213562 (REAL32):
-    VAL root.2.2 IS 0.7071067810 (REAL32):
     INT model :
 
     SEQ
       image ? model
-      IF
-        (model = 5)                               -- SMALL cylinder and sphere image for TESTING
-          SKIP 
-      VAL cosTheta IS 0.93969 (REAL32) :
-      VAL sinTheta IS 0.34202 (REAL32) :
-      VAL sin.256  IS sinTheta * 256.0 (REAL32) :
-      VAL cos.256  IS cosTheta * 256.0 (REAL32) :
-      VAL offX IS 0.0 (REAL32) :
-      VAL offY IS 0.0 (REAL32) :
-      VAL offZ IS 0.0 (REAL32) :
-      SEQ
-        --renderingMode := m.dumb
-        renderingMode := m.adaptive
-        runPatchSize  := patchEdge
-        scaleFactor   := 1
-
-        ambient   [0] := 266.0 (REAL32)
-        ambient   [1] := 266.0 (REAL32)
-        ambient   [2] := 280.0 (REAL32)
-
-        screenOrg [0] := offX - 256.0 (REAL32)
-        screenOrg [1] := offY - 256.0 (REAL32)
-        screenOrg [2] := offZ + 0.0 (REAL32)
-
-        screendX  [0] := 1.0 (REAL32)
-        screendX  [1] := 0.0 (REAL32)
-        screendX  [2] := 0.0 (REAL32)
-
-        screendY  [0] := 0.0 (REAL32)
-        screendY  [1] := 1.0 (REAL32) -- cosTheta
-        screendY  [2] := 0.0 (REAL32) -- sinTheta
-
-        pinhole   [0] := offX + 0.0 (REAL32)
-        pinhole   [1] := offY + 0.0 (REAL32) -- - (1024.0 (REAL32) * cosTheta)
-        pinhole   [2] := offZ + 1024.0 (REAL32) -- (1024.0 (REAL32) * cosTheta)
-
-        out ! c.runData; 20; [ runData FROM 0 FOR 20 ]
-
-      --VAL cosTheta IS 0.93969 (REAL32) :
-      --VAL sinTheta IS 0.34202 (REAL32) :
-      --VAL sin.256  IS sinTheta * 256.0 (REAL32) :
-      --VAL cos.256  IS cosTheta * 256.0 (REAL32) :
-      --VAL offX IS 0.0 (REAL32) :
-      --VAL offY IS 0.0 (REAL32) :
-      --VAL offZ IS 0.0 (REAL32) :
-      --SEQ
-      --  --renderingMode := m.dumb
-      --  renderingMode := m.adaptive
-      --  runPatchSize  := patchEdge
-      --  scaleFactor   := 1
-
-      --  ambient   [0] := 236.0 (REAL32)
-      --  ambient   [1] := 236.0 (REAL32)
-      --  ambient   [2] := 270.0 (REAL32)
-
-      --  screenOrg [0] := offX - 256.0 (REAL32)
-      --  screenOrg [1] := offY - 256.0 (REAL32)
-      --  screenOrg [2] := offZ + 0.0 (REAL32)
-
-      --  screendX  [0] := 1.0 (REAL32)
-      --  screendX  [1] := 0.0 (REAL32)
-      --  screendX  [2] := 0.0 (REAL32)
-
-      --  screendY  [0] := 0.0 (REAL32)
-      --  screendY  [1] := 1.0 (REAL32) -- cosTheta
-      --  screendY  [2] := 0.0 (REAL32) -- sinTheta
-
-      --  pinhole   [0] := offX + 0.0 (REAL32)
-      --  pinhole   [1] := offY + 0.0 (REAL32) -- - (1024.0 (REAL32) * cosTheta)
-      --  pinhole   [2] := offZ + 1024.0 (REAL32) -- (1024.0 (REAL32) * cosTheta)
-
-      --  out ! c.runData; 20; [ runData FROM 0 FOR 20 ]
-      writes ( "CNTLSYS run data", buffer)
   :
 
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
