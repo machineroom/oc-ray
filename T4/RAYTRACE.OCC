@@ -4,6 +4,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   #USE "occama.lib"     --T414 math library
   --#USE "occam8.lib"     --T8xx math library
 
+  VAL patchSize IS 16 :
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- render; x0; y0
   VAL c.object  IS 2 :  -- object; size; [ size ]
@@ -14,68 +15,14 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   VAL nil       IS -1 :
 
-  VAL n.red   IS 18 :
-  VAL n.green IS 19 :
-  VAL n.blue  IS 20 :
-
-  VAL nodeSize IS n.blue + 1 :
-
-  VAL maxDepth IS 6 :
-  VAL maxNodes IS 4 + (2 << maxDepth) :  -- traverse tree 5 deep max,
-                                         -- PLUS 4 for good measure
-  VAL treeSize  IS nodeSize * maxNodes : -- shadow generation
-
   -- the attribute word contains gross attributes of the object as
   -- bits. The relevant words in the object descriptor expand upon these
 
-  VAL a.spec     IS #01 :  -- use lambert / use phong and reflect
-  VAL a.frac     IS #02 :  -- refract on surface
-  VAL a.bound0   IS #04 :  -- bounded in 1 dimension
-  VAL a.bound1   IS #08 :  -- bounded in 2 dimension
-  VAL a.tex      IS #10 :  -- texture map ?
-  VAL a.bump     IS #20 :  -- bump map    ?
-
-  VAL o.type     IS  0 : -- type field of all objects
-  VAL o.attr     IS  1 : -- attribute field of all object
-
-  VAL o.kdR      IS  2 :  -- coeffs of diffuse reflection R G B
-  VAL o.kdG      IS  3 :
-  VAL o.kdB      IS  4 :
-
-  VAL o.ks       IS  5 :  -- coeff of specular reflection ( for reflections)
-
-  VAL o.kg       IS  6 :  -- coeff of gloss for phong shading
-  VAL o.xmitR    IS  7 :  -- coeffs of transmission R G B
-  VAL o.xmitG    IS  8 :
-  VAL o.xmitB    IS  9 :
-
-  VAL o.power    IS 10 :  -- power for phong shading
-  VAL o.refix    IS 11 :  -- refractive index (relative)
-
-  VAL o.specific IS 12 :
-
-  VAL first      IS o.specific :
-
-  VAL s.rad      IS  first + 0 :
-  VAL s.x        IS  first + 1 :
-  VAL s.y        IS  first + 2 :
-  VAL s.z        IS  first + 3 :
-
-  VAL s.map      IS  first + 4 :  -- which map ( texture or bump)
-  VAL s.uoffs    IS  first + 5 :  -- offsets for u and v in map
-  VAL s.voffs    IS  first + 6 :
-  VAL s.size     IS  first + 7 :
   VAL sizeWorld IS 1800 :  -- a sphere = 17 words + nextPtr,
                            -- giving 100 spheres
 
-  VAL l.ir   IS 0 :   -- light intensity fields  R G B
-  VAL l.ig   IS 1 :
-  VAL l.ib   IS 2 :
-
   VAL l.dx   IS 3 :   -- light direction cosines x y z
-  VAL l.dy   IS 4 :   -- this is a quick'n'tacky shading sheme
-  VAL l.dz   IS 5 :
-
+  
   VAL l.size IS 6 :
 
   -- each light is |nextPtr|r|g|b|dx|dy|dz
@@ -85,32 +32,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL maxLights  IS 10 :   -- any more than 2 is hell to shade !!
 
   VAL sizeLights IS sizeLight * maxLights :
-
-  VAL maxDescend   IS 2 :    -- this is a space limitation on the sub-pixel
-                             -- grid rather than a compute saver
-  VAL descendPower IS 4 :    -- 2 ^^ maxDescend
-
-  VAL patchSize IS 16 :
-  VAL gridSize  IS ((patchSize + 1) * descendPower) + 1 :
-
-  VAL mint  IS MOSTNEG INT :
-
-  -- colours are nr | 10 blue bits | 10 green bits | 10 red bits |
-
-  VAL threshold   IS 10 << 2 : -- this is 10 on a scale of 256, but we
-  VAL colourBits  IS 10 :      -- generate 10 bits
-
-  VAL rMask       IS (1 << colourBits) - 1 :
-  VAL gMask       IS rMask    << colourBits :
-  VAL bMask       IS gMask    << colourBits :
-
-  VAL rMaxDiff    IS threshold :               -- threshold values for
-  VAL gMaxDiff    IS rMaxDiff << colourBits :  -- instancing super sample
-  VAL bMaxDiff    IS gMaxDiff << colourBits :
-
-  VAL notRendered IS mint :  -- top bit set = not rendered
-
-
 
   PROC throughPut ( [256] INT work,
                     CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
@@ -296,19 +217,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
     [patchSize][patchSize] INT colours IS gcolours :
 
-
-    PROC normalize ( [3] REAL32 vector, REAL32 oldHyp )
-      REAL32 t :
-      SEQ
-        t :=  (vector [0] * vector [0]) +
-             ((vector [1] * vector [1]) +
-              (vector [2] * vector [2]))
-        oldHyp := SQRT( t )
-        vector [0] := vector [0] / oldHyp
-        vector [1] := vector [1] / oldHyp
-        vector [2] := vector [2] / oldHyp
-    :
-
     [256] INT message :
     INT mess.p :
 
@@ -443,8 +351,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 nlight := nlight + 1
                 workIn ? lights [ light.p] ;
                        [ lights FROM light.p + 1 FOR lights [ light.p]]
-                normalize ( [ flights FROM light.p + (l.dx + 1) FOR 3 ], hyp )
-                light.p := light.p + (lights [ light.p] + 1)
             command = c.runData
               INT size :
               SEQ
