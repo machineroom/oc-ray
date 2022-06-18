@@ -37,7 +37,6 @@ CONFIG
   CHAN OF SP frame.in, frame.out :
   PLACE frame.in, frame.out ON Hostlink :
   [workers]CHAN OF ANY forward, back :
-  CHAN OF ANY f,b :
   CHAN OF ANY graphics, soft :
   CHAN OF INT image :
 

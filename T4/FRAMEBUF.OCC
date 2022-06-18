@@ -643,6 +643,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                 [256] BYTE OutString : 
                 SEQ
                   fromRenderer ? size; [ chars FROM 0 FOR size ]
+                  --so.write.string (fs, ts, "FB cmd fsize ")
+                  --so.write.int (fs, ts, size, 1)
+                  --so.write.string.nl (fs, ts, "")
                   SEQ i = 0 FOR size   
                     OutString[i] := BYTE (chars[i] /\ #FF)
                   so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
