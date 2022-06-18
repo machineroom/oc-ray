@@ -12,43 +12,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- message; size; [ words ]
 
-  VAL m.adaptive   IS 0 :
-  VAL m.stochastic IS 1 :
-  VAL m.dumb       IS 2 :
-  VAL m.test       IS 3 :
-
   VAL nil       IS -1 :
-
-  VAL n.reflect IS 0 :        -- point to children
-  VAL n.refract IS 1 :
-  VAL n.next    IS 2 :        -- maintain linked list of leaf nodes
-  VAL n.type    IS 3 :        -- reflected, refracted or primary ray
-
-  -- Valid ray types for n.type slot
-
-  VAL rt.root IS 0 :   -- only first ray is of this type
-  VAL rt.spec IS 1 :   -- reflected ray
-  VAL rt.frac IS 2 :   -- transmitted ray
-
-  VAL n.objptr  IS 4 :        -- pointer into world model for intersect
-
-  VAL n.sectx   IS 5 :        -- point of intersection
-  VAL n.secty   IS 6 :
-  VAL n.sectz   IS 7 :
-
-  VAL n.normx   IS 8 :        -- surface normal at point of intersection
-  VAL n.normy   IS 9 :
-  VAL n.normz   IS 10 :
-
-  VAL n.t       IS 11 :       -- distance parameter 't' of intersection
-
-  VAL n.startx  IS 12 :       -- ray origin
-  VAL n.starty  IS 13 :
-  VAL n.startz  IS 14 :
-
-  VAL n.dx      IS 15 :       -- ray direction
-  VAL n.dy      IS 16 :
-  VAL n.dz      IS 17 :
 
   VAL n.red   IS 18 :
   VAL n.green IS 19 :
@@ -60,20 +24,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL maxNodes IS 4 + (2 << maxDepth) :  -- traverse tree 5 deep max,
                                          -- PLUS 4 for good measure
   VAL treeSize  IS nodeSize * maxNodes : -- shadow generation
-
-  VAL o.sphere    IS 0 :
-  VAL o.xyplane   IS 1 :
-  VAL o.xzplane   IS 2 :
-  VAL o.yzplane   IS 3 :
-  VAL o.plane     IS 4 :
-  VAL o.cone      IS 5 :
-  VAL o.cylinder  IS 6 :
-  VAL o.ellipsoid IS 7 :
-  VAL o.quadric   IS 8 : -- general quadric, hell to compute
-
-  VAL x.axis     IS  0 :
-  VAL y.axis     IS  1 :
-  VAL z.axis     IS  2 :
 
   -- the attribute word contains gross attributes of the object as
   -- bits. The relevant words in the object descriptor expand upon these
