@@ -322,30 +322,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       image ? model
       IF
         (model = 5)                               -- SMALL cylinder and sphere image for TESTING
-          SEQ
-            temp  [ o.type] := o.cylinder
-            temp  [ o.attr] := a.spec
-            ftemp [  o.kdR] :=     0.3        (REAL32)
-            ftemp [  o.kdG] :=     0.3        (REAL32)
-            ftemp [  o.kdB] :=     0.03       (REAL32)
-            ftemp [   o.ks] :=     0.9        (REAL32)
-            ftemp [   o.kg] :=     0.95       (REAL32)
-            ftemp [    c.x] :=   0.0        (REAL32)
-            ftemp [    c.y] :=  -500.0        (REAL32)
-            ftemp [    c.z] := 10900.0        (REAL32)
-            ftemp [  c.a11] :=     1.0  (REAL32)
-            ftemp [  c.a12] :=     0.0  (REAL32)
-            ftemp [  c.a13] :=     0.0  (REAL32)
-            ftemp [  c.a21] :=   ( 0.0  (REAL32))
-            ftemp [  c.a22] :=   (-1.0   (REAL32)) 
-            ftemp [  c.a23] :=     2.5  (REAL32)
-            ftemp [  c.a31] :=     0.0  (REAL32)
-            ftemp [  c.a32] :=     1.0  (REAL32)
-            ftemp [  c.a33] :=   -0.6   (REAL32)
-            ftemp [  c.rad] :=   3.0        (REAL32)
-            ftemp [  c.len] :=   800.0        (REAL32)
-            out ! c.object;  c.size; [ temp FROM 0 FOR   c.size ]
-        TRUE
           SKIP 
       VAL cosTheta IS 0.93969 (REAL32) :
       VAL sinTheta IS 0.34202 (REAL32) :
