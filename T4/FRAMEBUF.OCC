@@ -8,42 +8,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                   VAL INT processors,
                   VAL INT frameRate, lineFreq, interLace, pixelClock )
 
-  [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
-  
-  PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
-    VAL y.y IS (y + y) - 256 :
-    VAL x.x IS (x + x) - 256 :
-    INT ptr, flip :
-    BOOL display :
-    SEQ
-      ptr := ((511 - y.y) << 9) + x.x
-
-      [512*512] BYTE iscreen RETYPES screenRAM :
-      SEQ j = 0 FOR size
-        pLine IS patch [j] :
-        INT lptr :
-        SEQ
-          lptr := ptr
-          SEQ i = 0 FOR size    -- inner loop in x
-            VAL colour IS pLine [i] :
-            INT r, g, b :
-            SEQ
-              -- word is xxbbbbbbbbbbggggggggggrrrrrrrrrr
-              r := (colour >>  2) /\ #FF -- bottom 8 bits
-              g := (colour >> 12) /\ #FF
-              b := (colour >> 22) /\ #FF
-
-              iscreen [     lptr] := BYTE r
-              iscreen [   lptr+1] := BYTE g
-              iscreen [ lptr-512] := BYTE b
-              iscreen [ lptr-511] := BYTE 0
-
-              lptr := lptr + 2
-          ptr := ptr - 1024
-  :
-
-
-    ---------------------------- COMMANDS PROTOCOL -----------------------------
+  ---------------------------- COMMANDS PROTOCOL -----------------------------
   
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- render; x0; y0
@@ -120,15 +85,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
           command = c.stop
             fromRenderer ! command
     SEQ
-      ---------------------------- MAX COLOUR ------------------------------
-      [512] BYTE line :
-      SEQ
-        SEQ i = 0 FOR 256
-          line [i] := BYTE i
-        [ line FROM 256 FOR 256 ] := [ line FROM 0 FOR 256 ]
-        SEQ y = 0 FOR 512
-          screenRAM [y] := line
-
       ---------------------------- DO THE ACTION ---------------------------
 
       TIMER clock :
@@ -162,7 +118,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                   so.write.string.nl (fs, ts, "")
                   SEQ i = 0 FOR size
                     fromRenderer ? [ patch [i] FROM 0 FOR size ]
-                  displayPatch ( x, y, size, patch )
               command = c.message
                 INT size :
                 [256] INT chars :
