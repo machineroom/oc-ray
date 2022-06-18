@@ -311,17 +311,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     :
 
 
-    VAL ticksPerSecond IS 625000 / 64 :  -- lo priority
     INT command :
-    INT nrays, nobj, nlight, secs, ticks, then :
-    TIMER TIME :
     SEQ
-      secs    := 0
-      ticks   := 0
-      TIME ? then
-      nrays   := 0
-      nobj    := 0
-      nlight  := 0
       command := 0         -- clear command for when i move to bytes
       world.p := 0         -- empty world model
       light.p := 0         -- and lights list
@@ -343,22 +334,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
               SEQ
                 writef ( "Worker %I received garbage command %I", me, command, 0,0)
                 STOP
-          INT now, delay :
-          SEQ
-            TIME ? now
-            delay := now MINUS then
-            IF
-              delay > ticksPerSecond
-                SEQ
-                  secs  := secs + (delay / ticksPerSecond)
-                  ticks := delay \ ticksPerSecond
-                  then  := now PLUS ticks
-              TRUE
-                SKIP
           workIn ? command
-      writef ( "Worker %I DONE in %I seconds, scene of %I objects",
-        me, secs, nobj, 0 )
-      writef ( "Worker %I, %I lights traced %I rays", me, nlight, nrays, 0 )
+      writef ( "Worker %I DONE", me, 0,0,0 )
       pixelsOut ! command
   :
 
