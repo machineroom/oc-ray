@@ -32,22 +32,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
               in ? worker; x; y; size
               so.write.string (fs, ts, "FB patch from worker ")
               so.write.int (fs, ts, worker, 1)
-              so.write.string (fs, ts, ",x=")
-              so.write.int (fs, ts, x, 1)
-              so.write.string (fs, ts, ",y=")
-              so.write.int (fs, ts, y, 1)
-              so.write.string (fs, ts, ",size=")
-              so.write.int (fs, ts, size, 1)
-              so.write.string.nl (fs, ts, "")
-          command = c.message
-            INT size :
-            [256] INT chars :
-            [256] BYTE OutString : 
-            SEQ
-              in ? size; [ chars FROM 0 FOR size ]
-              SEQ i = 0 FOR size   
-                OutString[i] := BYTE (chars[i] /\ #FF)
-              so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
+              so.write.string.nl(fs, ts, "")
           command = c.done
             INT worker :
             SEQ

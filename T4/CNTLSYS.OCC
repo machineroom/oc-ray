@@ -10,13 +10,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   VAL c.message     IS 6 :  -- size; [ words ]
   VAL c.done        IS 7 :  -- worker
 
-  PROC writes ( VAL [] BYTE s, [256] INT buffer )
-    SEQ
-      SEQ i = 0 FOR SIZE s
-        buffer [i] := INT s [i]
-      graphics ! c.message; SIZE s; [ buffer FROM 0 FOR SIZE s ]
-  :
-
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
     VAL patchesWide IS 256 / patchEdge :
     SEQ
@@ -42,13 +35,11 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               command = c.render
                 INT x, y :
                 SEQ
-                  writes ( "CNTLSYS S c.render to system", buffer)
                   in  ? x; y
                   out ! command; x; y
                   free := free - 1
               command = c.stop
                 SEQ
-                  writes ( "CNTLSYS R c.stop from pumper", buffer)
                   out ! c.stop
                   passActive := FALSE
           return ? command
@@ -56,17 +47,9 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               command = c.patch
                 INT worker, x, y, size :
                 SEQ
-                  writes ( "CNTLSYS R patch", buffer)
                   return   ? worker; x; y; size
-                  writes ( "CNTLSYS R patch got x,y,size", buffer)
                   graphics ! command; worker; x; y; size
-                  writes ( "CNTLSYS R patch sent x,y,size", buffer)
                   free := free + 1
-              command = c.message
-                INT size :
-                SEQ
-                  return   ? size; [ buffer FROM 0 FOR size ]
-                  graphics ! command; size; [ buffer FROM 0 FOR size ]
               command = c.done
                 INT worker :
                 SEQ
@@ -75,7 +58,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               command = c.stop
                 SEQ
                   farmActive := FALSE
-                  writes ( "CNTLSYS received c.stop", buffer)
       graphics ! c.stop
   :
 
@@ -107,11 +89,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               SEQ
                 in  ? worker; x; y; size
                 out ! command; worker; x; y; size
-            command = c.message
-              INT size :
-              SEQ
-                in ? size; [ buffer FROM 0 FOR size ]
-                out ! command; size; [ buffer FROM 0 FOR size ]
             command = c.done
               INT worker :
               SEQ

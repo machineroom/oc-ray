@@ -100,10 +100,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   in  ? worker; x; y; size
                   out ! command; worker; x; y; size
-              command = c.message
-                SEQ
-                  in  ? size; [ pixels FROM 0 FOR size ]
-                  out ! command; size; [ pixels FROM 0 FOR size ]
               command = c.done
                 SEQ
                   in  ? worker
@@ -127,10 +123,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
             fromOther ? command
               SEQ
                 IF
-                  command = c.message
-                    SEQ
-                      fromOther ? size; [ pixels FROM 0 FOR size ]
-                      out ! command; size; [ pixels FROM 0 FOR size ]
                   command = c.patch
                     SEQ
                       fromOther ? worker; x; y; size
@@ -144,10 +136,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
             fromThis ? command
               SEQ
                 IF
-                  command = c.message
-                    SEQ
-                      fromThis ? size; [ pixels FROM 0 FOR size ]
-                      out ! command; size; [ pixels FROM 0 FOR size ]
                   command = c.patch
                     SEQ
                       fromThis ? worker; x; y; size
