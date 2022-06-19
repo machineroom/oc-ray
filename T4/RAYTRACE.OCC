@@ -20,7 +20,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   PROC throughPut ( [256] INT work,
                     CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
                     VAL INT propogate )
-
+    -- \/ bitwise OR
+    -- /\ bitwise AND
+    -- state is a bitfield
     VAL closeDown     IS 0 :
     VAL active        IS 1 :
     VAL busy          IS 2 :

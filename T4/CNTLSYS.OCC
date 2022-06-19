@@ -2,6 +2,13 @@
 -- graphics is output to framebuf
 -- machines is total number of workers
 
+-- upstream commands:
+--    c.render
+-- downstream command:
+--    c.patch
+--    c.message
+--    c.done
+
 PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
@@ -64,6 +71,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       graphics ! c.stop
   :
 
+  -- send messages downstream (towards 1st worker)
   PROC outputBuffer ( CHAN OF ANY in, out )
     INT command :
     SEQ
@@ -80,6 +88,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       out ! command
   :
 
+  -- send messages upstream (from 1st worker, to framebuf)
   PROC returnBuffer ( CHAN OF ANY in, out )
     INT command :
     SEQ
