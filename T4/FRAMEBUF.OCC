@@ -4,6 +4,8 @@
 #USE "hostio.lib"
 #USE "streamio.lib"
 
+-- fs, ts are host link
+-- in is from cntlsys
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
   VAL c.stop    IS 0 :

@@ -1,3 +1,7 @@
+-- out, back is link to first worker
+-- graphics is output to framebuf
+-- machines is total number of workers
+
 PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
@@ -10,7 +14,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   VAL c.message     IS 6 :  -- size; [ words ]
   VAL c.done        IS 7 :  -- worker
 
-  PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
+  PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge)
     VAL patchesWide IS 256 / patchEdge :
     SEQ
       SEQ x = 0 FOR patchesWide
@@ -20,8 +24,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   :
 
   PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
-                     VAL INT machines,
-                     [256] INT buffer )
+                     VAL INT machines)
     BOOL passActive, farmActive :
     INT free, command :
     SEQ
@@ -77,7 +80,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       out ! command
   :
 
-  PROC returnBuffer ( CHAN OF ANY in, out, [256] INT buffer )
+  PROC returnBuffer ( CHAN OF ANY in, out )
     INT command :
     SEQ
       in ? command
@@ -99,14 +102,13 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   :
 
   VAL patchEdge IS 8 :
-  [4][256] INT buffer :
   CHAN OF ANY a, b, c :
   WHILE TRUE
     SEQ
       PAR
-        sendPatches  ( a, patchEdge, buffer[3])
+        sendPatches  ( a, patchEdge)
         outputBuffer ( b, out  )
-        returnBuffer ( back, c, buffer [1] )
-        loadBalance  ( a, b, c, graphics, machines, buffer [2] )
+        returnBuffer ( back, c )
+        loadBalance  ( a, b, c, graphics, machines )
 :
 

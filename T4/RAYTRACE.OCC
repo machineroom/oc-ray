@@ -1,10 +1,13 @@
+-- workers are arranged in a linked list
+-- fromPrev, toPrev link to previous worker (or cntlsys for worker 0)
+-- fromNext, toNext link to next worker (or nowhere is last worker)
+-- propogate will be true for all but the last worker
+
 PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     VAL INT propogate, me )
 
   #USE "occama.lib"     --T414 math library
-  --#USE "occam8.lib"     --T8xx math library
 
-  VAL patchSize IS 16 :
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- x0; y0
   VAL c.object  IS 2 :  -- size; [ size ]
@@ -86,9 +89,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
 
 
-  PROC pixelBypass ( [3][256] INT buffers,
-                     CHAN OF ANY toPrev, fromNext, fromThis)
-    PROC buffer ( [256] INT pixels, CHAN OF ANY in, out )
+  PROC pixelBypass ( CHAN OF ANY toPrev, fromNext, fromThis)
+    PROC buffer ( CHAN OF ANY in, out )
       INT command :
       SEQ
         in ? command
@@ -109,7 +111,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     :
 
 
-    PROC mix ( [256] INT pixels, CHAN OF ANY fromOther, fromThis, out)
+    PROC mix ( CHAN OF ANY fromOther, fromThis, out)
       INT  state, command, x, y, size, worker :
 
       VAL closeDown  IS 0 :
@@ -151,9 +153,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
     CHAN OF ANY lubThis, lubOther :
     PAR
-      buffer ( buffers [0], fromNext, lubOther)
-      buffer ( buffers [1], fromThis, lubThis)
-      mix    ( buffers [2], lubOther, lubThis, toPrev)
+      buffer ( fromNext, lubOther)
+      buffer ( fromThis, lubThis)
+      mix    ( lubOther, lubThis, toPrev)
   :
   
   PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
@@ -190,7 +192,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         throughPut  ( buffers [0],
                       fromPrev, toNext, feedPixels, pixelTrigger,
                       propogate )
-        pixelBypass ( [ buffers FROM 0 FOR 3], toPrev, fromNext,  pixelsOut )
+        pixelBypass ( toPrev, fromNext,  pixelsOut )
       renderer   ( feedPixels, pixelsOut, pixelTrigger )
 :
 
