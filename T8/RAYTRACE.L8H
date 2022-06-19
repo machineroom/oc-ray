@@ -1,8 +1,0 @@
---
--- imakef : Version 3.79, 08 December 1992
---
--- linker command file "raytrace.l8h"
---
-raytrace.t8h
-occam8.lib
-#INCLUDE occam8.lnk
