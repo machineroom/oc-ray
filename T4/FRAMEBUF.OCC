@@ -17,67 +17,42 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
 
-  CHAN OF ANY fromRenderer :
-  PRI PAR
-    WHILE TRUE
-      INT command :
+  INT command :
+  INT32 Status :
+  SEQ
+    so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
+    in ? command
+    WHILE command <> c.stop
       SEQ
-        in ? command
         IF
           command = c.patch
             INT x, y, size :
             SEQ
               in ? x; y; size
-              fromRenderer ! command; x; y; size
+              so.write.string (fs, ts, "FB patch x=")
+              so.write.int (fs, ts, x, 1)
+              so.write.string (fs, ts, ",y=")
+              so.write.int (fs, ts, y, 1)
+              so.write.string (fs, ts, ",size=")
+              so.write.int (fs, ts, size, 1)
+              so.write.string.nl (fs, ts, "")
           command = c.message
             INT size :
             [256] INT chars :
+            [256] BYTE OutString : 
             SEQ
               in ? size; [ chars FROM 0 FOR size ]
-              fromRenderer ! command; size; [ chars FROM 0 FOR size ]
-          command = c.stop
-            fromRenderer ! command
+              SEQ i = 0 FOR size   
+                OutString[i] := BYTE (chars[i] /\ #FF)
+              so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
+          TRUE
+            SEQ
+              so.write.string.nl (fs, ts,"FB GARBAGE COMMAND")
+              STOP
+        in ? command
     SEQ
-      ---------------------------- DO THE ACTION ---------------------------
-
-      INT command :
-      SEQ
-        so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
-        fromRenderer ? command
-        WHILE command <> c.stop
-          SEQ
-            IF
-              command = c.patch
-                INT x, y, size :
-                SEQ
-                  fromRenderer ? x; y; size
-                  so.write.string (fs, ts, "FB patch x=")
-                  so.write.int (fs, ts, x, 1)
-                  so.write.string (fs, ts, ",y=")
-                  so.write.int (fs, ts, y, 1)
-                  so.write.string (fs, ts, ",size=")
-                  so.write.int (fs, ts, size, 1)
-                  so.write.string.nl (fs, ts, "")
-              command = c.message
-                INT size :
-                [256] INT chars :
-                [256] BYTE OutString : 
-                SEQ
-                  fromRenderer ? size; [ chars FROM 0 FOR size ]
-                  SEQ i = 0 FOR size   
-                    OutString[i] := BYTE (chars[i] /\ #FF)
-                  so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
-              TRUE
-                SEQ
-                  so.write.string.nl (fs, ts,"FB GARBAGE COMMAND")
-                  STOP
-            fromRenderer ? command
-        SEQ
-          so.write.string (fs, ts, " DONE!!!! ")
-          so.write.nl (fs, ts)
-
-      INT32 Status :
-      SEQ
-        so.exit (fs, ts, Status)      
+      so.write.string (fs, ts, " DONE!!!! ")
+      so.write.nl (fs, ts)
+      so.exit (fs, ts, Status)      
 :
 
