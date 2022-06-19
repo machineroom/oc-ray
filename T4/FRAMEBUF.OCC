@@ -4,10 +4,8 @@
 #USE "hostio.lib"
 #USE "streamio.lib"
 
-PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
+PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
-  ---------------------------- COMMANDS PROTOCOL -----------------------------
-  
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- render; x0; y0
   VAL c.object  IS 2 :  -- object; size; [ size ]
@@ -17,11 +15,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
   VAL c.message IS 6 :  -- message; size; [ words ]
 
 
-  VAL patchSize IS 16 :
-
   ---------------------------- COMMANDS PROTOCOL -----------------------------
-
-  VAL ticksPerSecond IS 625000 / 64 :  -- lo priority
 
   CHAN OF ANY fromRenderer :
   PRI PAR
@@ -32,7 +26,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
         IF
           command = c.patch
             INT x, y, size :
-            [16][16] INT patch :
             SEQ
               in ? x; y; size
               fromRenderer ! command; x; y; size
@@ -56,7 +49,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, VAL INT processors)
             IF
               command = c.patch
                 INT x, y, size :
-                [16][16] INT patch :
                 SEQ
                   fromRenderer ? x; y; size
                   so.write.string (fs, ts, "FB patch x=")

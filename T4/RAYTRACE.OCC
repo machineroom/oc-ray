@@ -101,10 +101,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   in  ? x; y; size
                   out ! command; x; y; size
-                  --SEQ i = 0 FOR size
-                  --  SEQ
-                  --    in  ? [ pixels FROM 0 FOR size ]
-                  --    out ! [ pixels FROM 0 FOR size ]
               command = c.message
                 SEQ
                   in  ? size; [ pixels FROM 0 FOR size ]
@@ -168,16 +164,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       mix    ( buffers [2], lubOther, lubThis, toPrev)
   :
   
-  [patchSize][patchSize] INT gcolours : -- these are the AREA-AVERAGED colours
-                                        -- returned to the grafix cards,
-                                        -- not the point samples
-
-
-
   PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
     VAL runPatchSize IS 8 :
-
-    [patchSize][patchSize] INT colours IS gcolours :
 
     [256] INT message :
     INT mess.p :

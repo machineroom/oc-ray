@@ -44,7 +44,7 @@ CONFIG
 
   PAR
     PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, workers)
+      frameBuffer (frame.in, frame.out, graphics)
     PROCESSOR cntlsys.p
       controlSystem (forward[0], back[0], graphics, workers)
     PAR i = 0 FOR workers-1
