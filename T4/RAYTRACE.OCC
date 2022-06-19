@@ -117,13 +117,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       VAL lubThis    IS 1 :
       VAL lubOther   IS 2 :
 
-      PROC pass ( CHAN OF ANY in, out )
-        buffer IS pixels : -- save static chaining
-        SEQ i = 0 FOR size
-          SEQ
-            in  ? [ buffer FROM 0 FOR size ]
-            out ! [ buffer FROM 0 FOR size ]
-      :
       SEQ
         state := lubThis \/ lubOther
         WHILE state <> closeDown
