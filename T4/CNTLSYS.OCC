@@ -2,14 +2,13 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
   VAL c.stop        IS 0 :
-  VAL c.render      IS 1 :  -- render; x0; y0
-  VAL c.object      IS 2 :  -- object; size; [ size ]
-  VAL c.light       IS 3 :  -- light;  size; [ size ]
-  VAL c.patch       IS 4 :  -- patch;  x; y; patchSize; [ patchSize][patchSize]
+  VAL c.render      IS 1 :  -- x0; y0
+  VAL c.object      IS 2 :  -- size; [ size ]
+  VAL c.light       IS 3 :  -- size; [ size ]
+  VAL c.patch       IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
   VAL c.runData     IS 5 :  -- ambient light, rendering mode, screen pos etc.
-  VAL c.message     IS 6 :  -- message; size; [ words ]
-  VAL c.texture     IS 7 :  -- texture; size; [ texture ]
-  VAL c.moretexture IS 8 :  -- moretexture; size; [ texture ]
+  VAL c.message     IS 6 :  -- size; [ words ]
+  VAL c.done        IS 7 :  -- worker
 
   PROC writes ( VAL [] BYTE s, [256] INT buffer )
     SEQ
@@ -55,12 +54,12 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
           return ? command
             IF
               command = c.patch
-                INT x, y, size :
+                INT worker, x, y, size :
                 SEQ
                   writes ( "CNTLSYS R patch", buffer)
-                  return   ? x; y; size
+                  return   ? worker; x; y; size
                   writes ( "CNTLSYS R patch got x,y,size", buffer)
-                  graphics ! command; x; y; size
+                  graphics ! command; worker; x; y; size
                   writes ( "CNTLSYS R patch sent x,y,size", buffer)
                   free := free + 1
               command = c.message
@@ -68,6 +67,11 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                 SEQ
                   return   ? size; [ buffer FROM 0 FOR size ]
                   graphics ! command; size; [ buffer FROM 0 FOR size ]
+              command = c.done
+                INT worker :
+                SEQ
+                  return   ? worker
+                  graphics ! command; worker
               command = c.stop
                 SEQ
                   farmActive := FALSE
@@ -99,15 +103,20 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
         SEQ
           IF
             command = c.patch
-              INT x, y, size :
+              INT x, y, size, worker :
               SEQ
-                in  ? x; y; size
-                out ! command; x; y; size
+                in  ? worker; x; y; size
+                out ! command; worker; x; y; size
             command = c.message
               INT size :
               SEQ
                 in ? size; [ buffer FROM 0 FOR size ]
                 out ! command; size; [ buffer FROM 0 FOR size ]
+            command = c.done
+              INT worker :
+              SEQ
+                in ? worker
+                out ! command; worker
           in ? command
       out ! command
   :

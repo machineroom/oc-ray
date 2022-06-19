@@ -7,12 +7,13 @@
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
   VAL c.stop    IS 0 :
-  VAL c.render  IS 1 :  -- render; x0; y0
-  VAL c.object  IS 2 :  -- object; size; [ size ]
-  VAL c.light   IS 3 :  -- light;  size; [ size ]
-  VAL c.patch   IS 4 :  -- patch;  x; y; patchSize; [ patchSize][patchSize]
+  VAL c.render  IS 1 :  -- x0; y0
+  VAL c.object  IS 2 :  -- size; [ size ]
+  VAL c.light   IS 3 :  -- size; [ size ]
+  VAL c.patch   IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
   VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
-  VAL c.message IS 6 :  -- message; size; [ words ]
+  VAL c.message IS 6 :  -- size; [ words ]
+  VAL c.done    IS 7 :  -- worker;
 
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
@@ -26,10 +27,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
       SEQ
         IF
           command = c.patch
-            INT x, y, size :
+            INT x, y, size, worker :
             SEQ
-              in ? x; y; size
-              so.write.string (fs, ts, "FB patch x=")
+              in ? worker; x; y; size
+              so.write.string (fs, ts, "FB patch from worker ")
+              so.write.int (fs, ts, worker, 1)
+              so.write.string (fs, ts, ",x=")
               so.write.int (fs, ts, x, 1)
               so.write.string (fs, ts, ",y=")
               so.write.int (fs, ts, y, 1)
@@ -45,6 +48,13 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
               SEQ i = 0 FOR size   
                 OutString[i] := BYTE (chars[i] /\ #FF)
               so.write.string.nl (fs, ts, [OutString FROM 0 FOR size])
+          command = c.done
+            INT worker :
+            SEQ
+              in ? worker
+              so.write.string (fs, ts, "Worker done: ")
+              so.write.int (fs,ts, worker, 1)
+              so.write.string.nl(fs, ts, "")
           TRUE
             SEQ
               so.write.string.nl (fs, ts,"FB GARBAGE COMMAND")
