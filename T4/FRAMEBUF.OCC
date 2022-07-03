@@ -16,6 +16,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
   VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- size; [ words ]
   VAL c.done    IS 7 :  -- worker;
+  VAL c.tick    IS 8 :  -- worker; debug;
 
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
@@ -41,6 +42,15 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
               in ? worker
               so.write.string (fs, ts, "Worker done: ")
               so.write.int (fs,ts, worker, 1)
+              so.write.string.nl(fs, ts, "")
+          command = c.tick
+            INT worker, debug :
+            SEQ
+              in ? worker;debug
+              so.write.string (fs, ts, "Tick: ")
+              so.write.int (fs,ts, worker, 1)
+              so.write.string (fs, ts, ",")
+              so.write.int (fs,ts, debug, 1)
               so.write.string.nl(fs, ts, "")
           TRUE
             SEQ

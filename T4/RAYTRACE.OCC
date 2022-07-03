@@ -3,6 +3,9 @@
 -- fromNext, toNext link to next worker (or nowhere is last worker)
 -- propogate will be true for all but the last worker
 
+-- pixelBypass - sends commands upstream (towards cntlsys)
+-- renderer    - the actual pixel rendernig (get c.render, send c.patch)
+
 PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     VAL INT propogate, me )
 
@@ -16,6 +19,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- size; [ words ]
   VAL c.done    IS 7 :  -- worker;
+  VAL c.tick    IS 8 :  -- worker;debug;
 
   PROC throughPut ( [256] INT work,
                     CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
@@ -90,7 +94,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   :
 
 
-
+  -- Read a message from this renderer, or an upstream renderer, and pass it downstream (multiplex)
   PROC pixelBypass ( CHAN OF ANY toPrev, fromNext, fromThis)
     PROC buffer ( CHAN OF ANY in, out )
       INT command :
@@ -108,10 +112,14 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   in  ? worker
                   out ! command; worker
+              command = c.tick
+                INT p1,p2 :
+                SEQ
+                  in  ? p1;p2
+                  out ! command; p1; p2
             in ? command
         out ! c.stop
     :
-
 
     PROC mix ( CHAN OF ANY fromOther, fromThis, out)
       INT  state, command, x, y, size, worker :
@@ -126,6 +134,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
           PRI ALT
             fromOther ? command
               SEQ
+                out ! c.tick; me; 1
                 IF
                   command = c.patch
                     SEQ
@@ -135,10 +144,18 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     SEQ
                       fromOther ? worker
                       out ! command; worker
+                  command = c.tick
+                    INT p1,p2 :
+                    SEQ
+                      fromOther   ? p1;p2
+                      out ! command; p1; p2
                   command = c.stop
-                    state := state >< lubOther
+                    SEQ
+                      out ! c.tick; me; 90
+                      state := state >< lubOther
             fromThis ? command
               SEQ
+                out ! c.tick; me; 2
                 IF
                   command = c.patch
                     SEQ
@@ -148,8 +165,16 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     SEQ
                       fromThis ? worker
                       out ! command; worker
+                  command = c.tick
+                    INT p1,p2 :
+                    SEQ
+                      fromThis   ? p1;p2
+                      out ! command; p1; p2
                   command = c.stop
-                    state := state >< lubThis
+                    SEQ
+                      out ! c.tick; me; 91
+                      state := state >< lubThis
+        out ! c.tick; me; 92
         out ! c.stop
     :
 
@@ -181,7 +206,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 STOP
           workIn ? command
       pixelsOut ! c.done; me
-      pixelsOut ! command
+      --pixelsOut ! command
   :
 
   CHAN OF ANY feedPixels, pixelTrigger, pixelsOut :
