@@ -10,10 +10,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- x0; y0
-  VAL c.object  IS 2 :  -- size; [ size ]
-  VAL c.light   IS 3 :  -- size; [ size ]
   VAL c.patch   IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- size; [ words ]
   VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker; debug;

@@ -13,14 +13,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- x0; y0
-  VAL c.object  IS 2 :  -- size; [ size ]
-  VAL c.light   IS 3 :  -- size; [ size ]
   VAL c.patch   IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- size; [ words ]
   VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker;debug;
 
+  -- pickup work, or forward
   PROC throughPut ( [256] INT work,
                     CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
                     VAL INT propogate )
@@ -39,6 +37,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       WHILE state <> closeDown
         PRI ALT
           pixelTrigger ? kick  -- should be guarded by (state /\ busy) <> 0 ..
+            -- local render is done - kick off another
             IF
               (state /\ buffered) <> 0
                 SEQ
@@ -54,13 +53,16 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                   fromPrev ? a; b
                   IF
                     (state /\ busy) = 0
+                      -- local render isn't busy so start it
                       SEQ
                         feedPixels ! tag; a; b
                         state := active \/ busy
 
                     (state /\ buffered) <> 0
+                      -- local render is busy and has parameters buffered so pass on to next
                       toNext ! tag; a; b
                     TRUE
+                      -- local render is busy but can buffer parameters for when it becomes free
                       SEQ
                         x     := a
                         y     := b
@@ -138,15 +140,11 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                   command = c.patch
                     SEQ
                       fromOther ? worker; x; y; size
-                      out ! c.tick; me; 1
                       out ! command; worker; x; y; size
-                      out ! c.tick; me; 2
                   command = c.done
                     SEQ
                       fromOther ? worker
-                      out ! c.tick; me; 3
                       out ! command; worker
-                      out ! c.tick; me; 4
                   command = c.tick
                     INT p1,p2 :
                     SEQ
@@ -206,6 +204,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 done ! 42
             TRUE
               SEQ
+                pixelsOut ! c.tick; me; 999
                 STOP
           workIn ? command
       pixelsOut ! c.done; me
