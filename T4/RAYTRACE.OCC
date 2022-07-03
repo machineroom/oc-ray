@@ -161,6 +161,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                       out ! c.tick; me; 91
                       state := state >< lubThis
         out ! c.tick; me; 92
+        -- reflect c.stop back down the pipeline
         out ! c.stop
     :
 

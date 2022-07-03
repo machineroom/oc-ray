@@ -30,6 +30,9 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       out ! c.stop
   :
 
+  -- feed work into the pipeline, but don't overflow it.
+  -- original code had machines*2 since each worker could either be rendering, or buffer one lot of parameters
+  -- c.stop traverses the pipeline and is reflected back so when it comes back here we know the pipeline has stopped
   PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
                      VAL INT machines)
     BOOL passActive, farmActive :
