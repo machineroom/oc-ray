@@ -37,53 +37,39 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       WHILE state <> closeDown
         PRI ALT
           pixelTrigger ? kick  -- should be guarded by (state /\ busy) <> 0 ..
-            -- local render is done - kick off another
-            IF
-              (state /\ buffered) <> 0
-                SEQ
-                  feedPixels ! c.render; x; y
-                  state := active \/ busy
-              TRUE
-                state := active -- i.e not busy and not buffered
+            -- local render is done - mark active
+            state := active -- i.e not busy and not buffered
           fromPrev ? tag
             IF
               tag = c.render
-                INT a, b :
+                INT x, y :
                 SEQ
-                  fromPrev ? a; b
+                  fromPrev ? x; y
                   IF
                     (state /\ busy) = 0
                       -- local render isn't busy so start it
                       SEQ
-                        feedPixels ! tag; a; b
                         state := active \/ busy
-
-                    (state /\ buffered) <> 0
-                      -- local render is busy and has parameters buffered so pass on to next
-                      toNext ! tag; a; b
+                        feedPixels ! tag; x; y
                     TRUE
-                      -- local render is busy but can buffer parameters for when it becomes free
-                      SEQ
-                        x     := a
-                        y     := b
-                        state := active \/ (busy \/ buffered)
+                      -- local render is busy so pass (if not the last node)
+                      IF
+                        propogate <> 0
+                          toNext ! tag; x; y
+                        TRUE
+                          SKIP
               tag = c.stop
                 SEQ
                   IF
                     (state /\ busy) <> 0
+                      -- wait for local render to finish
                       pixelTrigger ? kick
                     TRUE
                       SKIP
-                  IF
-                    (state /\ buffered) <> 0
-                      SEQ
-                        feedPixels   ! c.render; x; y
-                        pixelTrigger ? kick
-                    TRUE
-                      SKIP
+                  -- tell local render and next node to stop
+                  state := closeDown
                   feedPixels ! tag
                   toNext     ! tag
-                  state := closeDown
               TRUE
                 SEQ
                   fromPrev ? size; [ work FROM 0 FOR size ]
@@ -156,7 +142,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                       state := state >< lubOther
             fromThis ? command
               SEQ
-                out ! c.tick; me; 99
                 IF
                   command = c.patch
                     SEQ
