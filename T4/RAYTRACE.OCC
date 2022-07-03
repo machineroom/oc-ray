@@ -139,6 +139,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                   command = c.stop
                     SEQ
                       out ! c.tick; me; 90
+                      -- >< bitwise XOR
                       state := state >< lubOther
             fromThis ? command
               SEQ
