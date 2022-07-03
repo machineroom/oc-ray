@@ -4,10 +4,11 @@
 
 -- upstream commands:
 --    c.render
+--    c.stop
 -- downstream command:
 --    c.patch
---    c.message
 --    c.done
+--    c.stop
 
 PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
@@ -15,7 +16,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   VAL c.stop        IS 0 :
   VAL c.render      IS 1 :  -- x0; y0
   VAL c.patch       IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.message     IS 6 :  -- size; [ words ]
   VAL c.done        IS 7 :  -- worker
   VAL c.tick        IS 8 :  -- worker;debug;
 
