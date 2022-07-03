@@ -134,16 +134,19 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
           PRI ALT
             fromOther ? command
               SEQ
-                out ! c.tick; me; 1
                 IF
                   command = c.patch
                     SEQ
                       fromOther ? worker; x; y; size
+                      out ! c.tick; me; 1
                       out ! command; worker; x; y; size
+                      out ! c.tick; me; 2
                   command = c.done
                     SEQ
                       fromOther ? worker
+                      out ! c.tick; me; 3
                       out ! command; worker
+                      out ! c.tick; me; 4
                   command = c.tick
                     INT p1,p2 :
                     SEQ
@@ -155,7 +158,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                       state := state >< lubOther
             fromThis ? command
               SEQ
-                out ! c.tick; me; 2
+                out ! c.tick; me; 99
                 IF
                   command = c.patch
                     SEQ
