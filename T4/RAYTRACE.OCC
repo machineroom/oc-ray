@@ -108,6 +108,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         out ! c.stop
     :
 
+    -- \/ bitwise OR
+    -- /\ bitwise AND
     PROC mix ( CHAN OF ANY fromOther, fromThis, out)
       INT  state, command, x, y, size, worker :
 

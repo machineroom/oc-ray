@@ -10,6 +10,9 @@
 --    c.done
 --    c.stop
 
+-- out is to workers
+-- back is from workers
+-- graphics is to renderer
 PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
@@ -20,6 +23,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   VAL c.tick        IS 8 :  -- worker;debug;
 
 
+  -- flood out channel with the patch render commands for each 8*8 block (patchEdge=8)
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge)
     VAL patchesWide IS 256 / patchEdge :
     SEQ
@@ -33,6 +37,11 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   -- feed work into the pipeline, but don't overflow it.
   -- original code had machines*2 since each worker could either be rendering, or buffer one lot of parameters
   -- c.stop traverses the pipeline and is reflected back so when it comes back here we know the pipeline has stopped
+
+  -- in receives patch commands from sendPatches()
+  -- out is to workers - via outputBuffer()
+  -- return from workers - via returnBuffer()
+  -- graphics is to renderer
   PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
                      VAL INT machines)
     BOOL passActive, farmActive :
@@ -82,7 +91,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       graphics ! c.stop
   :
 
-  -- send messages downstream (towards 1st worker)
+  -- receive messages from loadbalance and send to worker chain
   PROC outputBuffer ( CHAN OF ANY in, out )
     INT command :
     SEQ
@@ -99,7 +108,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       out ! command
   :
 
-  -- send messages upstream (from 1st worker, to framebuf)
+  -- receive messages from worker chain and send to loadbalance
   PROC returnBuffer ( CHAN OF ANY in, out )
     INT command :
     SEQ
