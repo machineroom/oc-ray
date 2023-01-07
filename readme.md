@@ -25,9 +25,23 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |47|T425/16MB|183s|TBC|TBC|TBC|TBC|
 |71|T425/16MB|158s|TBC|TBC|TBC|TBC|
 
+lockup debugging. hacking network.inc total processors (renders is 2 less). run scene 5.
+20 OK (completes and writes MTV)
+30 ditto
+32 ditto
+34 ditto. usually. sometimes starts render but locks
+35 locks sending scene (53 * S c.render to system)
+36 locks sending scene (53 * S c.render to system)
+
+40 scene 5: locks sending scene (17 * S c.render to system). 
+40 scene 1: sends no "S c.render to system" 
+good render sends 64 * "S c.render to system" before first result
+
+50 starts render but locks
 53 doesn't start (no patches)
-59 starts but errors or locks
-65 starts but errors or locks
+55 starts but errors or locks card 6 in 2nd rack)
+59 ditto
+65 ditto
 
 
 ## Select processor type
