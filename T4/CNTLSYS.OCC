@@ -52,6 +52,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       free := machines 
       WHILE passActive OR farmActive
         SEQ
+          graphics ! c.tick; 258; free
           PRI ALT
             (free > 0) & in ? command
               SEQ
@@ -60,15 +61,19 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                     INT x, y :
                     SEQ
                       in  ? x; y
+                      graphics ! c.tick; 260; free
                       out ! command; x; y
+                      graphics ! c.tick; 261; free
                       free := free - 1
                       graphics ! c.tick; 254; free
                   command = c.stop
                     SEQ
+                      graphics ! c.tick; 257; free
                       out ! c.stop
                       passActive := FALSE
             return ? command
               SEQ
+                graphics ! c.tick; 256; free
                 IF
                   command = c.patch
                     INT worker, x, y, size :
