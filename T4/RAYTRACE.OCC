@@ -17,202 +17,63 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker;debug;
 
-  -- pickup work, or forward
-  PROC throughPut ( [256] INT work,
-                    CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
-                    VAL INT propogate )
-    -- \/ bitwise OR
-    -- /\ bitwise AND
-    -- <> not equal
-    -- state is a bitfield
-    VAL closeDown     IS 0 :
-    VAL active        IS 1 :
-    VAL busy          IS 2 :
+  -- forward
+  PROC throughPut ( CHAN OF ANY in, out, VAL INT forward )
 
-    INT state, tag :
-    INT x, y, size, kick :
-    SEQ
-      state := active
-      WHILE state <> closeDown
-        PRI ALT
-          pixelTrigger ? kick  -- should be guarded by (state /\ busy) <> 0 ..
-            -- local render is done - mark active
-            state := active -- i.e not busy
-          fromPrev ? tag
-            IF
-              tag = c.render
-                INT x, y :
-                SEQ
-                  fromPrev ? x; y
-                  IF
-                    (state /\ busy) = 0
-                      -- local render isn't busy so start it
-                      SEQ
-                        state := active \/ busy
-                        feedPixels ! tag; x; y
-                    TRUE
-                      -- local render is busy so pass (if not the last node)
-                      IF
-                        propogate <> 0
-                          toNext ! tag; x; y
-                        TRUE
-                          SKIP
-              tag = c.stop
-                SEQ
-                  IF
-                    (state /\ busy) <> 0
-                      -- wait for local render to finish
-                      pixelTrigger ? kick
-                    TRUE
-                      SKIP
-                  -- tell local render and next node to stop
-                  state := closeDown
-                  feedPixels ! tag
-                  toNext     ! tag
-              TRUE
-                SEQ
-                  fromPrev ? size; [ work FROM 0 FOR size ]
-                  IF
-                    propogate <> 0
-                      toNext ! tag; size; [ work FROM 0 FOR size ]
-                    TRUE
-                      SKIP
-                  feedPixels ! tag; size; [ work FROM 0 FOR size ]
+    INT tag :
+    WHILE TRUE
+      SEQ
+        in ? tag
+        IF
+          tag = c.render
+            INT x, y :
+            SEQ
+              in ? x; y
+              IF
+                forward <> 0
+                  out ! tag; x; y
+                TRUE
+                  SKIP
+          tag = c.stop
+            SEQ
+              IF
+                forward <> 0
+                  out ! tag
+                TRUE
+                  SKIP
   :
 
 
-  -- Read a message from this renderer, or an upstream renderer, and pass it downstream (multiplex)
-  PROC pixelBypass ( CHAN OF ANY toPrev, fromNext, fromThis)
-    PROC buffer ( CHAN OF ANY in, out )
-      INT command :
+  -- back
+  PROC pixelBypass ( CHAN OF ANY out, in)
+    INT command :
+    INT x, y, size, worker :
+    WHILE TRUE
       SEQ
         in ? command
-        WHILE command <> c.stop
-          INT x, y, size, worker :
-          SEQ
-            IF
-              command = c.patch
-                SEQ
-                  in  ? worker; x; y; size
-                  out ! command; worker; x; y; size
-              command = c.done
-                SEQ
-                  in  ? worker
-                  out ! command; worker
-              command = c.tick
-                INT p1,p2 :
-                SEQ
-                  in  ? p1;p2
-                  out ! command; p1; p2
-            in ? command
-        out ! c.stop
-    :
-
-    -- \/ bitwise OR
-    -- /\ bitwise AND
-    PROC mix ( CHAN OF ANY fromOther, fromThis, out)
-      INT  state, command, x, y, size, worker :
-
-      VAL closeDown  IS 0 :
-      VAL lubThis    IS 1 :
-      VAL lubOther   IS 2 :
-
-      SEQ
-        state := lubThis \/ lubOther
-        WHILE state <> closeDown
-          PRI ALT
-            fromOther ? command
-              SEQ
-                IF
-                  command = c.patch
-                    SEQ
-                      fromOther ? worker; x; y; size
-                      out ! command; worker; x; y; size
-                  command = c.done
-                    SEQ
-                      fromOther ? worker
-                      out ! command; worker
-                  command = c.tick
-                    INT p1,p2 :
-                    SEQ
-                      fromOther   ? p1;p2
-                      out ! command; p1; p2
-                  command = c.stop
-                    SEQ
-                      out ! c.tick; me; 90
-                      -- >< bitwise XOR
-                      state := state >< lubOther
-            fromThis ? command
-              SEQ
-                IF
-                  command = c.patch
-                    SEQ
-                      fromThis ? worker; x; y; size
-                      out ! command; worker; x; y; size
-                  command = c.done
-                    SEQ
-                      fromThis ? worker
-                      out ! command; worker
-                  command = c.tick
-                    INT p1,p2 :
-                    SEQ
-                      fromThis   ? p1;p2
-                      out ! command; p1; p2
-                  command = c.stop
-                    SEQ
-                      out ! c.tick; me; 91
-                      state := state >< lubThis
-        out ! c.tick; me; 92
-        -- reflect c.stop back down the pipeline
-        out ! c.stop
-    :
-
-    CHAN OF ANY lubThis, lubOther :
-    PAR
-      buffer ( fromNext, lubOther)
-      buffer ( fromThis, lubThis)
-      mix    ( lubOther, lubThis, toPrev)
+        IF
+          command = c.patch
+            SEQ
+              in  ? worker; x; y; size
+              out ! command; worker; x; y; size
+          command = c.done
+            SEQ
+              in  ? worker
+              out ! command; worker
+          command = c.tick
+            INT p1,p2 :
+            SEQ
+              in  ? p1;p2
+              out ! command; p1; p2
+          command = c.stop
+            SEQ
+              out ! command
   :
   
-  PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
-    VAL runPatchSize IS 8 :
-
-    INT command :
-    SEQ
-      command := 0         -- clear command for when i move to bytes
-      pixelsOut ! c.tick; 252; me -- 252 is "me starting" (all renderers report this)
-      workIn ? command     -- (eventually) pull in 1 byte
-      pixelsOut ! c.tick; 253; me -- 253 is "me working" (renderers 0-39 report this)
-      WHILE command <> c.stop
-        SEQ
-          IF
-            command = c.render
-              INT x0, y0 :
-              SEQ
-                workIn ? x0; y0
-                pixelsOut ! c.patch; me; x0; y0; runPatchSize
-                done ! 42
-            TRUE
-              SEQ
-                pixelsOut ! c.tick; me; 999
-                STOP
-          workIn ? command
-      pixelsOut ! c.done; me
-      --pixelsOut ! command
-  :
-
-  CHAN OF ANY feedPixels, pixelTrigger, pixelsOut :
-
-  [4][256] INT buffers :
-
   WHILE TRUE
-    PRI PAR
-      PAR
-        throughPut  ( buffers [0],
-                      fromPrev, toNext, feedPixels, pixelTrigger,
-                      propogate )
-        pixelBypass ( toPrev, fromNext,  pixelsOut )
-      renderer   ( feedPixels, pixelsOut, pixelTrigger )
+    PAR
+      throughPut  ( fromPrev, toNext, propogate )
+      pixelBypass ( toPrev, fromNext )
 :
 
 
