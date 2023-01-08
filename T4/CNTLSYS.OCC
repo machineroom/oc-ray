@@ -96,9 +96,8 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   VAL patchEdge IS 8 :
   CHAN OF ANY a :
   WHILE TRUE
-    SEQ
-      PAR
-        sendPatches  ( a, patchEdge)
-        loadBalance  ( a, out, back, graphics, machines )
+    PAR
+      sendPatches  ( a, patchEdge)
+      loadBalance  ( a, out, back, graphics, machines )
 :
 
