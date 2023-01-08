@@ -180,7 +180,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     INT command :
     SEQ
       command := 0         -- clear command for when i move to bytes
+      pixelsOut ! c.tick; 252; me -- 252 is "me starting" (all renderers report this)
       workIn ? command     -- (eventually) pull in 1 byte
+      pixelsOut ! c.tick; 253; me -- 253 is "me working" (renderers 0-39 report this)
       WHILE command <> c.stop
         SEQ
           IF

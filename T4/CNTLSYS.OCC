@@ -34,7 +34,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       out ! c.stop
   :
 
-  -- feed work into the pipeline, but don't overflow it.
+  -- feed work into the pipeline so long as there are free workers
   -- original code had machines*2 since each worker could either be rendering, or buffer one lot of parameters
   -- c.stop traverses the pipeline and is reflected back so when it comes back here we know the pipeline has stopped
 
@@ -62,6 +62,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                       in  ? x; y
                       out ! command; x; y
                       free := free - 1
+                      graphics ! c.tick; 254; free
                   command = c.stop
                     SEQ
                       out ! c.stop
@@ -75,6 +76,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                       return   ? worker; x; y; size
                       graphics ! command; worker; x; y; size
                       free := free + 1
+                      graphics ! c.tick; 255; free
                   command = c.done
                     INT worker :
                     SEQ
