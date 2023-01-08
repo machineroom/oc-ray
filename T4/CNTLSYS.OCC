@@ -93,58 +93,12 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       graphics ! c.stop
   :
 
-  -- receive messages from loadbalance and send to worker chain
-  PROC outputBuffer ( CHAN OF ANY in, out )
-    INT command :
-    SEQ
-      in ? command
-      WHILE command <> c.stop
-        SEQ
-          IF
-            command = c.render
-              INT x, y :
-              SEQ
-                in  ? x; y
-                out ! command; x; y
-          in ? command
-      out ! command
-  :
-
-  -- receive messages from worker chain and send to loadbalance
-  PROC returnBuffer ( CHAN OF ANY in, out )
-    INT command :
-    SEQ
-      in ? command
-      WHILE command <> c.stop
-        SEQ
-          IF
-            command = c.patch
-              INT x, y, size, worker :
-              SEQ
-                in  ? worker; x; y; size
-                out ! command; worker; x; y; size
-            command = c.done
-              INT worker :
-              SEQ
-                in ? worker
-                out ! command; worker
-            command = c.tick
-              INT p1,p2 :
-              SEQ
-                in   ? p1;p2
-                out ! command; p1; p2
-          in ? command
-      out ! command
-  :
-
   VAL patchEdge IS 8 :
-  CHAN OF ANY a, b, c :
+  CHAN OF ANY a :
   WHILE TRUE
     SEQ
       PAR
         sendPatches  ( a, patchEdge)
-        outputBuffer ( b, out  )
-        returnBuffer ( back, c )
-        loadBalance  ( a, b, c, graphics, machines )
+        loadBalance  ( a, out, back, graphics, machines )
 :
 
