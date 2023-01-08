@@ -23,11 +23,11 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     VAL INT propogate )
     -- \/ bitwise OR
     -- /\ bitwise AND
+    -- <> not equal
     -- state is a bitfield
     VAL closeDown     IS 0 :
     VAL active        IS 1 :
     VAL busy          IS 2 :
-    VAL buffered      IS 4 :
 
     INT state, tag :
     INT x, y, size, kick :
@@ -37,7 +37,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         PRI ALT
           pixelTrigger ? kick  -- should be guarded by (state /\ busy) <> 0 ..
             -- local render is done - mark active
-            state := active -- i.e not busy and not buffered
+            state := active -- i.e not busy
           fromPrev ? tag
             IF
               tag = c.render
