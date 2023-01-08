@@ -1,6 +1,6 @@
 -- workers are arranged in a linked list
--- fromPrev, toPrev link to previous worker (or cntlsys for worker 0)
--- fromNext, toNext link to next worker (or nowhere is last worker)
+-- fromPrev, toPrev links to previous worker (or cntlsys for worker 0)
+-- fromNext, toNext links to next worker (or nowhere if last worker)
 -- propogate will be true for all but the last worker
 
 -- pixelBypass - sends commands upstream (towards cntlsys)
