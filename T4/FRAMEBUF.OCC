@@ -18,7 +18,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
   ---------------------------- COMMANDS PROTOCOL -----------------------------
 
   INT command :
-  INT32 Status :
   SEQ
     so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
     in ? command
@@ -56,6 +55,5 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
     SEQ
       so.write.string (fs, ts, " DONE!!!! ")
       so.write.nl (fs, ts)
-      so.exit (fs, ts, Status)      
 :
 

@@ -26,12 +26,10 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         in ? tag
         IF
           tag = c.render
-            INT x, y :
             SEQ
-              in ? x; y
               IF
                 forward <> 0
-                  out ! tag; x; y
+                  out ! tag
                 TRUE
                   SKIP
           tag = c.stop

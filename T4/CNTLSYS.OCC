@@ -30,7 +30,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       SEQ x = 0 FOR patchesWide
         SEQ y = 0 FOR patchesWide
           SEQ
-            out ! c.render; (x * patchEdge) + 128; (y * patchEdge) + 128
+            out ! c.render
       out ! c.stop
   :
 
@@ -58,14 +58,11 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
               SEQ
                 IF
                   command = c.render
-                    INT x, y :
                     SEQ
-                      in  ? x; y
                       graphics ! c.tick; 260; free
-                      out ! command; x; y
+                      out ! command
                       graphics ! c.tick; 261; free
                       free := free - 1
-                      graphics ! c.tick; 254; free
                   command = c.stop
                     SEQ
                       graphics ! c.tick; 257; free
