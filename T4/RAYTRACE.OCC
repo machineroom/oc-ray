@@ -17,21 +17,30 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker;debug;
 
-  -- forward
-  PROC throughPut ( CHAN OF ANY in, out, VAL INT forward )
+  PROC ledon(VAL INT delay)
     TIMER t :
     INT start :
+    SEQ
+      ASM
+        CLRHALTERR
+        SETERR
+      t ? start
+      t ? AFTER start PLUS (delay)
+  :
+  
+  PROC ledoff()
+    ASM
+      TESTERR
+  :
+
+  -- forward
+  PROC throughPut ( CHAN OF ANY in, out, VAL INT forward )
     INT tag :
     WHILE TRUE
       SEQ
-        ASM
-          CLRHALTERR
-          SETERR
-        t ? start
-        t ? AFTER start PLUS (1000)
+        ledon(1000)
         in ? tag
-        ASM
-          TESTERR
+        ledoff()
         IF
           tag = c.render
             SEQ
@@ -76,10 +85,13 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
               out ! command
   :
   
-  WHILE TRUE
-    PAR
-      throughPut  ( fromPrev, toNext, propogate )
-      pixelBypass ( toPrev, fromNext )
+  SEQ
+    ledon(40000)
+    ledoff()
+    WHILE TRUE
+      PAR
+        throughPut  ( fromPrev, toNext, propogate )
+        pixelBypass ( toPrev, fromNext )
 :
 
 
