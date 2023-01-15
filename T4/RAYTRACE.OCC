@@ -19,11 +19,19 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   -- forward
   PROC throughPut ( CHAN OF ANY in, out, VAL INT forward )
-
+    TIMER t :
+    INT start :
     INT tag :
     WHILE TRUE
       SEQ
+        ASM
+          CLRHALTERR
+          SETERR
+        t ? start
+        t ? AFTER start PLUS (1000)
         in ? tag
+        ASM
+          TESTERR
         IF
           tag = c.render
             SEQ
