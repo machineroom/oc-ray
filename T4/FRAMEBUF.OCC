@@ -13,9 +13,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
   INT command :
   SEQ
     so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
-    in ? command
     WHILE TRUE
       SEQ
+        in ? command
         IF
           command = c.tick
             INT worker, debug :
@@ -26,11 +26,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
               so.write.string (fs, ts, ",")
               so.write.int (fs,ts, debug, 1)
               so.write.string.nl(fs, ts, "")
-          TRUE
-            SEQ
-              so.write.string.nl (fs, ts,"FB GARBAGE COMMAND")
-              STOP
-        in ? command
     SEQ
       so.write.string (fs, ts, " DONE!!!! ")
       so.write.nl (fs, ts)
