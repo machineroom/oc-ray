@@ -6,8 +6,7 @@
 -- pixelBypass - sends commands upstream (towards cntlsys)
 -- renderer    - the actual pixel rendernig (get c.render, send c.patch)
 
-PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
-                    VAL INT propogate, me )
+PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
 
   #USE "occama.lib"     --T414 math library
 
@@ -49,25 +48,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   :
 
 
-  -- back
-  PROC pixelBypass ( CHAN OF ANY out, in)
-    INT command :
-    WHILE TRUE
-      SEQ
-        in ? command
-        IF
-          command = c.tick
-            INT p1,p2 :
-            SEQ
-              in  ? p1;p2
-              out ! command; p1; p2
-  :
-  
   SEQ
     WHILE TRUE
-      PAR
-        throughPut  ( fromPrev, toNext, propogate )
-        pixelBypass ( toPrev, fromNext )
+      throughPut  ( fromPrev, toNext, propogate )
 :
 
 
