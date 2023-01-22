@@ -16,12 +16,24 @@
 PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
 
-  VAL c.stop        IS 0 :
   VAL c.render      IS 1 :  -- x0; y0
-  VAL c.patch       IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.done        IS 7 :  -- worker
   VAL c.tick        IS 8 :  -- worker;debug;
 
+  PROC ledon(VAL INT delay)
+    TIMER t :
+    INT start :
+    SEQ
+      ASM
+        CLRHALTERR
+        SETERR
+      t ? start
+      t ? AFTER start PLUS (delay)
+  :
+  
+  PROC ledoff()
+    ASM
+      TESTERR
+  :
 
   -- flood out channel with the patch render commands for each 8*8 block (patchEdge=8)
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge)
@@ -31,7 +43,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
         SEQ y = 0 FOR patchesWide
           SEQ
             out ! c.render
-      out ! c.stop
   :
 
   -- feed work into the pipeline so long as there are free workers
@@ -44,7 +55,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   -- graphics is to renderer
   PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
                      VAL INT machines)
-    BOOL passActive, farmActive :
     INT free, command :
     SEQ
       free := machines 
@@ -58,8 +68,10 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                   command = c.render
                     SEQ
                       graphics ! c.tick; 260; free
+                      ledon(1000)
                       out ! command
                       graphics ! c.tick; 261; free
+                      ledoff()
                       free := free - 1
             return ? command
               SEQ
@@ -70,7 +82,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                     SEQ
                       return   ? p1;p2
                       graphics ! command; p1;p2
-      graphics ! c.stop
   :
 
   VAL patchEdge IS 8 :

@@ -11,10 +11,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   #USE "occama.lib"     --T414 math library
 
-  VAL c.stop    IS 0 :
   VAL c.render  IS 1 :  -- x0; y0
-  VAL c.patch   IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker;debug;
 
   PROC ledon(VAL INT delay)
@@ -49,20 +46,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                   out ! tag
                 TRUE
                   SKIP
-          tag = c.stop
-            SEQ
-              IF
-                forward <> 0
-                  out ! tag
-                TRUE
-                  SKIP
   :
 
 
   -- back
   PROC pixelBypass ( CHAN OF ANY out, in)
     INT command :
-    INT x, y, size, worker :
     WHILE TRUE
       SEQ
         in ? command

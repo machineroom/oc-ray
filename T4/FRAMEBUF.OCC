@@ -8,20 +8,13 @@
 -- in is from cntlsys
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
-  VAL c.stop    IS 0 :
-  VAL c.render  IS 1 :  -- x0; y0
-  VAL c.patch   IS 4 :  -- worker; x; y; patchSize; [ patchSize][patchSize]
-  VAL c.done    IS 7 :  -- worker;
   VAL c.tick    IS 8 :  -- worker; debug;
-
-
-  ---------------------------- COMMANDS PROTOCOL -----------------------------
 
   INT command :
   SEQ
     so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
     in ? command
-    WHILE command <> c.stop
+    WHILE TRUE
       SEQ
         IF
           command = c.tick
