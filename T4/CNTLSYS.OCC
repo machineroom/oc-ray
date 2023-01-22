@@ -13,7 +13,7 @@
 -- out is to workers
 -- back is from workers
 -- graphics is to renderer
-PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
+PROC controlSystem ( CHAN OF ANY out, graphics, VAL INT machines )
 
 
   VAL c.render      IS 1 :  -- x0; y0
@@ -51,10 +51,8 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
 
   -- in receives patch commands from sendPatches()
   -- out is to workers - via outputBuffer()
-  -- return from workers - via returnBuffer()
   -- graphics is to renderer
-  PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
-                     VAL INT machines)
+  PROC loadBalance ( CHAN OF ANY in, out, graphics, VAL INT machines)
     INT free, command :
     SEQ
       free := machines 
@@ -75,6 +73,6 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
   WHILE TRUE
     PAR
       sendPatches  ( a, patchEdge)
-      loadBalance  ( a, out, back, graphics, machines )
+      loadBalance  ( a, out, graphics, machines )
 :
 

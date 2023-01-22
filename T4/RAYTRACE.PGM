@@ -31,7 +31,7 @@ MAPPING
 CONFIG
   CHAN OF SP frame.in, frame.out :
   PLACE frame.in, frame.out ON Hostlink :
-  [workers]CHAN OF ANY forward, back :
+  [workers]CHAN OF ANY forward :
   CHAN OF ANY graphics, soft :
 
   VAL true      IS #FFFF :
@@ -41,7 +41,7 @@ CONFIG
     PROCESSOR framebuf.p
       frameBuffer (frame.in, frame.out, graphics)
     PROCESSOR cntlsys.p
-      controlSystem (forward[0], back[0], graphics, workers)
+      controlSystem (forward[0], graphics, workers)
     PAR i = 0 FOR workers-1
       PROCESSOR raytrace.p[i]
         rayTrace (forward[i], forward[i+1], true, i)

@@ -10,8 +10,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
 
   #USE "occama.lib"     --T414 math library
 
-  VAL c.render  IS 1 :  -- x0; y0
-  VAL c.tick    IS 8 :  -- worker;debug;
+  INT tag :
 
   PROC ledon(VAL INT delay)
     TIMER t :
@@ -29,21 +28,13 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
       TESTERR
   :
 
-  -- forward
-  PROC throughPut ( CHAN OF ANY in, out, VAL INT forward )
-    INT tag :
+  SEQ
     WHILE TRUE
       SEQ
         ledon(1000)
-        in ? tag
+        fromPrev ? tag
         ledoff()
-        out ! tag
-  :
-
-
-  SEQ
-    WHILE TRUE
-      throughPut  ( fromPrev, toNext, propogate )
+        toNext ! tag
 :
 
 
