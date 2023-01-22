@@ -67,27 +67,14 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       SEQ
         in ? command
         IF
-          command = c.patch
-            SEQ
-              in  ? worker; x; y; size
-              out ! command; worker; x; y; size
-          command = c.done
-            SEQ
-              in  ? worker
-              out ! command; worker
           command = c.tick
             INT p1,p2 :
             SEQ
               in  ? p1;p2
               out ! command; p1; p2
-          command = c.stop
-            SEQ
-              out ! command
   :
   
   SEQ
-    ledon(40000)
-    ledoff()
     WHILE TRUE
       PAR
         throughPut  ( fromPrev, toNext, propogate )

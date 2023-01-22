@@ -47,10 +47,8 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
     BOOL passActive, farmActive :
     INT free, command :
     SEQ
-      farmActive := TRUE
-      passActive := TRUE
       free := machines 
-      WHILE passActive OR farmActive
+      WHILE TRUE
         SEQ
           graphics ! c.tick; 258; free
           PRI ALT
@@ -63,35 +61,15 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
                       out ! command
                       graphics ! c.tick; 261; free
                       free := free - 1
-                  command = c.stop
-                    SEQ
-                      graphics ! c.tick; 257; free
-                      out ! c.stop
-                      passActive := FALSE
             return ? command
               SEQ
                 graphics ! c.tick; 256; free
                 IF
-                  command = c.patch
-                    INT worker, x, y, size :
-                    SEQ
-                      return   ? worker; x; y; size
-                      graphics ! command; worker; x; y; size
-                      free := free + 1
-                      graphics ! c.tick; 255; free
-                  command = c.done
-                    INT worker :
-                    SEQ
-                      return   ? worker
-                      graphics ! command; worker
                   command = c.tick
                     INT p1,p2 :
                     SEQ
                       return   ? p1;p2
                       graphics ! command; p1;p2
-                  command = c.stop
-                    SEQ
-                      farmActive := FALSE
       graphics ! c.stop
   :
 

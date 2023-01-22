@@ -24,20 +24,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
     WHILE command <> c.stop
       SEQ
         IF
-          command = c.patch
-            INT x, y, size, worker :
-            SEQ
-              in ? worker; x; y; size
-              so.write.string (fs, ts, "FB patch from worker ")
-              so.write.int (fs, ts, worker, 1)
-              so.write.string.nl(fs, ts, "")
-          command = c.done
-            INT worker :
-            SEQ
-              in ? worker
-              so.write.string (fs, ts, "Worker done: ")
-              so.write.int (fs,ts, worker, 1)
-              so.write.string.nl(fs, ts, "")
           command = c.tick
             INT worker, debug :
             SEQ
