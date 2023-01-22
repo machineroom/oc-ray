@@ -31,10 +31,10 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
   SEQ
     WHILE TRUE
       SEQ
-        ledon(1000)
         fromPrev ? tag
-        ledoff()
+        ledon(1000)
         toNext ! tag
+        ledoff()
 :
 
 

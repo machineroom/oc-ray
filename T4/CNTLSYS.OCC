@@ -35,44 +35,22 @@ PROC controlSystem ( CHAN OF ANY out, graphics, VAL INT machines )
       TESTERR
   :
 
-  -- flood out channel with the patch render commands for each 8*8 block (patchEdge=8)
-  PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge)
-    VAL patchesWide IS 256 / patchEdge :
+  VAL patchEdge IS 8 :
+  VAL patchesWide IS 256 / patchEdge :
+  SEQ
+    INT free :
     SEQ
+      free := machines 
       SEQ x = 0 FOR patchesWide
         SEQ y = 0 FOR patchesWide
           SEQ
+            graphics ! c.tick; 258; free
+            graphics ! c.tick; 260; free
+            ledon(1000)
             out ! c.render
-  :
+            graphics ! c.tick; 261; free
+            ledoff()
+            free := free - 1
 
-  -- feed work into the pipeline so long as there are free workers
-  -- original code had machines*2 since each worker could either be rendering, or buffer one lot of parameters
-  -- c.stop traverses the pipeline and is reflected back so when it comes back here we know the pipeline has stopped
-
-  -- in receives patch commands from sendPatches()
-  -- out is to workers - via outputBuffer()
-  -- graphics is to renderer
-  PROC loadBalance ( CHAN OF ANY in, out, graphics, VAL INT machines)
-    INT free, command :
-    SEQ
-      free := machines 
-      WHILE TRUE
-        SEQ
-          graphics ! c.tick; 258; free
-          in ? command
-          graphics ! c.tick; 260; free
-          ledon(1000)
-          out ! command
-          graphics ! c.tick; 261; free
-          ledoff()
-          free := free - 1
-  :
-
-  VAL patchEdge IS 8 :
-  CHAN OF ANY a :
-  WHILE TRUE
-    PAR
-      sendPatches  ( a, patchEdge)
-      loadBalance  ( a, out, graphics, machines )
 :
 

@@ -8,6 +8,22 @@
 -- in is from cntlsys
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
 
+  PROC ledon(VAL INT delay)
+    TIMER t :
+    INT start :
+    SEQ
+      ASM
+        CLRHALTERR
+        SETERR
+      t ? start
+      t ? AFTER start PLUS (delay)
+  :
+
+  PROC ledoff()
+    ASM
+      TESTERR
+  :
+
   VAL c.tick    IS 8 :  -- worker; debug;
 
   INT command :
@@ -26,8 +42,5 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in)
               so.write.string (fs, ts, ",")
               so.write.int (fs,ts, debug, 1)
               so.write.string.nl(fs, ts, "")
-    SEQ
-      so.write.string (fs, ts, " DONE!!!! ")
-      so.write.nl (fs, ts)
 :
 
