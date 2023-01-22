@@ -61,27 +61,17 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, VAL INT machines )
       WHILE TRUE
         SEQ
           graphics ! c.tick; 258; free
-          PRI ALT
-            (free > 0) & in ? command
-              SEQ
-                IF
-                  command = c.render
-                    SEQ
-                      graphics ! c.tick; 260; free
-                      ledon(1000)
-                      out ! command
-                      graphics ! c.tick; 261; free
-                      ledoff()
-                      free := free - 1
-            return ? command
-              SEQ
-                graphics ! c.tick; 256; free
-                IF
-                  command = c.tick
-                    INT p1,p2 :
-                    SEQ
-                      return   ? p1;p2
-                      graphics ! command; p1;p2
+          in ? command
+          SEQ
+            IF
+              command = c.render
+                SEQ
+                  graphics ! c.tick; 260; free
+                  ledon(1000)
+                  out ! command
+                  graphics ! c.tick; 261; free
+                  ledoff()
+                  free := free - 1
   :
 
   VAL patchEdge IS 8 :
