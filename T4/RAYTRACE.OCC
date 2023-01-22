@@ -37,14 +37,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
         ledon(1000)
         in ? tag
         ledoff()
-        IF
-          tag = c.render
-            SEQ
-              IF
-                forward <> 0
-                  out ! tag
-                TRUE
-                  SKIP
+        out ! tag
   :
 
 

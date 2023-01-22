@@ -44,10 +44,10 @@ CONFIG
       controlSystem (forward[0], back[0], graphics, workers)
     PAR i = 0 FOR workers-1
       PROCESSOR raytrace.p[i]
-        rayTrace (forward[i], back[i], back[i+1], forward[i+1], true, i)
+        rayTrace (forward[i], forward[i+1], true, i)
     VAL i IS workers - 1 :
     PROCESSOR raytrace.p[i]
-      rayTrace (forward [i], back[i], soft, soft, false, i)
+      rayTrace (forward [i], soft, false, i)
 
 :
 --}}}
