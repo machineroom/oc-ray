@@ -56,5 +56,8 @@ for line in ispy_output:
                         # only connect "backwards" else occam tools complain about duplicated connections
                         # this also removes links connected on the same processor (that ispy reports twice and occam tools bitch about)
                         print (f"    CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
+                        # only connect 1 link
+                        break
+                        
         
 print (":")
