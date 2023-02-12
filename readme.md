@@ -16,32 +16,14 @@
 (@runtime x,y=[128,376])
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
-|1|T805/4MB|736s|662s|200s|145s|89s|SMT211B TRAM (all procs on single transputer)
-|1|T425/1MB|3630s|TBC|TBC|TBC|272s|TTM3A TRAM (all procs on single transputer)
-|5|T425/16MB|1009s|TBC|256s|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
-|11|T425/16MB|532s|585s|137s|88s|50s| 2 cards in system controller rack
-|17|T425/16MB|333s|TBC|137s|TBC|TBC|
-|41|T425/16MB|186s|TBC|TBC|TBC|TBC|
-|47|T425/16MB|183s|TBC|TBC|TBC|TBC|
-|71|T425/16MB|158s|TBC|TBC|TBC|TBC|
-
-lockup debugging. hacking network.inc total processors (renders is 2 less). run scene 5.
-20 OK (completes and writes MTV)
-30 ditto
-32 ditto
-34 ditto. usually. sometimes starts render but locks
-35 locks sending scene (53 * S c.render to system)
-36 locks sending scene (53 * S c.render to system)
-
-40 scene 5: locks sending scene (17 * S c.render to system). 
-40 scene 1: sends no "S c.render to system" 
-good render sends 64 * "S c.render to system" before first result
-
-50 starts render but locks
-53 doesn't start (no patches)
-55 starts but errors or locks card 6 in 2nd rack)
-59 ditto
-65 ditto
+|1|T805/4MB|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
+|1|T425/1MB|3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
+|5|T425/16MB|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
+|11|T425/16MB|532|585|137|88|50| 2 cards in system controller rack
+|17|T425/16MB|333|TBC|137|TBC|TBC|
+|41|T425/16MB|186|TBC|TBC|TBC|TBC|
+|47|T425/16MB|183|TBC|TBC|TBC|TBC|
+|71|T425/16MB|160|176|TBC|TBC|50|
 
 
 ## Select processor type
