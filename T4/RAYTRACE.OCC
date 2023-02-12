@@ -3,9 +3,6 @@
 -- fromNext, toNext links to next worker (or nowhere if last worker)
 -- propogate will be true for all but the last worker
 
--- pixelBypass - sends commands upstream (towards cntlsys)
--- renderer    - the actual pixel rendernig (get c.render, send c.patch)
-
 PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
 
   #USE "occama.lib"     --T414 math library
@@ -31,12 +28,20 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toNext, VAL INT propogate, me )
   SEQ
     WHILE TRUE
       SEQ
-        fromPrev ? tag
-        ledon(5000)
         IF
-          propogate = 1
-            toNext ! tag
-        --ledoff()
+          -- up-to 61 is OK. 62 bad
+          me < 62
+            SEQ
+              fromPrev ? tag
+              ledon(1000)
+              toNext ! tag
+          me = 62
+            SEQ
+              fromPrev ? tag
+              ledon(1000)
+          TRUE
+            ledoff()
+          
 :
 
 
