@@ -16,15 +16,20 @@
 (@runtime x,y=[128,376])
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
-|1|T805/4MB|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
-|1|T425/1MB|3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
-|5|T425/16MB|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
-|11|T425/16MB|532|585|137|88|50| 2 cards in system controller rack
-|17|T425/16MB|333|TBC|137|TBC|TBC|
-|41|T425/16MB|186|TBC|TBC|TBC|TBC|
-|47|T425/16MB|183|TBC|TBC|TBC|TBC|
-|71|T425/16MB|160|176|TBC|TBC|50|
+|1  |T805/4MB |736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
+|1  |T425/1MB |3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
+|5  |T425/16MB|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
+|11 |T425/16MB|532|585|137|88|50| 2 cards in system controller rack
+|17 |T425/16MB|333|TBC|137|TBC|TBC|
+|41 |T425/16MB|186|TBC|TBC|TBC|TBC|
+|47 |T425/16MB|183|TBC|TBC|TBC|TBC|
+|71 |T425/16MB|160|176|95|63|50|
+|88 |T425/16MB|162|||||
+|98 |T425/16MB|162|155||||
+|108|T425/16MB|161|196|87|77|65|
+|25|T80x|34||||Stefan Fennek "TransputerBox" (youtube)
 
+iserver won't boot 125 nodes :(
 
 ## Select processor type
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
