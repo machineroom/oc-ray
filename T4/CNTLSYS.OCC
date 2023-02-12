@@ -36,16 +36,13 @@ PROC controlSystem ( CHAN OF ANY out, graphics, VAL INT machines )
   :
 
   SEQ
-    INT free :
-    SEQ
-      free := machines 
-      SEQ x = 0 FOR 1024
-        SEQ
-          ledon(1000)
-          out ! c.render
-          graphics ! c.tick; 261; free
-          ledoff()
-          free := free - 1
+    SEQ x = 0 FOR 1024
+      SEQ
+        ledon(1000)
+        -- sendinog c.render causes lockup on x=62
+        out ! c.render
+        graphics ! c.tick; 261; x
+        ledoff()
 
 :
 
