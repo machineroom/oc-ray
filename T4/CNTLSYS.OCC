@@ -44,8 +44,7 @@ PROC controlSystem ( CHAN OF ANY out, graphics, VAL INT machines )
       SEQ x = 0 FOR patchesWide
         SEQ y = 0 FOR patchesWide
           SEQ
-            graphics ! c.tick; 258; free
-            graphics ! c.tick; 260; free
+            --graphics ! c.tick; 260; free
             ledon(1000)
             out ! c.render
             graphics ! c.tick; 261; free
