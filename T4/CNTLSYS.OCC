@@ -35,21 +35,17 @@ PROC controlSystem ( CHAN OF ANY out, graphics, VAL INT machines )
       TESTERR
   :
 
-  VAL patchEdge IS 8 :
-  VAL patchesWide IS 256 / patchEdge :
   SEQ
     INT free :
     SEQ
       free := machines 
-      SEQ x = 0 FOR patchesWide
-        SEQ y = 0 FOR patchesWide
-          SEQ
-            --graphics ! c.tick; 260; free
-            ledon(1000)
-            out ! c.render
-            graphics ! c.tick; 261; free
-            ledoff()
-            free := free - 1
+      SEQ x = 0 FOR 1024
+        SEQ
+          ledon(1000)
+          out ! c.render
+          graphics ! c.tick; 261; free
+          ledoff()
+          free := free - 1
 
 :
 
