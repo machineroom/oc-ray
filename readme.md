@@ -26,7 +26,7 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |71 |T425/16MB|160|176|95|63|50|
 |88 |T425/16MB|162|176||||
 |98 |T425/16MB|162|155||||
-|108|T425/16MB|161|196|87|77|65|
+|108|T425/16MB|161|186|87|77|65|
 |25|T80x|34||||Stefan Fennek "TransputerBox" (youtube)
 
 iserver won't boot 125 nodes :(
