@@ -2,6 +2,7 @@
 - Code obtained from [Ram's transputer pages](https://www.classiccmp.org/transputer/software/graphics/occam-raytracer.tar.gz) and thanks to Stefan Fennek (https://www.youtube.com/channel/UCauhcBH8yzUS7qwp2pN37tQ, https://github.com/DigiFennek) for pointers in the right direction :)
 - Make environment for Linux using dosbox
 - Configuration created for [Rpi/C011 interface](https://github.com/machineroom/rpi_c011) and Whitecross WX9020 T425 system. This system has a T425 on the system controller card (512KB), with link 1 to host and 2,3 to the transputer ring (T425, 16MB), all @ 20Mbps
+- See also Mike B's mods and results on FPGA hardware (cool!) https://bitbucket.org/transputer/raytracer/src/master/
 
 *note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
 
@@ -30,10 +31,10 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |77 |T425/16MB|164|||||
 |89 |T425/16MB|177|||||
 |98 |T425/16MB|162|155||||
-|108|T425/16MB|161|196|87|77|65|
-|25|T80x|34||||Stefan Fennek "TransputerBox" (youtube)
+|108|T425/16MB|161|186|87|77|65|
+|25|T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
+|16|FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
 
-iserver won't boot 125 nodes :(
 
 ## Select processor type
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
