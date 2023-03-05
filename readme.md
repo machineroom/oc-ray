@@ -20,11 +20,15 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |1  |T425/1MB |3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
 |5  |T425/16MB|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
 |11 |T425/16MB|532|585|137|88|50| 2 cards in system controller rack
-|17 |T425/16MB|333|TBC|137|TBC|TBC|
-|41 |T425/16MB|186|TBC|TBC|TBC|TBC|
-|47 |T425/16MB|183|TBC|TBC|TBC|TBC|
+|17 |T425/16MB|333||137|||
+|18 |T425/16MB|314|||||
+|35 |T425/16MB|184|||||
+|41 |T425/16MB|173|||||
+|53 |T425/16MB|165|||||
+|65 |T425/16MB|157|||||
 |71 |T425/16MB|160|176|95|63|50|
-|88 |T425/16MB|162|||||
+|77 |T425/16MB|164|||||
+|89 |T425/16MB|177|||||
 |98 |T425/16MB|162|155||||
 |108|T425/16MB|161|196|87|77|65|
 |25|T80x|34||||Stefan Fennek "TransputerBox" (youtube)
