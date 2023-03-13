@@ -17,25 +17,25 @@
 (@runtime x,y=[128,376])
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
-|1  |T805/4MB |736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
-|1  |T425/1MB |3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
-|5  |T425/16MB|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
-|11 |T425/16MB|532|585|137|88|50| 2 cards in system controller rack
-|17 |T425/16MB|333||137|||
-|18 |T425/16MB|314|||||
-|35 |T425/16MB|184|||||
-|41 |T425/16MB|173|||||
-|53 |T425/16MB|165|||||
-|65 |T425/16MB|157|||||
-|71 |T425/16MB|160|176|95|63|50|
-|77 |T425/16MB|164|||||
-|89 |T425/16MB|177|||||
-|98 |T425/16MB|162|155||||
-|108|T425/16MB|161|186|87|77|65|
-|113|T425/16MB|171|192||||
-|125|T425/16MB|199|181|95|88|77|
-|25|T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
-|16|FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
+|1  |T805|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
+|1  |T425|3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
+|5  |T425|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
+|11 |T425|532|585|137|88|50| 2 cards in system controller rack
+|17 |T425|333||137|||
+|18 |T425|314|||||
+|35 |T425|184|||||
+|41 |T425|173|||||
+|53 |T425|165|||||
+|65 |T425|157|||||
+|71 |T425|160|176|95|63|50|
+|77 |T425|164|||||
+|89 |T425|177|||||
+|98 |T425|162|155||||
+|108|T425|161|186|87|77|65|
+|113|T425|171|192||||
+|125|T425|199|181|95|88|77|
+|25 |T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
+|16 |FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
 
 
 ## Select processor type
