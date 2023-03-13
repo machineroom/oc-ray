@@ -13,14 +13,13 @@
 |14 spheres - scene 2|![](images/14spheres.jpg)|
 |Cone, Ellipsoid - scene 3|![](images/scene3.jpg)|
 
-## Performance
-(@runtime x,y=[128,376])
+## Performance (all WX9020 unless noted)
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
 |1  |T805|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
-|1  |T425|3630|TBC|TBC|TBC|272|TTM3A TRAM (all procs on single transputer)
-|5  |T425|1009|TBC|256|TBC|TBC| WX9020. cntlsys and framebuffer on seperate transputers
-|11 |T425|532|585|137|88|50| 2 cards in system controller rack
+|1  |T425|3630||||272|TTM3A TRAM (all procs on single transputer)
+|5  |T425|1009||256|||cntlsys and framebuffer on seperate transputers
+|11 |T425|532|585|137|88|50|2 cards in system controller rack
 |17 |T425|333||137|||
 |18 |T425|314|||||
 |35 |T425|184|||||
