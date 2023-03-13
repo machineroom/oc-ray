@@ -32,6 +32,8 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |89 |T425/16MB|177|||||
 |98 |T425/16MB|162|155||||
 |108|T425/16MB|161|186|87|77|65|
+|113|T425/16MB|171|192||||
+|125|T425/16MB|199|181|95|88|77|
 |25|T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
 |16|FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
 
