@@ -1,5 +1,8 @@
 #INCLUDE "hostio.inc"
 #INCLUDE "streamio.inc"
+#INCLUDE "f003e/occamlib/cgilib.inc"
+#INCLUDE "f003e/occamlib/b438.inc"
+#USE "f003e/occamlib/cgilib.lib"
 
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image, 
                   VAL INT processors)
