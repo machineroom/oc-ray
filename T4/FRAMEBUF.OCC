@@ -1,22 +1,188 @@
 #INCLUDE "hostio.inc"
 #INCLUDE "streamio.inc"
-#INCLUDE "f003e/occamlib/cgilib.inc"
-#INCLUDE "f003e/occamlib/b438.inc"
-#USE "f003e/occamlib/cgilib.lib"
 
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image, 
                   VAL INT processors)
   #USE "hostio.lib"
   #USE "streamio.lib"
-
-  ---------------------------- HARDWARE ADDRESSES -----------------------------
-  
-  [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
-  
-      
+     
   ---------------------------- GLOBALS ----------------------------------------
+  [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
 
 
+  -- delay ms
+  PROC sleep(VAL INT delay)
+    TIMER t :
+    INT start :
+    VAL ticksPerMilliSecond IS 15625/1000 :
+    SEQ
+      t ? start
+      t ? AFTER start PLUS (ticksPerMilliSecond * delay)
+  :
+  
+  PORT OF INT32 boardRegBase :
+  PLACE boardRegBase AT #200000 :
+
+  PROC resetB438()
+    SEQ
+      boardRegBase ! 0(INT32)
+      boardRegBase ! 1(INT32)
+      sleep(1)
+      boardRegBase ! 0(INT32)
+      sleep(1)  -- >50ns to settle
+  :
+
+  [1024]PORT OF INT32 regs :
+  PLACE regs AT 0 :
+  PROC ims332WriteRegister(VAL INT regno, VAL INT32 val)
+    SEQ
+      regs[regno] ! val
+  :
+
+  VAL INT32 mon.frequency IS 25(INT32) :
+  VAL INT32 mon.lineTime IS 202(INT32) :
+  VAL INT32 mon.halfSync IS 8(INT32) :
+  VAL INT32 mon.backPorch IS 20(INT32) :
+  VAL INT32 mon.display IS 160(INT32) :
+  VAL INT32 mon.shortDisplay IS 61(INT32) :
+  VAL INT32 mon.vDisplay IS 960(INT32) :
+  VAL INT32 mon.vBlank IS 80(INT32) :
+  VAL INT32 mon.vSync IS 4(INT32) :
+  VAL INT32 mon.vPreEqualize IS 4(INT32) :
+  VAL INT32 mon.vPostEqualize IS 4(INT32) :
+  VAL INT32 mon.broadPulse IS 75(INT32) :
+  VAL INT32 mon.memInit IS 512(INT32) :
+  VAL INT32 mon.xferDelay IS 1(INT32) :
+  VAL INT32 mon.lineStart IS 0(INT32) :
+  
+  VAL IMS332REGBOOT	IS #000 :
+  VAL	IMS332REGHALFSYNCH IS #021 :
+  VAL	IMS332REGBACKPORCH IS #022 :
+  VAL	IMS332REGDISPLAY IS #023 :
+  VAL	IMS332REGSHORTDIS IS	#024 :
+  VAL	IMS332REGBROADPULSE IS	#025 :
+  VAL	IMS332REGVSYNC	IS #026 :
+  VAL	IMS332REGVPREEQUALIZE	IS #027 :
+  VAL	IMS332REGVPOSTEQUALIZE IS #028 :
+  VAL	IMS332REGVBLANK IS #029 :
+  VAL	IMS332REGVDISPLAY IS	#02A :
+  VAL	IMS332REGLINETIME IS #02B :
+  VAL	IMS332REGLINESTART	IS #02C :
+  VAL	IMS332REGMEMINIT	IS #02D :
+  VAL	IMS332REGXFERDELAY	IS #02E :
+  VAL IMS332REGCOLORMASK IS #040 :
+  VAL IMS332REGCSRA	IS #060 :
+  VAL IMS332REGCSRB	IS #070 :
+  VAL IMS332REGLUTBASE IS #100 : --color palette
+  VAL IMS332REGLUTEND IS #1FF :
+
+  VAL INT32 IMS332CSRAVTGENABLE		IS #000001(INT32) :	-- vertical timing generator
+  VAL INT32 IMS332CSRAINTERLACED		IS #000002(INT32) :	-- screen format
+  VAL INT32 IMS332CSRACCIR		IS #000004(INT32) :	--default is EIA
+  VAL INT32 IMS332CSRASLAVESYNC		IS #000008(INT32) :	-- else from our pll
+  VAL INT32 IMS332CSRAPLAINSYNC		IS #000010(INT32) :	-- else tesselated
+  VAL INT32 IMS332CSRASEPARATESYNC	IS #000020(INT32) :	-- else composite
+  VAL INT32 IMS332CSRAVIDEOONLY		IS #000040(INT32) :	-- else video+sync
+  VAL INT32 IMS332CSRABLANKPEDESTAL	IS #000080(INT32) :	-- blank level
+  VAL INT32 IMS332CSRACBLANKISOUT	IS #000100(INT32) :
+  VAL INT32 IMS332CSRACBLANKNODELAY	IS #000200(INT32) :
+  VAL INT32 IMS332CSRAFORCEBLANK	IS #000400(INT32) :
+  VAL INT32 IMS332CSRABLANKDISABLE	IS #000800(INT32) :
+  VAL INT32 IMS332CSRAVRAMINCREMENT	IS #003000(INT32) :
+  VAL INT32 IMS332VRAMINC1	IS #000000(INT32) :
+  VAL INT32 IMS332VRAMINC256	IS #001000(INT32) :	-- except interlaced->2
+  VAL INT32 IMS332VRAMINC512	IS #002000(INT32) :
+  VAL INT32 IMS332VRAMINC1024	IS #003000(INT32) :
+  VAL INT32 IMS332CSRADMADISABLE	IS #004000(INT32) :
+  VAL INT32 IMS332CSRASYNCDELAYMASK	IS #038000(INT32) :	-- 0-7 VTG clk delays
+  VAL INT32 IMS332CSRAPIXELINTERLEAVE	IS #040000(INT32) :
+  VAL INT32 IMS332CSRADELAYEDSAMPLING	IS #080000(INT32) :
+  VAL INT32 IMS332CSRABITSPERPIXEL	IS #700000(INT32) :
+  VAL INT32 IMS332BPP1		IS #000000(INT32) :
+  VAL INT32 IMS332BPP2		IS #100000(INT32) :
+  VAL INT32 IMS332BPP4		IS #200000(INT32) :
+  VAL INT32 IMS332BPP8		IS #300000(INT32) :
+  VAL INT32 IMS332BPP15		IS #400000(INT32) :
+  VAL INT32 IMS332BPP16		IS #500000(INT32) :
+  VAL INT32 IMS332CSRADISABLECURSOR	IS #800000(INT32) :
+
+  VAL	INT32 IMS332BOOTPLL IS #00001F(INT32) :	-- xPLL, binary
+  VAL	INT32 IMS332BOOTCLOCKPLL IS #000020(INT32) :	-- else xternal
+  VAL	INT32 IMS332BOOT64BITMODE IS #000040(INT32) :	-- else 32
+
+  PROC ims332Init()
+    -- PLL multipler in bits 0..4 (values from 5 to 31 allowed)
+    -- B438 TRAM derives clock from TRAM clock (5MHz)
+    INT32 clock :
+    INT32 pllMultiplier :
+    INT32 CSRA :
+    SEQ
+      clock := 5(INT32)
+      pllMultiplier := mon.frequency/clock 
+      ims332WriteRegister (IMS332REGBOOT, pllMultiplier BITOR IMS332BOOTCLOCKPLL)
+      sleep(1)
+      ims332WriteRegister (IMS332REGCSRA, 0(INT32))
+      sleep(1)
+      ims332WriteRegister (IMS332REGCSRB, #B(INT32))
+      ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime)
+      ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync)
+      ims332WriteRegister (IMS332REGBACKPORCH,     mon.backPorch)
+      ims332WriteRegister (IMS332REGDISPLAY,        mon.display)
+      ims332WriteRegister (IMS332REGSHORTDIS,	    mon.shortDisplay)
+      ims332WriteRegister (IMS332REGVDISPLAY,      mon.vDisplay)
+      ims332WriteRegister (IMS332REGVBLANK,	    mon.vBlank)
+      ims332WriteRegister (IMS332REGVSYNC,		    mon.vSync)
+      ims332WriteRegister (IMS332REGVPREEQUALIZE, mon.vPreEqualize)
+      ims332WriteRegister (IMS332REGVPOSTEQUALIZE,mon.vPostEqualize)
+      ims332WriteRegister (IMS332REGBROADPULSE,	mon.broadPulse)
+      ims332WriteRegister (IMS332REGMEMINIT, 	    mon.memInit)
+      ims332WriteRegister (IMS332REGXFERDELAY,	    mon.xferDelay)
+      ims332WriteRegister (IMS332REGLINESTART,	    mon.lineStart)
+      ims332WriteRegister (IMS332REGCOLORMASK, #FFFFFF(INT32))
+      CSRA := 0(INT32)
+      CSRA := CSRA BITOR IMS332CSRADISABLECURSOR
+      CSRA := CSRA BITOR IMS332BPP8
+      CSRA := CSRA BITOR IMS332CSRAPIXELINTERLEAVE
+      CSRA := CSRA BITOR IMS332VRAMINC1024
+      CSRA := CSRA BITOR IMS332CSRAPLAINSYNC
+      CSRA := CSRA BITOR IMS332CSRAVTGENABLE
+      CSRA := CSRA BITOR IMS332CSRASEPARATESYNC
+      CSRA := CSRA BITOR IMS332CSRAVIDEOONLY
+      ims332WriteRegister(IMS332REGCSRA, CSRA)
+  :
+  
+  PROC setPalette (VAL INT index, VAL BYTE red, VAL BYTE green, VAL BYTE blue)
+    INT32 word :
+    SEQ
+      word := (INT32 red)
+      word := word << 8
+      word := word BITOR (INT32 green)
+      word := word << 8
+      word := word BITOR (INT32 blue)
+      ims332WriteRegister(IMS332REGLUTBASE + (index BITAND #FF), word)
+  :  
+  
+  [524288]PORT OF INT32 VRAM :  -- 4*512K=2MB
+  PLACE VRAM AT #80400000 :
+
+  PROC pokeWords (VAL INT addr, VAL INT count, VAL INT32 val)
+    INT a :
+    SEQ
+      a := addr
+      SEQ c = 0 FOR count
+        SEQ
+          VRAM[a] ! val
+          a := a + 1
+  :
+        
+  PROC setupGfx()
+    SEQ
+      resetB438()
+      ims332Init()
+      setPalette (0, 20(BYTE), 20(BYTE), 20(BYTE))
+      pokeWords(0, 200, (INT32 0))
+  :
+  
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
     VAL y.y IS (y + y) - 256 :
     VAL x.x IS (x + x) - 256 :
@@ -58,9 +224,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   VAL c.patch   IS 4 :  -- patch;  x; y; patchSize; [ patchSize][patchSize]
   VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
   VAL c.message IS 6 :  -- message; size; [ words ]
-
-
-  VAL patchSize IS 16 :
 
   ------------------------------------------------------------------------------------------
   -- This procedure has been developed to print the image to file called 'ray.mtv'.
@@ -199,8 +362,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
 
-  VAL ticksPerSecond IS 625000 / 64 :  -- lo priority
-
   CHAN OF ANY fromRenderer :
   PRI PAR
     WHILE TRUE
@@ -247,7 +408,11 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       VAL iticks       IS 1000000 / 64 :
       VAL ticks IS REAL32 TRUNC iticks :
       INT command :
+      INT32 Status :
       SEQ
+        so.write.string.nl (fs, ts, " setupGfx and exit!")
+        setupGfx()
+        so.exit (fs, ts, Status)      
         MenuSelection(image)
         so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
         clock ? start
@@ -295,8 +460,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
           so.write.string.nl (fs, ts, " processors.")
         clock ? start
         clock ? AFTER (start PLUS (20 * iticks))
-
-
 
       INT32 Status :
       SEQ
