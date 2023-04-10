@@ -32,11 +32,13 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       sleep(1)  -- >50ns to settle
   :
 
-  [1024]PORT OF INT32 regs :
+  [2048]PORT OF INT32 regs :
   PLACE regs AT 0 :
   PROC ims332WriteRegister(VAL INT regno, VAL INT32 val)
     SEQ
-      regs[regno] ! val
+      regs[regno*4] ! val
+      -- regs[regno*4] := val
+      sleep(1)
   :
 
   VAL INT32 mon.frequency IS 25(INT32) :
@@ -162,7 +164,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       ims332WriteRegister(IMS332REGLUTBASE + (index BITAND #FF), word)
   :  
   
-  [524288]PORT OF INT32 VRAM :  -- 4*512K=2MB
+  [524288]INT32 VRAM :  -- 4*512K=2MB
   PLACE VRAM AT #80400000 :
 
   PROC pokeWords (VAL INT addr, VAL INT count, VAL INT32 val)
@@ -171,7 +173,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       a := addr
       SEQ c = 0 FOR count
         SEQ
-          VRAM[a] ! val
+          VRAM[a] := val
           a := a + 1
   :
         
@@ -179,8 +181,8 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       resetB438()
       ims332Init()
-      setPalette (0, 20(BYTE), 20(BYTE), 20(BYTE))
-      pokeWords(0, 200, (INT32 0))
+      -- setPalette (0, 20(BYTE), 20(BYTE), 20(BYTE))
+      -- pokeWords(0, 200, (INT32 0))
   :
   
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
