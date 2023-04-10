@@ -2,8 +2,7 @@
 #INCLUDE "streamio.inc"
 
 PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image, 
-                  VAL INT processors,
-                  VAL INT frameRate, lineFreq, interLace, pixelClock )
+                  VAL INT processors)
   #USE "hostio.lib"
   #USE "streamio.lib"
 
@@ -49,17 +48,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     VAL y.y IS (y + y) - 256 :
     VAL x.x IS (x + x) - 256 :
     INT ptr, flip :
-    BOOL display :
     SEQ
       ptr := ((511 - y.y) << 9) + x.x
-      -- address of bottom left of patch in screen area
-      --IF
-      --  y.y < (textStart + textHeight)
-      --    display := FALSE
-      --  TRUE
-      --    display := TRUE
 
-      --[512*512] BYTE vscreen RETYPES screenRAM [ currentScreen] :
       [512*512] BYTE iscreen RETYPES screenRAM :
       SEQ j = 0 FOR size
         pLine IS patch [j] :
@@ -80,54 +71,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
               iscreen [ lptr-512] := BYTE b
               iscreen [ lptr-511] := BYTE 0
 
-              --IF
-              --  display
-              --    SEQ
-              --      vscreen [     lptr] := BYTE (r >> 2)
-              --      vscreen [   lptr+1] := BYTE ((g >> 2) + 64)
-              --      vscreen [ lptr-512] := BYTE ((b >> 2) + 128)
-              --      vscreen [ lptr-511] := BYTE 0
-              --  TRUE
-              --    SKIP
               lptr := lptr + 2
           ptr := ptr - 1024
   :
-
-
-  ---------------------------- FOLDED COMMENT -------------------------------
-
-  --PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
-  --  VAL y.y IS (y + y) - 256 :
-  --  VAL x.x IS (x + x) - 256 :
-  --  INT ptr, flip :
-  --  SEQ
-  --    ptr := ((511 - y.y) << 9) + x.x
-  --    -- address of bottom left of patch in screen area
-  --    IF
-  --      y.y < (textStart + textHeight)
-  --        flip := 1
-  --      TRUE
-  --        flip := 0
-  --    [512*512] BYTE screen RETYPES screenRAM [ currentScreen >< flip ] :
-  --    SEQ j = 0 FOR size
-  --      pLine IS patch [j] :
-  --      INT lptr :
-  --      SEQ
-  --        lptr := ptr
-  --        SEQ i = 0 FOR size    -- inner loop in x
-  --          VAL colour IS pLine [i] :
-  --          INT r, g, b :
-  --          SEQ
-  --            r := (colour >>  4) /\ 63
-  --            g := (colour >> 14) /\ 63
-  --            b := (colour >> 24) /\ 63
-  --            screen [     lptr] := BYTE r
-  --            screen [   lptr+1] := BYTE (g + 64)
-  --            screen [ lptr-512] := BYTE (b + 128)
-  --            screen [ lptr-511] := BYTE 0
-  --            lptr := lptr + 2
-  --        ptr := ptr - 1024
-  --:
 
 
   ---------------------------- COMMANDS PROTOCOL -----------------------------
