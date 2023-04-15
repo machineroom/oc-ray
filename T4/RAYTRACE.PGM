@@ -15,46 +15,28 @@ ARC Hostlink:
 
 --{{{  Mapping
 NODE framebuf.p :
-NODE cntlsys.p :
-[workers]NODE raytrace.p :
 
 MAPPING
   DO
     MAP framebuf.p ONTO System[0]
-    MAP cntlsys.p ONTO System[1]
-    DO i = 0 FOR workers
-      MAP raytrace.p[i] ONTO System[i+2]
 :
 --}}}
 
 --{{{  Code
 #INCLUDE "hostio.inc"
 #USE "framebuf.c4h"
-#USE "cntlsys.c4h"
-#USE "raytrace.c4h"
 
 CONFIG
   CHAN OF SP frame.in, frame.out :
   PLACE frame.in, frame.out ON Hostlink :
-  [workers]CHAN OF ANY forward, back :
-  CHAN OF ANY f,b :
-  CHAN OF ANY graphics, soft :
+  CHAN OF ANY graphics:
   CHAN OF INT image :
 
   VAL true      IS #FFFF :
   VAL false     IS #0000 :
 
-  PAR
-    PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, image, workers)
-    PROCESSOR cntlsys.p
-      controlSystem (forward[0], back[0], graphics, image, workers)
-    PAR i = 0 FOR workers-1
-      PROCESSOR raytrace.p[i]
-        rayTrace (forward[i], back[i], back[i+1], forward[i+1], true, i)
-    VAL i IS workers - 1 :
-    PROCESSOR raytrace.p[i]
-      rayTrace (forward [i], back[i], soft, soft, false, i)
+  PROCESSOR framebuf.p
+    frameBuffer (frame.in, frame.out, graphics, image, workers)
 
 :
 --}}}
