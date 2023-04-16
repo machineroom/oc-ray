@@ -193,7 +193,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       pokeWords(640*20, 640*10, #000000FF(INT32)) -- blue
   :
 
-  
+  -- display a 2D patch
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
     VAL y.y IS (y + y) - 256 :
     VAL x.x IS (x + x) - 256 :
@@ -210,12 +210,14 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
           SEQ i = 0 FOR size    -- inner loop in x
             VAL colour IS pLine [i] :
             INT r, g, b :
+            INT32 c :
             SEQ
               -- word is xxbbbbbbbbbbggggggggggrrrrrrrrrr
               r := (colour >>  2) /\ #FF -- bottom 8 bits
               g := (colour >> 12) /\ #FF
               b := (colour >> 22) /\ #FF
-              pokeWords(((y*640)+x)+i, 1, INT32 colour)
+              c := INT32(((r << 16) BITOR (g << 8)) BITOR b)
+              pokeWords(((((y-128)+j)*(640))+(x-128))+i, 1, c)
               iscreen [     lptr] := BYTE r
               iscreen [   lptr+1] := BYTE g
               iscreen [ lptr-512] := BYTE b
