@@ -100,16 +100,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   VAL INT32 IMS332VRAMINC1024	IS #003000(INT32) :
   VAL INT32 IMS332CSRADMADISABLE	IS #004000(INT32) :
   VAL INT32 IMS332CSRASYNCDELAYMASK	IS #038000(INT32) :	-- 0-7 VTG clk delays
-  VAL INT32 IMS332CSRAPIXELINTERLEAVE	IS #040000(INT32) :
+  VAL INT32 IMS332CSRAPIXELINTERLEAVE	IS #040000(INT32) : -- bit 18
   VAL INT32 IMS332CSRADELAYEDSAMPLING	IS #080000(INT32) :
   VAL INT32 IMS332CSRABITSPERPIXEL	IS #700000(INT32) :
-  VAL INT32 IMS332BPP1		IS #000000(INT32) :
-  VAL INT32 IMS332BPP2		IS #100000(INT32) :
-  VAL INT32 IMS332BPP4		IS #200000(INT32) :
-  VAL INT32 IMS332BPP8		IS #300000(INT32) :
-  VAL INT32 IMS332BPP15		IS #400000(INT32) :
-  VAL INT32 IMS332BPP16		IS #500000(INT32) :
   VAL INT32 IMS332CSRADISABLECURSOR	IS #800000(INT32) :
+
+  VAL INT32 IMS335BPP24		IS #600000(INT32) : -- bits 22,21
 
   VAL	INT32 IMS332BOOTPLL IS #00001F(INT32) :	-- xPLL, binary
   VAL	INT32 IMS332BOOTCLOCKPLL IS #000020(INT32) :	-- else xternal
@@ -122,31 +118,32 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     INT32 pllMultiplier :
     INT32 CSRA :
     SEQ
-      clock := 5(INT32)
+      clock := 5(INT32) --5MHz from TRAM
       pllMultiplier := mon.frequency/clock 
+      pllMultiplier := pllMultiplier * 2(INT32) -- 24bpp interleaved mode -> clock=2*dot rate
       ims332WriteRegister (IMS332REGBOOT, pllMultiplier BITOR IMS332BOOTCLOCKPLL)
       sleep(1)
       ims332WriteRegister (IMS332REGCSRA, 0(INT32))
       sleep(1)
       ims332WriteRegister (IMS332REGCSRB, #B(INT32)) -- 1011
-      ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime)
-      ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync)
-      ims332WriteRegister (IMS332REGBACKPORCH,     mon.backPorch)
-      ims332WriteRegister (IMS332REGDISPLAY,        mon.display)
-      ims332WriteRegister (IMS332REGSHORTDIS,	    mon.shortDisplay)
+      ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime*2(INT32))
+      ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync*2(INT32))
+      ims332WriteRegister (IMS332REGBACKPORCH,     mon.backPorch*2(INT32))
+      ims332WriteRegister (IMS332REGDISPLAY,        mon.display*2(INT32))
+      ims332WriteRegister (IMS332REGSHORTDIS,	    mon.shortDisplay*2(INT32))
       ims332WriteRegister (IMS332REGVDISPLAY,      mon.vDisplay)
       ims332WriteRegister (IMS332REGVBLANK,	    mon.vBlank)
       ims332WriteRegister (IMS332REGVSYNC,		    mon.vSync)
       ims332WriteRegister (IMS332REGVPREEQUALIZE, mon.vPreEqualize)
       ims332WriteRegister (IMS332REGVPOSTEQUALIZE,mon.vPostEqualize)
-      ims332WriteRegister (IMS332REGBROADPULSE,	mon.broadPulse)
+      ims332WriteRegister (IMS332REGBROADPULSE,	mon.broadPulse*2(INT32))
       ims332WriteRegister (IMS332REGMEMINIT, 	    mon.memInit)
       ims332WriteRegister (IMS332REGXFERDELAY,	    mon.xferDelay)
       ims332WriteRegister (IMS332REGLINESTART,	    mon.lineStart)
       ims332WriteRegister (IMS332REGCOLORMASK, #FFFFFF(INT32))
       CSRA := 0(INT32)
       CSRA := CSRA BITOR IMS332CSRADISABLECURSOR
-      CSRA := CSRA BITOR IMS332BPP8
+      CSRA := CSRA BITOR IMS335BPP24 --IMS332BPP8
       CSRA := CSRA BITOR IMS332CSRAPIXELINTERLEAVE
       CSRA := CSRA BITOR IMS332VRAMINC1024
       CSRA := CSRA BITOR IMS332CSRAPLAINSYNC
@@ -155,17 +152,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       CSRA := CSRA BITOR IMS332CSRAVIDEOONLY
       ims332WriteRegister(IMS332REGCSRA, CSRA)
   :
-  
-  PROC setPalette (VAL INT index, VAL BYTE red, VAL BYTE green, VAL BYTE blue)
-    INT32 word :
-    SEQ
-      word := (INT32 red)
-      word := word << 8
-      word := word BITOR (INT32 green)
-      word := word << 8
-      word := word BITOR (INT32 blue)
-      ims332WriteRegister(IMS332REGLUTBASE + (index BITAND #FF), word)
-  :  
   
   [524288]INT32 VRAM :  -- 4*512K=2MB
   VAL VRAMHardware IS #80400000 :
@@ -186,8 +172,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       resetB438()
       ims332Init()
-      setPalette (0, 255(BYTE), 20(BYTE), 20(BYTE))
-      pokeWords(0, 200, (INT32 0))
+      pokeWords(00000, 640*480, #00000000(INT32))
+      pokeWords(00000, 20000,   #000000FF(INT32))
+      pokeWords(20000, 40000,   #00000001(INT32))
   :
   
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
