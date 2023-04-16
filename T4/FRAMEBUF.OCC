@@ -20,25 +20,28 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       t ? AFTER start PLUS (ticksPerMilliSecond * delay)
   :
   
+  -- See Inmos TN66. Occam addresses are not Hardware addresses. Oh no, that would be 
+  -- way to to simple, wouldn't it. Oh no, we're Inmos and we know better. #FFS
   PORT OF INT32 boardRegBase :
-  PLACE boardRegBase AT #200000 :
+  VAL boardRegBaseHardware IS #200000 :
+  PLACE boardRegBase AT ((boardRegBaseHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
 
   PROC resetB438()
     SEQ
       boardRegBase ! 0(INT32)
-      boardRegBase ! 1(INT32)
+      boardRegBase ! #1(INT32)
       sleep(1)
       boardRegBase ! 0(INT32)
       sleep(1)  -- >50ns to settle
   :
 
-  [2048]PORT OF INT32 regs :
-  PLACE regs AT 0 :
+  [4096]PORT OF INT32 regs :
+  VAL regsHardware IS 0 :
+  PLACE regs AT ((regsHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
   PROC ims332WriteRegister(VAL INT regno, VAL INT32 val)
+    INT32 v :
     SEQ
-      regs[regno*4] ! val
-      -- regs[regno*4] := val
-      sleep(1)
+      regs[regno] ! val
   :
 
   VAL INT32 mon.frequency IS 25(INT32) :
@@ -125,7 +128,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       sleep(1)
       ims332WriteRegister (IMS332REGCSRA, 0(INT32))
       sleep(1)
-      ims332WriteRegister (IMS332REGCSRB, #B(INT32))
+      ims332WriteRegister (IMS332REGCSRB, #B(INT32)) -- 1011
       ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime)
       ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync)
       ims332WriteRegister (IMS332REGBACKPORCH,     mon.backPorch)
@@ -165,7 +168,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   :  
   
   [524288]INT32 VRAM :  -- 4*512K=2MB
-  PLACE VRAM AT #80400000 :
+  VAL VRAMHardware IS #80400000 :
+  PLACE VRAM AT ((VRAMHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
+
 
   PROC pokeWords (VAL INT addr, VAL INT count, VAL INT32 val)
     INT a :
@@ -181,8 +186,8 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       resetB438()
       ims332Init()
-      -- setPalette (0, 20(BYTE), 20(BYTE), 20(BYTE))
-      -- pokeWords(0, 200, (INT32 0))
+      setPalette (0, 255(BYTE), 20(BYTE), 20(BYTE))
+      pokeWords(0, 200, (INT32 0))
   :
   
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
