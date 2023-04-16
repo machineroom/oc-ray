@@ -217,7 +217,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
               g := (colour >> 12) /\ #FF
               b := (colour >> 22) /\ #FF
               c := INT32(((r << 16) BITOR (g << 8)) BITOR b)
-              pokeWords(((((y-128)+j)*(640))+(x-128))+i, 1, c)
+              pokeWords(((((256-(y-128))+(size-j))*(640))+(x-128))+i, 1, c)
               iscreen [     lptr] := BYTE r
               iscreen [   lptr+1] := BYTE g
               iscreen [ lptr-512] := BYTE b
