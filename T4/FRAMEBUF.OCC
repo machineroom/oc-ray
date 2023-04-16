@@ -153,8 +153,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       ims332WriteRegister(IMS332REGCSRA, CSRA)
   :
   
-  --[524288]INT32 VRAM :  -- 4*512K=2MB
-  [524288]PORT OF INT32 VRAM :  -- 4*512K=2MB
+  [524288]INT32 VRAM :  -- 4*512K=2MB
   VAL VRAMHardware IS #80400000 :
   PLACE VRAM AT ((VRAMHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
 
@@ -165,12 +164,11 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       a := addr
       SEQ c = 0 FOR count
         SEQ
-          --VRAM[a] := val
-          VRAM[a] ! val
+          VRAM[a] := val
           a := a + 1
   :
   
-  -- Thaks again, Inmos. Somewhere deep in the data sheet is a one liner about the palette being used for
+  -- Thanks again, Inmos. Somewhere deep in the data sheet is a one liner about the palette being used for
   -- gamma correction in true colour modes. #FFS
   PROC nilGamma ()
     INT32 gamma :
@@ -420,11 +418,11 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       VAL iticks       IS 1000000 / 64 :
       VAL ticks IS REAL32 TRUNC iticks :
       INT command :
-      INT32 Status :
+      --INT32 Status :
       SEQ
-        so.write.string.nl (fs, ts, " setupGfx and exit!")
+        so.write.string.nl (fs, ts, " setupGfx for B438")
         setupGfx()
-        so.exit (fs, ts, Status)      
+        --so.exit (fs, ts, Status)      
         MenuSelection(image)
         so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
         clock ? start
