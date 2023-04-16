@@ -21,7 +21,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   :
   
   -- See Inmos TN66. Occam addresses are not Hardware addresses. Oh no, that would be 
-  -- way to to simple, wouldn't it. Oh no, we're Inmos and we know better. #FFS
+  -- way too simple, wouldn't it. Oh no, we're Inmos and we know better. #FFS
   PORT OF INT32 boardRegBase :
   VAL boardRegBaseHardware IS #200000 :
   PLACE boardRegBase AT ((boardRegBaseHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
@@ -39,7 +39,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   VAL regsHardware IS 0 :
   PLACE regs AT ((regsHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
   PROC ims332WriteRegister(VAL INT regno, VAL INT32 val)
-    INT32 v :
     SEQ
       regs[regno] ! val
   :
@@ -56,7 +55,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   VAL INT32 mon.vPreEqualize IS 4(INT32) :
   VAL INT32 mon.vPostEqualize IS 4(INT32) :
   VAL INT32 mon.broadPulse IS 75(INT32) :
-  VAL INT32 mon.memInit IS 512(INT32) :
+  VAL INT32 mon.memInit IS 128(INT32) :
   VAL INT32 mon.xferDelay IS 1(INT32) :
   VAL INT32 mon.lineStart IS 0(INT32) :
   
@@ -114,6 +113,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
   PROC ims332Init()
     -- PLL multipler in bits 0..4 (values from 5 to 31 allowed)
     -- B438 TRAM derives clock from TRAM clock (5MHz)
+    -- SU are *2 for 24bpp mode
     INT32 clock :
     INT32 pllMultiplier :
     INT32 CSRA :
@@ -125,7 +125,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       sleep(1)
       ims332WriteRegister (IMS332REGCSRA, 0(INT32))
       sleep(1)
-      ims332WriteRegister (IMS332REGCSRB, #B(INT32)) -- 1011
+      ims332WriteRegister (IMS332REGCSRB, #B(INT32)) -- 1011 Split SAM, Sync on green, External pixel sampling
       ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime*2(INT32))
       ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync*2(INT32))
       ims332WriteRegister (IMS332REGBACKPORCH,     mon.backPorch*2(INT32))
@@ -137,13 +137,13 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       ims332WriteRegister (IMS332REGVPREEQUALIZE, mon.vPreEqualize)
       ims332WriteRegister (IMS332REGVPOSTEQUALIZE,mon.vPostEqualize)
       ims332WriteRegister (IMS332REGBROADPULSE,	mon.broadPulse*2(INT32))
-      ims332WriteRegister (IMS332REGMEMINIT, 	    mon.memInit)
-      ims332WriteRegister (IMS332REGXFERDELAY,	    mon.xferDelay)
-      ims332WriteRegister (IMS332REGLINESTART,	    mon.lineStart)
-      ims332WriteRegister (IMS332REGCOLORMASK, #FFFFFF(INT32))
+      ims332WriteRegister (IMS332REGMEMINIT, 	    mon.memInit*2(INT32))
+      ims332WriteRegister (IMS332REGXFERDELAY,	    mon.xferDelay*2(INT32))
+      ims332WriteRegister (IMS332REGLINESTART,	    mon.lineStart*2(INT32))
+      ims332WriteRegister (IMS332REGCOLORMASK, #FFFFFFFF(INT32))
       CSRA := 0(INT32)
       CSRA := CSRA BITOR IMS332CSRADISABLECURSOR
-      CSRA := CSRA BITOR IMS335BPP24 --IMS332BPP8
+      CSRA := CSRA BITOR IMS335BPP24
       CSRA := CSRA BITOR IMS332CSRAPIXELINTERLEAVE
       CSRA := CSRA BITOR IMS332VRAMINC1024
       CSRA := CSRA BITOR IMS332CSRAPLAINSYNC
@@ -153,7 +153,8 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       ims332WriteRegister(IMS332REGCSRA, CSRA)
   :
   
-  [524288]INT32 VRAM :  -- 4*512K=2MB
+  --[524288]INT32 VRAM :  -- 4*512K=2MB
+  [524288]PORT OF INT32 VRAM :  -- 4*512K=2MB
   VAL VRAMHardware IS #80400000 :
   PLACE VRAM AT ((VRAMHardware >> 2) - (#80000000 >> 2)) /\ #3FFFFFFF :
 
@@ -164,17 +165,34 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       a := addr
       SEQ c = 0 FOR count
         SEQ
-          VRAM[a] := val
+          --VRAM[a] := val
+          VRAM[a] ! val
           a := a + 1
+  :
+  
+  -- Thaks again, Inmos. Somewhere deep in the data sheet is a one liner about the palette being used for
+  -- gamma correction in true colour modes. #FFS
+  PROC nilGamma ()
+    INT32 gamma :
+    SEQ
+      SEQ c = IMS332REGLUTBASE FOR 256
+        SEQ
+          gamma := INT32 c
+          gamma := gamma << 8
+          gamma := gamma BITOR (INT32 c)
+          gamma := gamma << 8
+          gamma := gamma BITOR (INT32 c)
+          ims332WriteRegister (c, gamma)
   :
         
   PROC setupGfx()
     SEQ
       resetB438()
       ims332Init()
-      pokeWords(00000, 640*480, #00000000(INT32))
-      pokeWords(00000, 20000,   #000000FF(INT32))
-      pokeWords(20000, 40000,   #00000001(INT32))
+      nilGamma()
+      pokeWords(0000, 640*480, #00000000(INT32)) -- black
+      pokeWords(640*10, 640*10, #0000FF00(INT32)) -- green
+      pokeWords(640*20, 640*10, #000000FF(INT32)) -- blue
   :
   
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
