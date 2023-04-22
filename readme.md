@@ -4,6 +4,9 @@
 - Configuration created for [Rpi/C011 interface](https://github.com/machineroom/rpi_c011) and Whitecross WX9020 T425 system. This system has a T425 on the system controller card (512KB), with link 1 to host and 2,3 to the transputer ring (T425, 16MB), all @ 20Mbps
 - See also Mike B's mods and results on FPGA hardware (cool!) https://bitbucket.org/transputer/raytracer/src/master/
 
+# 2023 updates
+- Use framebuffer on B438 root node by default
+
 *note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
 
 ## Samples
@@ -51,6 +54,10 @@ The T4 directory is where the action happens and can fairly easily build for eit
 Generate the network map for the current system
 ```
 sudo /home/james/INMOS_ispy_c011/ispy | ./ispy_to_network.py > network.inc
+```
+B438 has odd behaviour with ispy... hacky work-around:
+```
+sudo /home/james/INMOS_ispy_c011/ispy | ./ispy_to_network.py --B438 > network.inc
 ```
 Make the code
 ```

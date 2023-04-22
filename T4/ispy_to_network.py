@@ -27,6 +27,11 @@ print ("    SET System[1] (type, memsize := \"T425\", 16*M)")
 print ("    DO i = 2 FOR workers")
 print ("      SET System[i] (type, memsize := \"T425\", 16*M)")
 
+if sys.argv[1] == "--B438":
+    # work around: ispy on B438 doesn't print HOST for the host link?
+    print ("    CONNECT System[0][link][0] TO HOST WITH Hostlink")
+
+    
 
 for line in ispy_output:
     targets = []
