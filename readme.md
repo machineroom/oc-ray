@@ -5,7 +5,7 @@
 - See also Mike B's mods and results on FPGA hardware (cool!) https://bitbucket.org/transputer/raytracer/src/master/
 
 # 2023 updates
-- Use framebuffer on B438 root node by default
+- Use framebuffer on B438 root node by default. Lots of assumptions about framebuf running on T805
 
 *note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
 

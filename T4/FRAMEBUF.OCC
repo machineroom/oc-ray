@@ -5,21 +5,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                   VAL INT processors)
   #USE "hostio.lib"
   #USE "streamio.lib"
+  #USE "SNGLMATH.LIB"
      
   ---------------------------- GLOBALS ----------------------------------------
   [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
 
 
-  -- delay ms
-  PROC sleep(VAL INT delay)
-    TIMER t :
-    INT start :
-    VAL ticksPerMilliSecond IS 15625/1000 :
-    SEQ
-      t ? start
-      t ? AFTER start PLUS (ticksPerMilliSecond * delay)
-  :
-  
   -- See Inmos TN66. Occam addresses are not Hardware addresses. Oh no, that would be 
   -- way too simple, wouldn't it. Oh no, we're Inmos and we know better. #FFS
   PORT OF INT32 boardRegBase :
@@ -30,9 +21,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       boardRegBase ! 0(INT32)
       boardRegBase ! #1(INT32)
-      sleep(1)
       boardRegBase ! 0(INT32)
-      sleep(1)  -- >50ns to settle
   :
 
   [4096]PORT OF INT32 regs :
@@ -122,9 +111,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       pllMultiplier := mon.frequency/clock 
       pllMultiplier := pllMultiplier * 2(INT32) -- 24bpp interleaved mode -> clock=2*dot rate
       ims332WriteRegister (IMS332REGBOOT, pllMultiplier BITOR IMS332BOOTCLOCKPLL)
-      sleep(1)
       ims332WriteRegister (IMS332REGCSRA, 0(INT32))
-      sleep(1)
       ims332WriteRegister (IMS332REGCSRB, #B(INT32)) -- 1011 Split SAM, Sync on green, External pixel sampling
       ims332WriteRegister (IMS332REGLINETIME,	    mon.lineTime*2(INT32))
       ims332WriteRegister (IMS332REGHALFSYNCH,     mon.halfSync*2(INT32))
@@ -175,7 +162,24 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       SEQ c = IMS332REGLUTBASE FOR 256
         SEQ
-          gamma := INT32 c
+          gamma := INT32 (c-IMS332REGLUTBASE)
+          gamma := gamma << 8
+          gamma := gamma BITOR (INT32 c)
+          gamma := gamma << 8
+          gamma := gamma BITOR (INT32 c)
+          ims332WriteRegister (c, gamma)
+  :
+
+  PROC bt709Gamma ()
+    INT32 gamma :
+    REAL32 g,h,i :
+    SEQ
+      SEQ c = IMS332REGLUTBASE FOR 256
+        SEQ
+          i := REAL32 ROUND ((c-IMS332REGLUTBASE)+1)
+          h := i/255.0(REAL32)
+          g := POWER(h, 2.3(REAL32))
+          gamma := INT32 ROUND (255.0(REAL32) * g)
           gamma := gamma << 8
           gamma := gamma BITOR (INT32 c)
           gamma := gamma << 8
@@ -187,7 +191,8 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       resetB438()
       ims332Init()
-      nilGamma()
+      --nilGamma()
+      bt709Gamma()
       pokeWords(0000, 640*480, #00000000(INT32)) -- black
       pokeWords(640*10, 640*10, #0000FF00(INT32)) -- green
       pokeWords(640*20, 640*10, #000000FF(INT32)) -- blue
@@ -436,12 +441,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
                 [16][16] INT patch :
                 SEQ
                   fromRenderer ? x; y; size
-                  so.write.string (fs, ts, " p x=")
-                  so.write.int (fs, ts, x, 1)
-                  so.write.string (fs, ts, ",y=")
-                  so.write.int (fs, ts, y, 1)
-                  so.write.string (fs, ts, ",size=")
-                  so.write.int (fs, ts, size, 1)
+                  --so.write.string (fs, ts, " p x=")
+                  --so.write.int (fs, ts, x, 1)
+                  --so.write.string (fs, ts, ",y=")
+                  --so.write.int (fs, ts, y, 1)
+                  --so.write.string (fs, ts, ",size=")
+                  --so.write.int (fs, ts, size, 1)
                   SEQ i = 0 FOR size
                     fromRenderer ? [ patch [i] FROM 0 FOR size ]
                   displayPatch ( x, y, size, patch )
