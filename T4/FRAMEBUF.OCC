@@ -180,11 +180,11 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
           i := REAL32 ROUND (c-IMS.332.REGLUTBASE)
           g := POWER(i/255.0(REAL32), 2.2(REAL32))
           corrected := INT32 ROUND (255.0(REAL32) * g)
-          so.write.string (fs,ts, "gamma uncorrected=")
-          so.write.real32 (fs,ts, i, 3, 1)
-          so.write.string (fs,ts, " corrected=")
-          so.write.int32 (fs,ts, corrected, 2)
-          so.write.string.nl (fs,ts, "")
+          --so.write.string (fs,ts, "gamma uncorrected=")
+          --so.write.real32 (fs,ts, i, 3, 1)
+          --so.write.string (fs,ts, " corrected=")
+          --so.write.int32 (fs,ts, corrected, 2)
+          --so.write.string.nl (fs,ts, "")
           entry := corrected
           entry := entry << 8
           entry := entry BITOR corrected

@@ -874,7 +874,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               command = c.render
                 INT x, y :
                 SEQ
-                  writes ( "*N*C S c.render to system", buffer)
+                  --writes ( "*N*C S c.render to system", buffer)
                   in  ? x; y
                   out ! command; x; y
                   free := free - 1
@@ -888,7 +888,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
               command = c.patch
                 INT x, y, size :
                 SEQ
-                  writes ( "*N*C R patch", buffer)
+                  --writes ( "*N*C R patch", buffer)
                   return   ? x; y; size
                   graphics ! command; x; y; size
                   SEQ i = 0 FOR size
