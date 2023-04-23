@@ -19,7 +19,7 @@ DB=dosbox\
 	-c "D:"
 
 CPU=/T425
-FBCPU=/T8
+T8CPU=/T8
 #CPU=/T8
 ##### IMAKEF CUT #####
 
@@ -43,19 +43,19 @@ RAYTRACE.CFB : RAYTRACE.PGM FRAMEBUF.C4H CNTLSYS.C4H RAYTRACE.C4H network.inc
 	-grep --color "Warning\|Error" 2.OUT
 
 FRAMEBUF.C4H : FRAMEBUF.L4H FRAMEBUF.T4H 
-	$(DB) -c "$(LINK) /f FRAMEBUF.L4H $(FBCPU) /h /o FRAMEBUF.C4H $(LINKOPT) > 3.out" -c "exit"
+	$(DB) -c "$(LINK) /f FRAMEBUF.L4H $(T8CPU) /h /o FRAMEBUF.C4H $(LINKOPT) > 3.out" -c "exit"
 	-grep --color "Warning\|Error" 3.OUT
 
 FRAMEBUF.T4H : FRAMEBUF.OCC
-	$(DB) -c "$(OCCAM) FRAMEBUF $(FBCPU) /h /o FRAMEBUF.T4H $(OCCOPT) > 4.out" -c "exit"
+	$(DB) -c "$(OCCAM) FRAMEBUF $(T8CPU) /h /o FRAMEBUF.T4H $(OCCOPT) > 4.out" -c "exit"
 	-grep --color "Warning\|Error" 4.OUT
 
 CNTLSYS.C4H : CNTLSYS.L4H CNTLSYS.T4H 
-	$(DB) -c "$(LINK) /f CNTLSYS.L4H $(CPU) /h /o CNTLSYS.C4H $(LINKOPT) > 5.out" -c "exit"
+	$(DB) -c "$(LINK) /f CNTLSYS.L4H $(T8CPU) /h /o CNTLSYS.C4H $(LINKOPT) > 5.out" -c "exit"
 	-grep --color "Warning\|Error" 5.OUT
 
 CNTLSYS.T4H : CNTLSYS.OCC
-	$(DB) -c "$(OCCAM) CNTLSYS /A $(CPU) /h /o CNTLSYS.T4H $(OCCOPT) > 6.out" -c "exit"
+	$(DB) -c "$(OCCAM) CNTLSYS /A $(T8CPU) /h /o CNTLSYS.T4H $(OCCOPT) > 6.out" -c "exit"
 	-grep --color "Warning\|Error" 6.OUT
 
 RAYTRACE.C4H : RAYTRACE.L4H RAYTRACE.T4H 

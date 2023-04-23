@@ -17,6 +17,7 @@
 |Cone, Ellipsoid - scene 3|![](images/scene3.jpg)|
 
 ## Performance (all WX9020 unless noted)
+All WX9020 results below are with the virtual router enabled, since the WX9020 hardware isn't a pipe! The results point at the VR quickly becoming a bottleneck as workers are scaled.
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
 |1  |T805|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
@@ -38,6 +39,11 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |125|T425|199|181|95|88|77|
 |25 |T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
 |16 |FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
+
+Results with virtual router disabled, on simple pipe (achievable with a small number of processors). framebuf and cntlsys on root T8. Linear scaling!:
+|3  |T425|1265|||||fb on T8, cntlsys on worker T4
+|5  |T425|760|||||fb on T8, cntlsys on worker T4
+|6  |T425||||||fb & cntlsys on T8
 
 
 ## Select processor type

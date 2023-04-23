@@ -22,9 +22,9 @@ NODE cntlsys.p :
 MAPPING
   DO
     MAP framebuf.p ONTO System[0]
-    MAP cntlsys.p ONTO System[1]
+    MAP cntlsys.p ONTO System[0]
     DO i = 0 FOR workers
-      MAP raytrace.p[i] ONTO System[i+2]
+      MAP raytrace.p[i] ONTO System[i+1]
 :
 --}}}
 
