@@ -2956,8 +2956,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     :
 
     INT command :
-    INT nobj, nlight :
+    INT nobj, nlight, njobs :
     SEQ
+      njobs   := 0
       nrays   := 0
       nobj    := 0
       nlight  := 0
@@ -2972,6 +2973,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
             command = c.render
               INT x0, y0 :
               SEQ
+                njobs := njobs + 1
                 workIn ? x0; y0
                 IF
                   renderingMode = m.adaptive
@@ -3011,7 +3013,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 writef ( "*N*C received garbage command %I", command, 0,0,0)
                 STOP
           workIn ? command
-      writef ( "*N*C Worker %I: %I lights traced %I rays", me, nlight, nrays, 0 )
+      writef ( "*N*C Worker %I: %I lights traced %I rays & %I jobs", me, nlight, nrays, njobs )
       pixelsOut ! command
   :
 
