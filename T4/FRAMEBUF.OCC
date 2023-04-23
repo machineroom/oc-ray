@@ -177,7 +177,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
     SEQ
       SEQ c = IMS332REGLUTBASE FOR 256
         SEQ
-          i := REAL32 ROUND ((c-IMS332REGLUTBASE)+1)
+          i := REAL32 ROUND ((c-IMS332REGLUTBASE))
           g := POWER(i/255.0(REAL32), 2.3(REAL32))
           gamma := INT32 ROUND (255.0(REAL32) * g)
           gamma := gamma << 8
