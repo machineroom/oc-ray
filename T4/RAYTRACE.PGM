@@ -3,11 +3,6 @@ VAL K IS 1024:
 VAL M IS K*K:
 --}}}
 
---{{{  HIGH, LOW priority levels
-VAL HIGH IS 0:
-VAL LOW IS 1:
---}}}
-
 ARC Hostlink:
 
 -- network.inc is written by ispy_to_network.py
