@@ -172,18 +172,19 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
 
   --some sort of gamma correction
   PROC bt709Gamma ()
-    INT32 gamma :
+    INT32 gamma, corrected :
     REAL32 g,i :
     SEQ
       SEQ c = IMS332REGLUTBASE FOR 256
         SEQ
           i := REAL32 ROUND ((c-IMS332REGLUTBASE))
           g := POWER(i/255.0(REAL32), 2.3(REAL32))
-          gamma := INT32 ROUND (255.0(REAL32) * g)
+          corrected := INT32 ROUND (255.0(REAL32) * g)
+          gamma := corrected
           gamma := gamma << 8
-          gamma := gamma BITOR (INT32 c)
+          gamma := gamma BITOR corrected
           gamma := gamma << 8
-          gamma := gamma BITOR (INT32 c)
+          gamma := gamma BITOR corrected
           ims332WriteRegister (c, gamma)
   :
         
