@@ -4,7 +4,6 @@
 # a combo of ispy_to_network and ispy_to_graph
 import sys
 import string
-import matplotlib.pyplot as plt
 import networkx as nx
 import argparse
 
