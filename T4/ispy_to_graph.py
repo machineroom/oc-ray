@@ -59,8 +59,7 @@ for node in G:
     #cmap.append(colour)
     G.nodes[node]['weight'] = distanceDict[node]
     cmap.append(float(distanceDict[node]))
-pos = nx.spring_layout(G, seed=0)
-#pos = nx.circular_layout(G)
+pos = nx.spring_layout(G, center=[0,0], iterations=5000)
 nx.draw(G, with_labels=True, node_color=cmap, pos=pos, cmap=plt.cm.Blues, vmin=0, vmax=8)
 plt.show()
 
