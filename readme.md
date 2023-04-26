@@ -48,6 +48,7 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 |5  |T425|760|fb on T8, cntlsys on worker T4|
 |6  |T425|636|fb & cntlsys on T8|
 |14 |T425|277|fb & cntlsys on T8|
+|92 |T425|67|fb & cntlsys on T8 (using ispy_to_long_pipe.py)|
 
 
 ## Select processor type
