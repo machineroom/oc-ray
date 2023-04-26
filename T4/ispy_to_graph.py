@@ -55,15 +55,10 @@ for path in nx.all_simple_edge_paths(G,0,n-1):
 print (f"longest path(edges) = {longest_path}")
 
 #colour edges by longest path
-edge_colours = ['black']*len(edges)
-#for i,edge in enumerate (edges):
-#    if edge in longest_path:
-#        edge_colours[i]='red'
 for e in G.edges():
     G[e[0]][e[1]]['color'] = 'black'
 for e in longest_path:
     G[e[0]][e[1]]['color'] = 'red'
-
 edge_colours = [ G[e[0]][e[1]]['color'] for e in G.edges() ]
 
 #colour nodes by distance from root
