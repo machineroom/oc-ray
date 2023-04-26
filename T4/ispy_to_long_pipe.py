@@ -114,5 +114,21 @@ with open(args.output, encoding="utf-8", mode="w+") as output:
                     break
                         
         
+    output.write (":\n\n")
+    
+    output.write ("--{{{  Mapping\n")
+    output.write ("NODE framebuf.p :\n")
+    output.write ("NODE cntlsys.p :\n")
+    output.write ("[workers]NODE raytrace.p :\n")
+    output.write ("MAPPING\n")
+    output.write ("  DO\n")
+    output.write ("    MAP framebuf.p ONTO System[0]\n")
+    output.write ("    MAP cntlsys.p ONTO System[0]\n")
+    for i,(a,b) in enumerate(longest_path):
+      output.write (f"    MAP raytrace.p[{i}] ONTO System[{m[b]}]\n")
+    #output.write ("    DO i = 0 FOR workers\n")
+    #output.write ("      MAP raytrace.p[i] ONTO System[i+1]\n")
     output.write (":\n")
+    output.write ("--}}}\n")
+    
 

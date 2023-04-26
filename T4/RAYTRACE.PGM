@@ -9,20 +9,6 @@ ARC Hostlink:
 #INCLUDE "network.inc"
 
 
---{{{  Mapping
-NODE framebuf.p :
-NODE cntlsys.p :
-[workers]NODE raytrace.p :
-
-MAPPING
-  DO
-    MAP framebuf.p ONTO System[0]
-    MAP cntlsys.p ONTO System[0]
-    DO i = 0 FOR workers
-      MAP raytrace.p[i] ONTO System[i+1]
-:
---}}}
-
 --{{{  Code
 #INCLUDE "hostio.inc"
 #USE "framebuf.c4h"
