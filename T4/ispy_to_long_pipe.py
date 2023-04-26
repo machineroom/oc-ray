@@ -81,8 +81,7 @@ with open(args.output, encoding="utf-8", mode="w+") as output:
     else:
        output.write ("    SET System[0] (type, memsize := \"T425\", 1*M)\n")
     
-    output.write ("    SET System[1] (type, memsize := \"T425\", 16*M)\n")
-    output.write ("    DO i = 2 FOR workers\n")
+    output.write ("    DO i = 1 FOR workers\n")
     output.write ("      SET System[i] (type, memsize := \"T425\", 16*M)\n")
 
     if args.b438:
