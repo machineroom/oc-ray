@@ -6,6 +6,7 @@
 
 # 2023 updates
 - Use framebuffer on B438 root node by default. Lots of assumptions about framebuf running on T805
+- Remove the virtual router and use proper hardware links (massive speedup with many nodes)
 
 *note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
 
