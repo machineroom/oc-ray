@@ -49,6 +49,9 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 |6  |T425|636|fb & cntlsys on T8|
 |14 |T425|277|fb & cntlsys on T8|
 |92 |T425|67|fb & cntlsys on T8 (using ispy_to_long_pipe.py)|
+|92 |T425|55|4*4 patches (8*8 causes one worker to hold everything up at end!)|
+|92 |T425|52|3*3 patches|
+|92 |T425|56|2*2 patches|
 
 
 ## Select processor type

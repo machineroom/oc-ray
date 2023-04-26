@@ -949,7 +949,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       out ! command
   :
 
-  VAL patchEdge IS 8 :
+  VAL patchEdge IS 3 :
   [4][256] INT buffer :
   CHAN OF ANY a, b, c :
   WHILE TRUE
