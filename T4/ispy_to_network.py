@@ -61,12 +61,12 @@ for line in ispy_output:
                 if target_processor not in targets:
                     targets.append(target_processor)
                     target_link = link.split(":")[1]
-                    if int(target_processor) < int(processor):
+                    if int(target_processor) != int(processor):
                         # only connect "backwards" else occam tools complain about duplicated connections
                         # this also removes links connected on the same processor (that ispy reports twice and occam tools bitch about)
                         print (f"    CONNECT System[{processor}][link][{index}] TO System[{target_processor}][link][{target_link}]")
                         # only connect 1 link
-                        break
+                        #break
                         
         
 print (":")

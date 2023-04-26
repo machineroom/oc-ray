@@ -17,6 +17,7 @@
 |Cone, Ellipsoid - scene 3|![](images/scene3.jpg)|
 
 ## Performance (all WX9020 unless noted)
+All WX9020 results below are with the virtual router enabled (default with D7305a occam tools), since the WX9020 hardware isn't a pipe! The results point at the VR quickly becoming a bottleneck as workers are scaled.
 Workers|Type|Scene 1|2|3|4|5|notes|
 |--|--|--|--|--|--|--|--|
 |1  |T805|736|662|200|145|89|SMT211B TRAM (all procs on single transputer)
@@ -39,6 +40,16 @@ Workers|Type|Scene 1|2|3|4|5|notes|
 |25 |T80x|34|||||Stefan Fennek "TransputerBox" (youtube)
 |16 |FPGA|6.5|7.5|2.0|1.5||Acorn CLE-215+ (XC7A200T-3 Artix-7 FPGA) (See Mike B link above)
 
+## Removing virtual router
+Results with virtual router disabled, on simple pipe (achievable with a small number of processors). framebuf and cntlsys on root T8. Linear scaling!:
+|Workers|Type|Scene 1|notes|
+|--|--|--|--|
+|3  |T425|1265|fb on T8, cntlsys on worker T4|
+|5  |T425|760|fb on T8, cntlsys on worker T4|
+|6  |T425|636|fb & cntlsys on T8|
+|14 |T425|277|fb & cntlsys on T8|
+|92 |T425|67|fb & cntlsys on T8 (using ispy_to_long_pipe.py)|
+
 
 ## Select processor type
 The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
@@ -53,11 +64,8 @@ The T4 directory is where the action happens and can fairly easily build for eit
 ## Build
 Generate the network map for the current system
 ```
-sudo /home/james/INMOS_ispy_c011/ispy | ./ispy_to_network.py > network.inc
-```
-B438 has odd behaviour with ispy... hacky work-around:
-```
-sudo /home/james/INMOS_ispy_c011/ispy | ./ispy_to_network.py --B438 > network.inc
+sudo /home/james/INMOS_ispy_c011/ispy > ispy.txt
+./ispy_to_long_pipe.py --input ispy.txt --b438 > network.inc
 ```
 Make the code
 ```

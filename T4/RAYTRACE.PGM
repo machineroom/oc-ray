@@ -3,30 +3,11 @@ VAL K IS 1024:
 VAL M IS K*K:
 --}}}
 
---{{{  HIGH, LOW priority levels
-VAL HIGH IS 0:
-VAL LOW IS 1:
---}}}
-
 ARC Hostlink:
 
 -- network.inc is written by ispy_to_network.py
 #INCLUDE "network.inc"
 
-
---{{{  Mapping
-NODE framebuf.p :
-NODE cntlsys.p :
-[workers]NODE raytrace.p :
-
-MAPPING
-  DO
-    MAP framebuf.p ONTO System[0]
-    MAP cntlsys.p ONTO System[1]
-    DO i = 0 FOR workers
-      MAP raytrace.p[i] ONTO System[i+2]
-:
---}}}
 
 --{{{  Code
 #INCLUDE "hostio.inc"
@@ -38,7 +19,6 @@ CONFIG
   CHAN OF SP frame.in, frame.out :
   PLACE frame.in, frame.out ON Hostlink :
   [workers]CHAN OF ANY forward, back :
-  CHAN OF ANY f,b :
   CHAN OF ANY graphics, soft :
   CHAN OF INT image :
 
