@@ -3,7 +3,6 @@
 # Create an Occam network map from the output of ispy for the WX9020 hardware
 import sys
 import string
-from pyvis.network import Network
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -16,20 +15,11 @@ for line in ispy_output:
     if line.startswith(tuple(string.digits)):
         filtered.append (line.strip())
 
-pvnet = Network()  # create graph object
 G = nx.Graph()  # create graph object
 
 n = len(filtered)
 nodes = range(n)
 labels = ['n ' + str(l) for l in range(n)]
-
-pvnet.add_nodes(
-    nodes,  # node ids
-    label=labels,  # node labels
-    # node titles (display on mouse hover)
-    #title=['Main node', 'Just node', 'Just node', 'Just node', 'Node with self-loop'],
-    #color=['#d47415', '#22b512', '#42adf5', '#4a21b0', '#e627a3']  # node colors (HEX)
-)
 
 edges = []
 
@@ -42,26 +32,45 @@ for line in filtered:
             pass
         else:
             target_processor = int(link.split(":")[0])
-            pvnet.add_edges([(processor, target_processor)])
-            edges.append((processor, target_processor))
+            if processor != target_processor:
+                edges.append((processor, target_processor))
 
-
-pvnet.show('graph.html', notebook=False)  # save visualization in 'graph.html'
 
 G.add_nodes_from(nodes)
 G.add_edges_from(edges)
 
+# crude hack to get a long path - i.e. for simple pipe layout
+longest_length=0
+longest_path=None
+count=0
+for path in nx.all_simple_edge_paths(G,0,n-1):
+    if len(path) > longest_length:
+        print (f"Longest so far {len(path)}")
+        longest_path = path
+        longest_length = len(path)
+    count+=1
+    if count == 2000:
+        print (f"stopping at {count}")
+        break
+print (f"longest path(edges) = {longest_path}")
+
+#colour edges by longest path
+edge_colours = ['black']*len(edges)
+#for i,edge in enumerate (edges):
+#    if edge in longest_path:
+#        edge_colours[i]='red'
+for e in G.edges():
+    G[e[0]][e[1]]['color'] = 'black'
+for e in longest_path:
+    G[e[0]][e[1]]['color'] = 'red'
+
+edge_colours = [ G[e[0]][e[1]]['color'] for e in G.edges() ]
+
+#colour nodes by distance from root
 distanceDict = nx.shortest_path_length(G, 0)
-#colours=['black','pink','yellow','orange','yellow','brown','burgundy','red', 'green']
 cmap=[]
 for node in G:
-    #colour = colours[distanceDict[node]]
-    #cmap.append(colour)
-    G.nodes[node]['weight'] = distanceDict[node]
     cmap.append(float(distanceDict[node]))
 pos = nx.spring_layout(G, center=[0,0], iterations=5000)
-nx.draw(G, with_labels=True, node_color=cmap, pos=pos, cmap=plt.cm.Blues, vmin=0, vmax=8)
+nx.draw(G, edge_color=edge_colours, with_labels=True, node_color=cmap, pos=pos, cmap=plt.cm.Blues, vmin=0, vmax=8)
 plt.show()
-
-                        
-        
