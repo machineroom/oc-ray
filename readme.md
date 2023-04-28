@@ -8,8 +8,6 @@
 - Use framebuffer on B438 root node by default. Lots of assumptions about framebuf running on T805
 - Remove the virtual router and use proper hardware links (massive speedup with many nodes)
 
-*note* The `New` and `T8` directories are maintained for completeness but not used. See `T4`
-
 ## Samples
 |   |   |
 | - | - |
@@ -47,13 +45,17 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 |--|--|--|--|
 |3  |T425|1265|fb on T8, cntlsys on worker T4|
 |5  |T425|760|fb on T8, cntlsys on worker T4|
+|5  |T425||3*3 patches|
 |6  |T425|636|fb & cntlsys on T8|
 |14 |T425|277|fb & cntlsys on T8|
 |92 |T425|67|fb & cntlsys on T8 (using ispy_to_long_pipe.py)|
+|92 |T425|55|4*4 patches (8*8 causes one worker to hold everything up at end!)|
+|92 |T425|52|3*3 patches|
+|92 |T425|56|2*2 patches|
 
 
 ## Select processor type
-The T4 directory is where the action happens and can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
+Can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
 
 |file|T4|T8|
 |----|--|----|
@@ -66,7 +68,7 @@ The T4 directory is where the action happens and can fairly easily build for eit
 Generate the network map for the current system
 ```
 sudo /home/james/INMOS_ispy_c011/ispy > ispy.txt
-./ispy_to_long_pipe.py --input ispy.txt --b438 > network.inc
+./ispy_to_long_pipe.py --input ispy.txt --b438 --output network.inc
 ```
 Make the code
 ```
