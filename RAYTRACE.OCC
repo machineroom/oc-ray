@@ -30,18 +30,18 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
           fromPrev ? tag
             IF
               tag = c.render
-                INT a, b :
+                INT x, y :
                 SEQ
-                  fromPrev ? a; b
+                  fromPrev ? x; y
                   IF
                     state = active
                       SEQ
-                        toLocal ! tag; a; b
+                        toLocal ! tag; x; y
                         state := busy
                     state = busy
                       SEQ
                         -- pass work onto next
-                        toNext ! tag; a; b
+                        toNext ! tag; x; y
               tag = c.stop
                 SEQ
                   IF
