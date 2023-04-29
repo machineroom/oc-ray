@@ -85,35 +85,33 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     [256] INT buffer :
 
     VAL closeDown  IS 0 :
-    VAL lubThis    IS 1 :
-    VAL lubOther   IS 2 :
+    VAL busy IS 1 :
 
-    PROC pass ( CHAN OF ANY in, out )
-      SEQ i = 0 FOR size
-        SEQ
-          in  ? [ buffer FROM 0 FOR size ]
-          out ! [ buffer FROM 0 FOR size ]
-    :
-    
     SEQ
-      state := lubThis \/ lubOther
+      state := busy
       WHILE state <> closeDown
         ALT
-          ALT i=0 FOR number.of.workers
-            workers[i] ? command
+          ALT w=0 FOR number.of.workers
+            workers[w] ? command
               SEQ
                 IF
                   command = c.message
                     SEQ
-                      workers[i] ? size; [ buffer FROM 0 FOR size ]
+                      workers[w] ? size; [ buffer FROM 0 FOR size ]
                       out ! command; size; [ buffer FROM 0 FOR size ]
                   command = c.patch
                     SEQ
-                      workers[i] ? x; y; size
+                      workers[w] ? x; y; size
                       out ! command; x; y; size
-                      pass ( workers[i], out )
+                      --pass ( workers[w], out )
+                      SEQ i = 0 FOR size
+                        SEQ
+                          workers[w]  ? [ buffer FROM 0 FOR size ]
+                          out ! [ buffer FROM 0 FOR size ]
+
                   command = c.stop
-                    state := state >< lubOther -- >< bitwise xor
+                    --TODO wait for all workers to drain
+                    state := closeDown
       out ! c.stop
   :
 
