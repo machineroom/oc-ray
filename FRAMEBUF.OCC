@@ -285,7 +285,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
 
       INT32 Status :
       SEQ
-        FileImage(Status)
+        --FileImage(Status)
         so.exit (fs, ts, Status)      
 :
 

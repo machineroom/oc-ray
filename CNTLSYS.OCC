@@ -12,8 +12,9 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
 
   #INCLUDE "WORLD.INC"
 
-  PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge, [256] INT buffer )
-    VAL patchesWide IS 256 / patchEdge :
+  PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge )
+    --VAL patchesWide IS 256 / patchEdge :
+    VAL patchesWide IS 60 / patchEdge :
     SEQ
       SEQ x = 0 FOR patchesWide
         SEQ y = 0 FOR patchesWide
@@ -112,17 +113,19 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
       out ! command
   :
 
+  -- out,back is to/from farm
+  -- fb.in is patches to framebuffer
   -- PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, VAL INT machines )
   VAL patchEdge IS 3 :
-  [4][256] INT buffer :
-  CHAN OF ANY a, b, c :
+  [3][256] INT buffer :
+  CHAN OF ANY render.commands, to.farm, from.farm :
   WHILE TRUE
     SEQ
       pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
-        sendPatches  ( a, patchEdge, buffer[3])
-        outputBuffer ( b, out  )
-        returnBuffer ( back, c, buffer [1] )
-        loadBalance  ( a, b, c, fb.in, machines, buffer [2] )
+        sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches to a
+        outputBuffer ( to.farm, out )               -- sends commands to farm
+        returnBuffer ( back, from.farm, buffer [1] )  -- receives patches from farm
+        loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
 :
 
