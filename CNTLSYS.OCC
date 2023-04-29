@@ -1,13 +1,7 @@
 
 PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT machines )
 
-  VAL c.stop        IS 0 :
-  VAL c.render      IS 1 :  -- render; x0; y0
-  VAL c.object      IS 2 :  -- object; size; [ size ]
-  VAL c.light       IS 3 :  -- light;  size; [ size ]
-  VAL c.patch       IS 4 :  -- patch;  x; y; patchSize; [ patchSize][patchSize]
-  VAL c.runData     IS 5 :  -- ambient light, rendering mode, screen pos etc.
-  VAL c.message     IS 6 :  -- message; size; [ words ]
+  #INCLUDE "PROTOCOL.INC"
 
   PROC writes ( VAL [] BYTE s, [256] INT buffer )
     SEQ
