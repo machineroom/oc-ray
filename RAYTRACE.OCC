@@ -80,7 +80,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
 
   -- accept input from one of the workers and push the results upstream
-  PROC pixelBypass ( CHAN OF ANY out, []CHAN OF ANY workers, VAL INT number.of.workers)
+  PROC pixelBypass ( CHAN OF ANY out, []CHAN OF ANY workers)
     INT  state, command, x, y, size :
     [256] INT buffer :
 
@@ -91,7 +91,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
       state := busy
       WHILE state <> closeDown
         ALT
-          ALT w=0 FOR number.of.workers
+          ALT w=0 FOR SIZE workers
             workers[w] ? command
               SEQ
                 IF
@@ -127,7 +127,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         PAR
           throughPut  ( fromPrev, toNext, toLocal, localDone,
                         propogate )
-          pixelBypass ( toPrev, workers, SIZE workers )
+          pixelBypass ( toPrev, workers )
         renderer   ( toLocal, fromLocal, localDone )
 :
 
