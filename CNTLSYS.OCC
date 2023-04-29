@@ -123,7 +123,7 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
     SEQ
       pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
-        sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches to a
+        sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
         outputBuffer ( to.farm, out )               -- sends commands to farm
         returnBuffer ( back, from.farm, buffer [1] )  -- receives patches from farm
         loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
