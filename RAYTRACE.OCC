@@ -80,88 +80,53 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
 
 
-  PROC pixelBypass ( [3][256] INT buffers,
-                     CHAN OF ANY toPrev, fromNext, fromThis)
-    PROC buffer ( [256] INT pixels, CHAN OF ANY in, out )
-      INT command :
-      SEQ
-        in ? command
-        WHILE command <> c.stop
-          INT x, y, size :
-          SEQ
-            IF
-              command = c.patch
-                SEQ
-                  in  ? x; y; size
-                  out ! command; x; y; size
-                  SEQ i = 0 FOR size
-                    SEQ
-                      in  ? [ pixels FROM 0 FOR size ]
-                      out ! [ pixels FROM 0 FOR size ]
-              command = c.message
-                SEQ
-                  in  ? size; [ pixels FROM 0 FOR size ]
-                  out ! command; size; [ pixels FROM 0 FOR size ]
-            in ? command
-        out ! c.stop
+  PROC pixelBypass ( CHAN OF ANY out, fromOther	, fromThis)
+    INT  state, command, x, y, size :
+    [256] INT buffer :
+
+    VAL closeDown  IS 0 :
+    VAL lubThis    IS 1 :
+    VAL lubOther   IS 2 :
+
+    PROC pass ( CHAN OF ANY in, out )
+      SEQ i = 0 FOR size
+        SEQ
+          in  ? [ buffer FROM 0 FOR size ]
+          out ! [ buffer FROM 0 FOR size ]
     :
-
-
-    PROC mix ( [256] INT pixels, CHAN OF ANY fromOther, fromThis, out)
-      INT  state, command, x, y, size :
-
-      VAL closeDown  IS 0 :
-      VAL lubThis    IS 1 :
-      VAL lubOther   IS 2 :
-
-      PROC pass ( CHAN OF ANY in, out )
-        buffer IS pixels : -- save static chaining
-        SEQ i = 0 FOR size
-          SEQ
-            in  ? [ buffer FROM 0 FOR size ]
-            out ! [ buffer FROM 0 FOR size ]
-      :
-      SEQ
-        state := lubThis \/ lubOther
-        WHILE state <> closeDown
-          PRI ALT
-            fromOther ? command
-              SEQ
-                IF
-                  command = c.message
-                    SEQ
-                      fromOther ? size; [ pixels FROM 0 FOR size ]
-                      out ! command; size; [ pixels FROM 0 FOR size ]
-                  command = c.patch
-                    SEQ
-                      fromOther ? x; y; size
-                      out ! command; x; y; size
-                      pass ( fromOther, out )
-                  command = c.stop
-                    state := state >< lubOther
-            fromThis ? command
-              SEQ
-                IF
-                  command = c.message
-                    SEQ
-                      fromThis ? size; [ pixels FROM 0 FOR size ]
-                      out ! command; size; [ pixels FROM 0 FOR size ]
-                  command = c.patch
-                    SEQ
-                      fromThis ? x; y; size
-                      out ! command; x; y; size
-                      pass ( fromThis, out )
-                  command = c.stop
-                    state := state >< lubThis
-        out ! c.stop
-    :
-
-    --PROC pixelBypass ([3][256] INT buffers, CHAN OF ANY toPrev, fromNext, fromThis)
-    CHAN OF ANY lubThis, lubOther :
-    PAR
-      buffer ( buffers [0], fromNext, lubOther)
-      buffer ( buffers [1], fromThis, lubThis)
-      mix    ( buffers [2], lubOther, lubThis, toPrev)
+    SEQ
+      state := lubThis \/ lubOther
+      WHILE state <> closeDown
+        PRI ALT
+          fromOther ? command
+            SEQ
+              IF
+                command = c.message
+                  SEQ
+                    fromOther ? size; [ buffer FROM 0 FOR size ]
+                    out ! command; size; [ buffer FROM 0 FOR size ]
+                command = c.patch
+                  SEQ
+                    fromOther ? x; y; size
+                    out ! command; x; y; size
+                    pass ( fromOther, out )
+                command = c.stop
+                  state := state >< lubOther -- >< bitwise xor
+          fromThis ? command
+            SEQ
+              IF
+                command = c.message
+                  SEQ
+                    fromThis ? size; [ buffer FROM 0 FOR size ]
+                    out ! command; size; [ buffer FROM 0 FOR size ]
+                command = c.patch
+                  SEQ
+                    fromThis ? x; y; size
+                    out ! command; x; y; size
+                    pass ( fromThis, out )
+                command = c.stop
+                  state := state >< lubThis
+      out ! c.stop
   :
 
  
@@ -176,7 +141,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         throughPut  ( buffers [0],
                       fromPrev, toNext, feedPixels, pixelTrigger,
                       propogate )
-        pixelBypass ( [ buffers FROM 0 FOR 3], toPrev, fromNext,  pixelsOut )
+        pixelBypass ( toPrev, fromNext, pixelsOut )
       renderer   ( feedPixels, pixelsOut, pixelTrigger )
 :
 
