@@ -8,8 +8,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   #INCLUDE "RENDERER.INC"
 
-  PROC throughPut ( [256] INT work,
-                    CHAN OF ANY fromPrev, toNext, feedPixels, pixelTrigger,
+  PROC throughPut ( CHAN OF ANY fromPrev, toNext, toLocal, localDone,
                     VAL INT propogate )
 
     VAL closeDown     IS 0 :
@@ -17,17 +16,18 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     VAL busy          IS 2 :
     VAL buffered      IS 4 :
 
+    [256] INT buffer :
     INT state, tag :
     INT x, y, size, kick :
     SEQ
       state := active
       WHILE state <> closeDown
         PRI ALT
-          pixelTrigger ? kick  -- should be guarded by (state /\ busy) <> 0 ..
+          localDone ? kick  -- should be guarded by (state /\ busy) <> 0 ..
             IF
               (state /\ buffered) <> 0
                 SEQ
-                  feedPixels ! c.render; x; y
+                  toLocal ! c.render; x; y
                   state := active \/ busy
               TRUE
                 state := active -- i.e not busy and not buffered
@@ -40,7 +40,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                   IF
                     (state /\ busy) = 0
                       SEQ
-                        feedPixels ! tag; a; b
+                        toLocal ! tag; a; b
                         state := active \/ busy
 
                     (state /\ buffered) <> 0
@@ -54,28 +54,28 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   IF
                     (state /\ busy) <> 0
-                      pixelTrigger ? kick
+                      localDone ? kick
                     TRUE
                       SKIP
                   IF
                     (state /\ buffered) <> 0
                       SEQ
-                        feedPixels   ! c.render; x; y
-                        pixelTrigger ? kick
+                        toLocal   ! c.render; x; y
+                        localDone ? kick
                     TRUE
                       SKIP
-                  feedPixels ! tag
+                  toLocal ! tag
                   toNext     ! tag
                   state := closeDown
               TRUE
                 SEQ
-                  fromPrev ? size; [ work FROM 0 FOR size ]
+                  fromPrev ? size; [ buffer FROM 0 FOR size ]
                   IF
                     propogate <> 0
-                      toNext ! tag; size; [ work FROM 0 FOR size ]
+                      toNext ! tag; size; [ buffer FROM 0 FOR size ]
                     TRUE
                       SKIP
-                  feedPixels ! tag; size; [ work FROM 0 FOR size ]
+                  toLocal ! tag; size; [ buffer FROM 0 FOR size ]
   :
 
 
@@ -117,23 +117,18 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
  
   --PROC rayTrace (CHAN OF ANY fromPrev, toPrev, fromNext, toNext, VAL INT propogate, me)
-  CHAN OF ANY feedPixels, pixelTrigger, pixelsOut :
+  CHAN OF ANY toLocal, localDone, fromLocal :
 
-  [4][256] INT buffers :
-  [2] CHAN OF ANY workers IS [fromNext, pixelsOut]:
+  [2] CHAN OF ANY workers IS [fromNext, fromLocal]:
   
   SEQ
-    --workers[0] := fromNext
-    --workers[1] := pixelsOut
-
     WHILE TRUE
       PRI PAR
         PAR
-          throughPut  ( buffers [0],
-                        fromPrev, toNext, feedPixels, pixelTrigger,
+          throughPut  ( fromPrev, toNext, toLocal, localDone,
                         propogate )
-          pixelBypass ( toPrev, workers, 2 )
-        renderer   ( feedPixels, pixelsOut, pixelTrigger )
+          pixelBypass ( toPrev, workers, SIZE workers )
+        renderer   ( toLocal, fromLocal, localDone )
 :
 
 

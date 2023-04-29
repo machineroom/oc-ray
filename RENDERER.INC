@@ -2369,6 +2369,7 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
         colour := (x0 + (y0 * patchSize))
   :
 
+  --PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
   INT command :
   INT nobj, nlight, njobs :
   SEQ
