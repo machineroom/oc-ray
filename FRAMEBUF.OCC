@@ -183,8 +183,9 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
   :
                         
 
-  ---------------------------- COMMANDS PROTOCOL -----------------------------
+  --PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection, VAL INT processors)
 
+  ---------------------------- COMMANDS PROTOCOL -----------------------------
   CHAN OF ANY fromRenderer :
   PRI PAR
     WHILE TRUE

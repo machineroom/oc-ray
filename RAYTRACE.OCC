@@ -156,6 +156,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
         out ! c.stop
     :
 
+    --PROC pixelBypass ([3][256] INT buffers, CHAN OF ANY toPrev, fromNext, fromThis)
     CHAN OF ANY lubThis, lubOther :
     PAR
       buffer ( buffers [0], fromNext, lubOther)
@@ -164,6 +165,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
   :
 
  
+  --PROC rayTrace (CHAN OF ANY fromPrev, toPrev, fromNext, toNext, VAL INT propogate, me)
   CHAN OF ANY feedPixels, pixelTrigger, pixelsOut :
 
   [4][256] INT buffers :

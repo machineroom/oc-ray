@@ -112,6 +112,7 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
       out ! command
   :
 
+  -- PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, VAL INT machines )
   VAL patchEdge IS 3 :
   [4][256] INT buffer :
   CHAN OF ANY a, b, c :
