@@ -16,20 +16,20 @@ ARC Hostlink:
 #USE "raytrace.c4h"
 
 CONFIG
-  CHAN OF SP frame.in, frame.out :
-  PLACE frame.in, frame.out ON Hostlink :
+  CHAN OF SP host.in, host.out :
+  PLACE host.in, host.out ON Hostlink :
   [workers]CHAN OF ANY forward, back :
-  CHAN OF ANY graphics, soft :
-  CHAN OF INT image :
+  CHAN OF ANY fb.in, soft :
+  CHAN OF INT image.selection :
 
   VAL true      IS #FFFF :
   VAL false     IS #0000 :
 
   PAR
     PROCESSOR framebuf.p
-      frameBuffer (frame.in, frame.out, graphics, image, workers)
+      frameBuffer (host.in, host.out, fb.in, image.selection, workers)
     PROCESSOR cntlsys.p
-      controlSystem (forward[0], back[0], graphics, image, workers)
+      controlSystem (forward[0], back[0], fb.in, image.selection, workers)
     PAR i = 0 FOR workers-1
       PROCESSOR raytrace.p[i]
         rayTrace (forward[i], back[i], back[i+1], forward[i+1], true, i)

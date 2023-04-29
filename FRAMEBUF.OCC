@@ -1,14 +1,14 @@
 #INCLUDE "hostio.inc"
 #INCLUDE "streamio.inc"
 
-PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image, 
+PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection, 
                   VAL INT processors)
   #USE "hostio.lib"
   #USE "streamio.lib"
   #USE "SNGLMATH.LIB"
 
   #INCLUDE "B438.INC"
-  #include "PROTOCOL.INC"
+  #INCLUDE "PROTOCOL.INC"
     
   ---------------------------- GLOBALS ----------------------------------------
   [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
@@ -234,7 +234,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image,
       SEQ
         so.write.string.nl (fs, ts, " setupGfx")
         setupGfx()
-        MenuSelection(image)
+        MenuSelection(image.selection)
         so.write.string.nl (fs, ts, " The inmos ray tracer is GO")
         clock ? start
         fromRenderer ? command

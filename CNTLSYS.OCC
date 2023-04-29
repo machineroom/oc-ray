@@ -1,5 +1,5 @@
 
-PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT machines )
+PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, VAL INT machines )
 
   #INCLUDE "PROTOCOL.INC"
 
@@ -7,7 +7,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
     SEQ
       SEQ i = 0 FOR SIZE s
         buffer [i] := INT s [i]
-      graphics ! c.message; SIZE s; [ buffer FROM 0 FOR SIZE s ]
+      fb.in ! c.message; SIZE s; [ buffer FROM 0 FOR SIZE s ]
   :
 
   #INCLUDE "WORLD.INC"
@@ -21,7 +21,7 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
       out ! c.stop
   :
 
-  PROC loadBalance ( CHAN OF ANY in, out, return, graphics,
+  PROC loadBalance ( CHAN OF ANY in, out, return, fb.in,
                      VAL INT machines,
                      [256] INT buffer )
     BOOL passActive, farmActive :
@@ -53,22 +53,22 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
                 SEQ
                   --writes ( "*N*C R patch", buffer)
                   return   ? x; y; size
-                  graphics ! command; x; y; size
+                  fb.in ! command; x; y; size
                   SEQ i = 0 FOR size
                     SEQ
                       return   ? [ buffer FROM 0 FOR size ]
-                      graphics ! [ buffer FROM 0 FOR size ]
+                      fb.in ! [ buffer FROM 0 FOR size ]
                   free := free + 1
               command = c.message
                 INT size :
                 SEQ
                   return   ? size; [ buffer FROM 0 FOR size ]
-                  graphics ! command; size; [ buffer FROM 0 FOR size ]
+                  fb.in ! command; size; [ buffer FROM 0 FOR size ]
               command = c.stop
                 SEQ
                   farmActive := FALSE
                   writes ( "*N*C received c.stop", buffer)
-      graphics ! c.stop
+      fb.in ! c.stop
   :
 
   PROC outputBuffer ( CHAN OF ANY in, out )
@@ -117,11 +117,11 @@ PROC controlSystem ( CHAN OF ANY out, back, graphics, CHAN OF INT image, VAL INT
   CHAN OF ANY a, b, c :
   WHILE TRUE
     SEQ
-      pumpWorldModels ( out, image, patchEdge, buffer [0] )
+      pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
         sendPatches  ( a, patchEdge, buffer[3])
         outputBuffer ( b, out  )
         returnBuffer ( back, c, buffer [1] )
-        loadBalance  ( a, b, c, graphics, machines, buffer [2] )
+        loadBalance  ( a, b, c, fb.in, machines, buffer [2] )
 :
 
