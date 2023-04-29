@@ -29,7 +29,7 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
     SEQ
       farmActive := TRUE
       passActive := TRUE
-      free := machines * 2
+      free := machines
       WHILE passActive OR farmActive
         PRI ALT
           (free > 0) & in ? command

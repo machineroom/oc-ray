@@ -8,13 +8,13 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   #INCLUDE "RENDERER.INC"
 
+  -- accept work from upstream and send it downstream or process locally
   PROC throughPut ( CHAN OF ANY fromPrev, toNext, toLocal, localDone,
                     VAL INT propogate )
 
     VAL closeDown     IS 0 :
     VAL active        IS 1 :
     VAL busy          IS 2 :
-    VAL buffered      IS 4 :
 
     [256] INT buffer :
     INT state, tag :
@@ -22,15 +22,11 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
     SEQ
       state := active
       WHILE state <> closeDown
-        PRI ALT
-          localDone ? kick  -- should be guarded by (state /\ busy) <> 0 ..
-            IF
-              (state /\ buffered) <> 0
-                SEQ
-                  toLocal ! c.render; x; y
-                  state := active \/ busy
-              TRUE
-                state := active -- i.e not busy and not buffered
+        ALT
+          localDone ? kick
+            SEQ
+              --update local state to indicate free for work
+              state := active
           fromPrev ? tag
             IF
               tag = c.render
@@ -38,34 +34,22 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                 SEQ
                   fromPrev ? a; b
                   IF
-                    (state /\ busy) = 0
+                    state = active
                       SEQ
                         toLocal ! tag; a; b
-                        state := active \/ busy
-
-                    (state /\ buffered) <> 0
-                      toNext ! tag; a; b
-                    TRUE
+                        state := busy
+                    state = busy
                       SEQ
-                        x     := a
-                        y     := b
-                        state := active \/ (busy \/ buffered)
+                        -- pass work onto next
+                        toNext ! tag; a; b
               tag = c.stop
                 SEQ
                   IF
-                    (state /\ busy) <> 0
+                    state = busy
+                      -- wait for local to finish
                       localDone ? kick
-                    TRUE
-                      SKIP
-                  IF
-                    (state /\ buffered) <> 0
-                      SEQ
-                        toLocal   ! c.render; x; y
-                        localDone ? kick
-                    TRUE
-                      SKIP
                   toLocal ! tag
-                  toNext     ! tag
+                  toNext  ! tag
                   state := closeDown
               TRUE
                 SEQ
@@ -103,7 +87,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                     SEQ
                       workers[w] ? x; y; size
                       out ! command; x; y; size
-                      --pass ( workers[w], out )
                       SEQ i = 0 FOR size
                         SEQ
                           workers[w]  ? [ buffer FROM 0 FOR size ]
