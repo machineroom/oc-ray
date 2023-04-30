@@ -162,52 +162,42 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
 
   -- accept results from one of the workers and push the results upstream
   PROC pixelBypass ( CHAN OF ANY out, CHAN OF ANY local, []CHAN OF ANY workers)
+
     INT  state, command, x, y, size :
     [256] INT buffer :
 
     VAL closeDown  IS 0 :
     VAL busy IS 1 :
 
+    PROC commandHandler (CHAN OF ANY in)
+      SEQ
+        IF
+          command = c.message
+            SEQ
+              in ? size; [ buffer FROM 0 FOR size ]
+              out ! command; size; [ buffer FROM 0 FOR size ]
+          command = c.patch
+            SEQ
+              in ? x; y; size
+              out ! command; x; y; size
+              SEQ i = 0 FOR size
+                SEQ
+                  in  ? [ buffer FROM 0 FOR size ]
+                  out ! [ buffer FROM 0 FOR size ]
+          command = c.stop
+            state := closeDown
+    :
+
     SEQ
       state := busy
       WHILE state <> closeDown
         ALT
           local ? command
-            SEQ
-              IF
-                command = c.message
-                  SEQ
-                    local ? size; [ buffer FROM 0 FOR size ]
-                    out ! command; size; [ buffer FROM 0 FOR size ]
-                command = c.patch
-                  SEQ
-                    local ? x; y; size
-                    out ! command; x; y; size
-                    SEQ i = 0 FOR size
-                      SEQ
-                        local  ? [ buffer FROM 0 FOR size ]
-                        out ! [ buffer FROM 0 FOR size ]
-                command = c.stop
-                  state := closeDown
+            commandHandler(local)
       
           ALT w=0 FOR SIZE workers
             workers[w] ? command
-              SEQ
-                IF
-                  command = c.message
-                    SEQ
-                      workers[w] ? size; [ buffer FROM 0 FOR size ]
-                      out ! command; size; [ buffer FROM 0 FOR size ]
-                  command = c.patch
-                    SEQ
-                      workers[w] ? x; y; size
-                      out ! command; x; y; size
-                      SEQ i = 0 FOR size
-                        SEQ
-                          workers[w]  ? [ buffer FROM 0 FOR size ]
-                          out ! [ buffer FROM 0 FOR size ]
-                  command = c.stop
-                    state := closeDown
+              commandHandler(workers[w])
       out ! c.stop
   :
 
