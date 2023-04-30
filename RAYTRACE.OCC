@@ -8,6 +8,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
 
   [256] INT message :
   INT mess.p :
+  
+  -- max 3 workers (+ local)
+  [3]BOOL free.worker:
 
   PROC wrch ( CHAN OF ANY out, VAL INT ch )
     IF
@@ -102,7 +105,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   #INCLUDE "RENDERER.INC"
 
   -- accept work from upstream and send it downstream or process locally
-  PROC throughPut ( CHAN OF ANY fromPrev, toNext, toLocal, localDone,
+  PROC throughPut ( CHAN OF ANY fromPrev, []CHAN OF ANY toWorkers, CHAN OF ANY toLocal, localDone,
                     VAL INT propogate )
 
     VAL closeDown     IS 0 :
@@ -133,8 +136,16 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                         state := busy
                     state = busy
                       SEQ
-                        -- pass work onto next
-                        toNext ! tag; x; y
+                        -- pass work onto next free worker
+                        SEQ w=0 FOR SIZE toWorkers
+                          IF 
+                            free.worker[w]
+                              SEQ
+                                --temp! marking worker as not free will block the rest of the pipe!
+                                --free.worker[w] := FALSE
+                                toWorkers[w] ! tag; x; y
+                            TRUE
+                              SKIP
                     TRUE
                       SKIP
               tag = c.stop
@@ -146,14 +157,16 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                     TRUE
                       SKIP
                   toLocal ! tag
-                  toNext  ! tag
+                  SEQ w=0 FOR SIZE toWorkers
+                    toWorkers[w] ! tag
                   state := closeDown
               TRUE
                 SEQ
                   fromPrev ? size; [ buffer FROM 0 FOR size ]
                   IF
                     propogate <> 0
-                      toNext ! tag; size; [ buffer FROM 0 FOR size ]
+                      SEQ w=0 FOR SIZE toWorkers
+                        toWorkers[w] ! tag; size; [ buffer FROM 0 FOR size ]
                     TRUE
                       SKIP
                   toLocal ! tag; size; [ buffer FROM 0 FOR size ]
@@ -194,10 +207,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
         ALT
           local ? command
             commandHandler(local)
-      
+    
           ALT w=0 FOR SIZE workers
             workers[w] ? command
-              commandHandler(workers[w])
+              SEQ
+                commandHandler(workers[w])
+                free.worker[w] := TRUE
       out ! c.stop
   :
 
@@ -206,10 +221,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   CHAN OF ANY toLocal, localDone, fromLocal :
 
   SEQ
+    PAR i=0 FOR SIZE free.worker
+      free.worker[i] := TRUE
     WHILE TRUE
       PRI PAR
         PAR
-          throughPut  ( fromPrev, toWorkers[0], toLocal, localDone, --[0] temp
+          throughPut  ( fromPrev, toWorkers, toLocal, localDone,
                         propogate )
           pixelBypass ( toPrev, fromLocal, fromWorkers )
         renderer   ( toLocal, fromLocal, localDone )

@@ -124,7 +124,6 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   CHAN OF ANY back IS fromWorkers[0]:
   WHILE TRUE
     SEQ
-      -- temp
       pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
         sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
