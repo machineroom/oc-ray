@@ -135,12 +135,16 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                       SEQ
                         -- pass work onto next
                         toNext ! tag; x; y
+                    TRUE
+                      SKIP
               tag = c.stop
                 SEQ
                   IF
                     state = busy
                       -- wait for local to finish
                       localDone ? kick
+                    TRUE
+                      SKIP
                   toLocal ! tag
                   toNext  ! tag
                   state := closeDown
@@ -185,7 +189,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
                           workers[w]  ? [ buffer FROM 0 FOR size ]
                           out ! [ buffer FROM 0 FOR size ]
                   command = c.stop
-                    --TODO wait for all workers to drain
                     state := closeDown
       out ! c.stop
   :

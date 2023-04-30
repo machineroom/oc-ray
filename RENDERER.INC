@@ -2278,7 +2278,9 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
   --PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
   INT command :
   INT nobj, nlight, njobs :
+  BOOL stop :
   SEQ
+    stop    := FALSE
     njobs   := 0
     nrays   := 0
     nobj    := 0
@@ -2287,9 +2289,9 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
     world.p := 0         -- empty world model
     light.p := 0         -- and lights list
     mess.p  := 0         -- clear debug message
-    workIn ? command     -- (eventually) pull in 1 byte
-    WHILE command <> c.stop
+    WHILE NOT stop
       SEQ
+        workIn ? command     -- (eventually) pull in 1 byte
         IF
           command = c.render
             INT x0, y0 :
@@ -2334,11 +2336,12 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
               workIn ? size; [ runData FROM 0 FOR size ]
               lights     [ light.p] := nil
               worldModel [ world.p] := nil
+          command = c.stop
+            stop := TRUE
           TRUE
             SEQ
               writef ( pixelsOut, "*N*C received garbage command %I", command, 0,0,0)
               STOP
-        workIn ? command
     writef ( pixelsOut, "*N*C Worker %I: %I lights traced %I rays & %I jobs", me, nlight, nrays, njobs )
     pixelsOut ! command
 :
