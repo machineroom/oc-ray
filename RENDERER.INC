@@ -348,100 +348,6 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
     a.b := (a[0] * b[0]) + ((a[1] * b[1]) + (a[2] * b[2]))
   :
 
-  [256] INT message :
-  INT mess.p :
-
-  PROC wrch ( VAL INT ch )
-    IF
-      ch = (-7)
-        SEQ
-          pixelsOut ! c.message; mess.p; [ message FROM 0 FOR mess.p ]
-          mess.p := 0
-      mess.p = 256
-        SKIP
-      TRUE
-        SEQ
-          message [ mess.p] := ch
-          mess.p := mess.p + 1
-  :
-
-
-  PROC writen ( VAL INT num)
-    [20] INT stack :
-    INT sp :
-    PROC push (VAL INT push)
-      SEQ
-        stack[sp] := push
-        sp := sp + 1
-        SKIP
-    :
-
-    PROC pop (INT pop)
-      SEQ
-        sp := sp - 1
-        pop := stack[sp]
-        SKIP
-    :
-
-    VAL nil IS #DEAD :
-    INT n :
-    SEQ
-      IF
-        num < 0
-          SEQ
-            n := -num
-            wrch ( INT '-')
-        TRUE
-          n := num
-      sp := 0
-      push (nil)
-      WHILE n > 9
-        SEQ
-          push (n \ 10)
-          n := n / 10
-      WHILE n <> nil
-        SEQ
-          wrch ( n + (INT '0'))
-          pop (n)
-  :
-
-  PROC writef ( VAL [] BYTE str, VAL INT a, b, c, d)
-    INT chptr, ch, ptr :
-    [4] INT args :
-    SEQ
-      ptr     := 0
-      chptr   := 0
-      args[0] := a
-      args[1] := b
-      args[2] := c
-      args[3] := d
-      WHILE chptr < (SIZE str)
-        SEQ
-          ch := INT str[chptr]
-          IF
-            ch = (INT '%')
-              SEQ
-                chptr := chptr + 1
-                ch := INT str [chptr]
-                IF
-                  (ch = (INT 'I')) OR (ch = (INT 'i'))
-                    SEQ
-                      writen ( args[ptr])
-                      IF
-                        ptr = 3
-                          SKIP
-                        TRUE
-                          ptr := ptr + 1
-                  TRUE
-                    SKIP
-
-            TRUE
-              wrch ( ch)
-          chptr := chptr + 1
-      wrch ( -7)
-  :
-
-
   PROC initWORDvec ( [] INT vec, VAL INT pattern, words )
     INT dest, xfer :
      
@@ -1603,7 +1509,7 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
           IF
             garbage
               SEQ
-                writef ("*N*CGarbage object %I in list at offset %I",
+                writef (pixelsOut, "*N*CGarbage object %I in list at offset %I",
                   object [o.type], ptr, 0, 0 )
                 STOP
             TRUE
@@ -2425,10 +2331,10 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
               worldModel [ world.p] := nil
           TRUE
             SEQ
-              writef ( "*N*C received garbage command %I", command, 0,0,0)
+              writef ( pixelsOut, "*N*C received garbage command %I", command, 0,0,0)
               STOP
         workIn ? command
-    writef ( "*N*C Worker %I: %I lights traced %I rays & %I jobs", me, nlight, nrays, njobs )
+    writef ( pixelsOut, "*N*C Worker %I: %I lights traced %I rays & %I jobs", me, nlight, nrays, njobs )
     pixelsOut ! command
 :
 

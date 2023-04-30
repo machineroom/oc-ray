@@ -6,6 +6,99 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, fromNext, toNext,
 
   #INCLUDE "PROTOCOL.INC"
 
+  [256] INT message :
+  INT mess.p :
+
+  PROC wrch ( CHAN OF ANY out, VAL INT ch )
+    IF
+      ch = (-7)
+        SEQ
+          out ! c.message; mess.p; [ message FROM 0 FOR mess.p ]
+          mess.p := 0
+      mess.p = 256
+        SKIP
+      TRUE
+        SEQ
+          message [ mess.p] := ch
+          mess.p := mess.p + 1
+  :
+
+
+  PROC writen ( CHAN OF ANY out, VAL INT num)
+    [20] INT stack :
+    INT sp :
+    PROC push (VAL INT push)
+      SEQ
+        stack[sp] := push
+        sp := sp + 1
+        SKIP
+    :
+
+    PROC pop (INT pop)
+      SEQ
+        sp := sp - 1
+        pop := stack[sp]
+        SKIP
+    :
+
+    VAL nil IS #DEAD :
+    INT n :
+    SEQ
+      IF
+        num < 0
+          SEQ
+            n := -num
+            wrch ( out, INT '-')
+        TRUE
+          n := num
+      sp := 0
+      push (nil)
+      WHILE n > 9
+        SEQ
+          push (n \ 10)
+          n := n / 10
+      WHILE n <> nil
+        SEQ
+          wrch ( out, n + (INT '0'))
+          pop (n)
+  :
+
+  PROC writef ( CHAN OF ANY out, VAL [] BYTE str, VAL INT a, b, c, d)
+    INT chptr, ch, ptr :
+    [4] INT args :
+    SEQ
+      ptr     := 0
+      chptr   := 0
+      args[0] := a
+      args[1] := b
+      args[2] := c
+      args[3] := d
+      WHILE chptr < (SIZE str)
+        SEQ
+          ch := INT str[chptr]
+          IF
+            ch = (INT '%')
+              SEQ
+                chptr := chptr + 1
+                ch := INT str [chptr]
+                IF
+                  (ch = (INT 'I')) OR (ch = (INT 'i'))
+                    SEQ
+                      writen ( out, args[ptr])
+                      IF
+                        ptr = 3
+                          SKIP
+                        TRUE
+                          ptr := ptr + 1
+                  TRUE
+                    SKIP
+
+            TRUE
+              wrch ( out, ch)
+          chptr := chptr + 1
+      wrch ( out, -7)
+  :
+
   #INCLUDE "RENDERER.INC"
 
   -- accept work from upstream and send it downstream or process locally
