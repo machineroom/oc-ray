@@ -2296,6 +2296,11 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
             SEQ
               njobs := njobs + 1
               workIn ? x0; y0
+              IF 
+                njobs = 1
+                  writef ( pixelsOut, "*N*C tracer %I is GO", me, 0,0,0)
+                TRUE
+                  SKIP
               IF
                 renderingMode = m.adaptive
                   initWORDvec ( rawSamples, notRendered, gridSize * gridSize )
