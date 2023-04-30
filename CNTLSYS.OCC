@@ -1,5 +1,5 @@
 
-PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, VAL INT machines )
+PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection, VAL INT machines )
 
   #INCLUDE "PROTOCOL.INC"
 
@@ -115,12 +115,16 @@ PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, 
 
   -- out,back is to/from farm
   -- fb.in is patches to framebuffer
-  -- PROC controlSystem ( CHAN OF ANY out, back, fb.in, CHAN OF INT image.selection, VAL INT machines )
+  --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection, VAL INT machines )
   VAL patchEdge IS 3 :
   [3][256] INT buffer :
   CHAN OF ANY render.commands, to.farm, from.farm :
+  -- temp
+  CHAN OF ANY out IS toWorkers[0]:
+  CHAN OF ANY back IS fromWorkers[0]:
   WHILE TRUE
     SEQ
+      -- temp
       pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
         sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
