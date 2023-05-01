@@ -27,8 +27,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   #INCLUDE "WORLD.INC"
 
   PROC sendPatches ( CHAN OF ANY out, VAL INT patchEdge )
-    --VAL patchesWide IS 256 / patchEdge :
-    VAL patchesWide IS 60 / patchEdge :
+    VAL patchesWide IS 256 / patchEdge :
+    --VAL patchesWide IS 60 / patchEdge :
     SEQ
       SEQ x = 0 FOR patchesWide
         SEQ y = 0 FOR patchesWide

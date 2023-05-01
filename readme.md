@@ -53,6 +53,12 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 |92 |T425|52|3*3 patches|
 |92 |T425|56|2*2 patches|
 
+## Non-pipe restructure
+Results with virtual router disabled, non-pipe branch (map directly to the WX9020 network)
+|Workers|Type|Scene 1|notes|
+|--|--|--|--|
+|12 |T425|540|manual timing, a few patches not rendering - ctrlsys RR worker branches (should be ~316s)|
+
 
 ## Select processor type
 Can fairly easily build for either T425 or T805. To switch modify the following (and do a `git clean -df .` because the makefile dependencies aren't right)  
