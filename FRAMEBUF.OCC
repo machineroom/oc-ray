@@ -209,6 +209,15 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
             SEQ
               in ? size; [ chars FROM 0 FOR size ]
               fromRenderer ! command; size; [ chars FROM 0 FOR size ]
+          command = c.message2
+            INT size :
+            INT a,b:
+            [256] INT chars :
+            SEQ
+              in ? a
+              in ? b
+              in ? size; [ chars FROM 0 FOR size ]
+              fromRenderer ! command; a; b; size; [ chars FROM 0 FOR size ]
           command = c.stop
             fromRenderer ! command
     SEQ
@@ -265,6 +274,21 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
                   SEQ i = 0 FOR size   
                     OutString[i] := BYTE (chars[i] /\ #FF)
                   so.write.string (fs, ts, [OutString FROM 0 FOR size])
+              command = c.message2
+                INT size :
+                INT a,b:
+                [256] INT chars :
+                [256] BYTE OutString : 
+                SEQ
+                  fromRenderer ? a
+                  fromRenderer ? b
+                  fromRenderer ? size; [ chars FROM 0 FOR size ]
+                  SEQ i = 0 FOR size   
+                    OutString[i] := BYTE (chars[i] /\ #FF)
+                  so.write.string (fs, ts, [OutString FROM 0 FOR size])
+                  so.write.int (fs,ts,a,1)
+                  so.write.string (fs, ts, ":")
+                  so.write.int (fs,ts,b,1)
               TRUE
                 SEQ
                   so.write.string.nl (fs, ts," GARBAGE COMMAND")

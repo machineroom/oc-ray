@@ -4,12 +4,24 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   #INCLUDE "PROTOCOL.INC"
 
   [4]INT free.workers:
+  INT rr:
+
+  [256] INT message :
+  INT mess.p :
 
   PROC writes ( VAL [] BYTE s, [256] INT buffer )
     SEQ
       SEQ i = 0 FOR SIZE s
         buffer [i] := INT s [i]
       fb.in ! c.message; SIZE s; [ buffer FROM 0 FOR SIZE s ]
+  :
+
+  PROC writes2 ( VAL [] BYTE s, VAL INT a,b )
+    [256] INT buffer:
+    SEQ
+      SEQ i = 0 FOR SIZE s
+        buffer [i] := INT s [i]
+      fb.in ! c.message2; a;b;SIZE s; [ buffer FROM 0 FOR SIZE s ]
   :
 
   #INCLUDE "WORLD.INC"
@@ -25,7 +37,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   :
 
   -- loadBalance ensures that farm isn't overloaded using a count of free workers
-  PROC loadBalance ( CHAN OF ANY in, out, return, fb.in,
+  PROC loadBalance ( CHAN OF ANY in, out, return, 
                      [256] INT buffer )
     BOOL passActive, farmActive :
     INT free, command :
@@ -37,6 +49,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
       SEQ w=0 FOR SIZE free.workers
         SEQ
           free := free + free.workers[w]
+      writes2 ( "*N*C cntlsys free = ", free, free)
       WHILE passActive OR farmActive
         PRI ALT
           (free > 0) & in ? command
@@ -81,18 +94,29 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   -- send render to available worker
   PROC outputBuffer ( CHAN OF ANY in, []CHAN OF ANY out )
     INT command :
+    INT max:
     SEQ
       in ? command
       WHILE command <> c.stop
         SEQ
+          max := SIZE out
           IF
             command = c.render
               INT x, y :
               SEQ
                 in  ? x; y
-                IF w=0 FOR SIZE out
-                  free.workers[w]>0 
-                    out[w] ! command;x;y
+                --IF w=0 FOR SIZE out
+                --  free.workers[w]>0
+                --    out[w] ! command;x;y
+                -- TODO send to branch with most free workers. for now RR
+                --writes2 ( "*N*C cntlsys send work to worker = ", rr, rr)
+                out[rr] ! command;x;y
+                rr := rr + 1
+                IF
+                  rr = max
+                    rr := 0
+                  TRUE
+                    SKIP
           in ? command
       SEQ i=0 FOR SIZE out
         out[i] ! command
@@ -156,6 +180,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                       continue := FALSE
                     TRUE
                       SKIP
+      writes2 ( "*N*C receiveMapAck free.workers[0]:[1] = ", free.workers[0], free.workers[1])
   :
 
   -- fb.in is patches to framebuffer
@@ -165,6 +190,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   CHAN OF ANY render.commands, to.farm, from.farm :
   INT model:
   SEQ
+    rr := 0
     SEQ i=0 FOR SIZE free.workers
       free.workers[i] := 0
     WHILE TRUE
@@ -179,6 +205,6 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
           sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
           outputBuffer ( to.farm, toWorkers )               -- sends commands to farm
           returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
-          loadBalance  ( render.commands, to.farm, from.farm, fb.in, buffer [2] )
+          loadBalance  ( render.commands, to.farm, from.farm, buffer [2] )
 :
 
