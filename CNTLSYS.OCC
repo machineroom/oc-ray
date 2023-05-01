@@ -78,7 +78,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
       fb.in ! c.stop
   :
 
-  PROC outputBuffer ( CHAN OF ANY in, out )
+  -- send render to available worker
+  PROC outputBuffer ( CHAN OF ANY in, []CHAN OF ANY out )
     INT command :
     SEQ
       in ? command
@@ -89,11 +90,17 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
               INT x, y :
               SEQ
                 in  ? x; y
-                out ! command; x; y
+                IF w=0 FOR SIZE out
+                  free.workers[w]>0 
+                    out[w] ! command;x;y
+                --out ! command; x; y
           in ? command
-      out ! command
+      --out ! command
+      SEQ i=0 FOR SIZE out
+        out[i] ! command
   :
 
+  -- receive patches from one of workers
   PROC returnBuffer ( []CHAN OF ANY fromWorkers, CHAN OF ANY out, [256] INT buffer )
     INT command :
     SEQ
@@ -153,14 +160,11 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                       SKIP
   :
 
-  -- out,back is to/from farm
   -- fb.in is patches to framebuffer
   --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection, VAL INT machines )
   VAL patchEdge IS 3 :
   [3][256] INT buffer :
   CHAN OF ANY render.commands, to.farm, from.farm :
-  -- temp
-  CHAN OF ANY out IS toWorkers[0]:
   INT model:
   SEQ
     SEQ i=0 FOR SIZE free.workers
@@ -175,7 +179,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
           pumpWorldModels ( toWorkers[i], model, patchEdge, buffer [0] )
         PAR
           sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
-          outputBuffer ( to.farm, out )               -- sends commands to farm
+          outputBuffer ( to.farm, toWorkers )               -- sends commands to farm
           returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
           loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
 :
