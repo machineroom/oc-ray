@@ -224,19 +224,33 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
         toWorkers[w] ! c.map
   :
 
-  -- receive mapAck response from workers
+  -- receive mapAck response from all workers
   PROC receiveMapAck ([]CHAN OF ANY fromWorkers)
     INT command:
     [256] INT buffer:
     INT count:
-    ALT
-      ALT w=0 FOR SIZE fromWorkers
-        fromWorkers[w] ? command
-          IF
-            command = c.mapAck
-              SEQ
-                fromWorkers[w] ? count
-                free.workers[w] := count
+    INT done:
+    INT expected:
+    BOOL continue:
+    SEQ
+      done := 0
+      expected := SIZE fromWorkers
+      continue := TRUE
+      WHILE continue
+        ALT
+          ALT w=0 FOR SIZE fromWorkers
+            fromWorkers[w] ? command
+              IF
+                command = c.mapAck
+                  SEQ
+                    done := done + 1
+                    fromWorkers[w] ? count
+                    free.workers[w] := count
+                    IF
+                      done = expected
+                        continue := FALSE
+                      TRUE
+                        SKIP
   :
  
   --PROC rayTrace ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHAN OF ANY toWorkers,  VAL INT propogate, me )
