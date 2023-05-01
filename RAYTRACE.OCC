@@ -138,16 +138,15 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                         state := busy
                     state = busy
                       SEQ
-                        -- pass work onto next free worker
-                        SEQ w=0 FOR SIZE toWorkers
-                          toWorkers[w] ! tag; x; y
-                          --IF 
-                          --  free.workers[w] > 0
-                          --    SEQ
-                          --      free.workers[w] := free.workers[w] - 1
-                          --      toWorkers[w] ! tag; x; y
-                          --  TRUE
-                          --    SKIP
+                        IF
+                          -- pass work onto next free worker
+                          IF w=0 FOR SIZE free.workers
+                            free.workers[w] > 0
+                              SEQ
+                                free.workers[w] := free.workers[w] - 1
+                                toWorkers[w] ! tag; x; y
+                          TRUE
+                            SKIP
                     TRUE
                       SKIP
               tag = c.stop
@@ -174,7 +173,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                   toLocal ! tag; size; [ buffer FROM 0 FOR size ]
   :
 
-  -- accept results from one of the workers and push the results upstream
+  -- accept results from local or one of the workers and push the results upstream
   PROC pixelBypass ( CHAN OF ANY out, CHAN OF ANY local, []CHAN OF ANY workers)
 
     INT  state, command, x, y, size, count :
@@ -183,24 +182,20 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
     VAL closeDown  IS 0 :
     VAL busy IS 1 :
 
-    PROC commandHandler (CHAN OF ANY in)
+    PROC messageHandler (CHAN OF ANY in)
       SEQ
-        IF
-          command = c.message
-            SEQ
-              in ? size; [ buffer FROM 0 FOR size ]
-              out ! command; size; [ buffer FROM 0 FOR size ]
-          command = c.patch
-            SEQ
-              in ? x; y; size
-              out ! command; x; y; size
-              SEQ i = 0 FOR size
-                SEQ
-                  in  ? [ buffer FROM 0 FOR size ]
-                  out ! [ buffer FROM 0 FOR size ]
-              --free.workers[w] := free.workers[w] + 1
-          command = c.stop
-            state := closeDown
+        in ? size; [ buffer FROM 0 FOR size ]
+        out ! command; size; [ buffer FROM 0 FOR size ]
+    :
+
+    PROC patchHandler (CHAN OF ANY in)
+      SEQ
+        in ? x; y; size
+        out ! command; x; y; size
+        SEQ i = 0 FOR size
+          SEQ
+            in  ? [ buffer FROM 0 FOR size ]
+            out ! [ buffer FROM 0 FOR size ]
     :
 
     SEQ
@@ -208,12 +203,24 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
       WHILE state <> closeDown
         ALT
           local ? command
-            commandHandler(local)
-    
+            IF 
+              command = c.message
+                messageHandler(local)
+              command = c.patch
+                patchHandler(local)
+              command = c.stop
+                state := closeDown
           ALT w=0 FOR SIZE workers
             workers[w] ? command
-              SEQ
-                commandHandler(workers[w])
+              IF 
+                command = c.message
+                  messageHandler(workers[w])
+                command = c.patch
+                  SEQ
+                    patchHandler(workers[w])
+                    free.workers[w] := free.workers[w] + 1
+                command = c.stop
+                  state := closeDown
       out ! c.stop
   :
 
@@ -275,6 +282,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
     SEQ w=0 FOR SIZE free.workers
       SEQ
         n := n + free.workers[w]
+    -- send total workers known to this renderer
     toPrev ! c.mapAck; n
     -- normal operation
     WHILE TRUE
