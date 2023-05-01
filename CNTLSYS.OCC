@@ -88,29 +88,29 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
       out ! command
   :
 
-  PROC returnBuffer ( CHAN OF ANY in, out, [256] INT buffer )
+  PROC returnBuffer ( []CHAN OF ANY fromWorkers, CHAN OF ANY out, [256] INT buffer )
     INT command :
     SEQ
-      in ? command
+      command := c.invalid
       WHILE command <> c.stop
-        SEQ
-          IF
-            command = c.patch
-              INT x, y, size :
-              SEQ
-                in  ? x; y; size
-                out ! command; x; y; size
-                SEQ i = 0 FOR size
+        ALT
+          ALT w=0 FOR SIZE fromWorkers
+            fromWorkers[w] ? command
+              IF
+                command = c.patch
+                  INT x, y, size :
                   SEQ
-                    in  ? [ buffer FROM 0 FOR size ]
-                    out ! [ buffer FROM 0 FOR size ]
-            command = c.message
-              INT size :
-              SEQ
-                in ? size; [ buffer FROM 0 FOR size ]
-                out ! command; size; [ buffer FROM 0 FOR size ]
-          in ? command
-      out ! command
+                    fromWorkers[w]  ? x; y; size
+                    out ! command; x; y; size
+                    SEQ i = 0 FOR size
+                      SEQ
+                        fromWorkers[w]  ? [ buffer FROM 0 FOR size ]
+                        out ! [ buffer FROM 0 FOR size ]
+                command = c.message
+                  INT size :
+                  SEQ
+                    fromWorkers[w] ? size; [ buffer FROM 0 FOR size ]
+                    out ! command; size; [ buffer FROM 0 FOR size ]
   :
 
   -- out,back is to/from farm
@@ -121,14 +121,13 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   CHAN OF ANY render.commands, to.farm, from.farm :
   -- temp
   CHAN OF ANY out IS toWorkers[0]:
-  CHAN OF ANY back IS fromWorkers[0]:
   WHILE TRUE
     SEQ
       pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
       PAR
         sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
         outputBuffer ( to.farm, out )               -- sends commands to farm
-        returnBuffer ( back, from.farm, buffer [1] )  -- receives patches from farm
+        returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
         loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
 :
 

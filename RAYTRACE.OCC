@@ -9,8 +9,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   [256] INT message :
   INT mess.p :
   
-  -- max 3 workers (+ local)
-  [3]BOOL free.worker:
+  -- counts of the number of free workers on each link
+  -- max 4 workers (one per link - in practice 1..3)
+  [4]INT free.workers:
 
   PROC wrch ( CHAN OF ANY out, VAL INT ch )
     IF
@@ -138,14 +139,14 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                       SEQ
                         -- pass work onto next free worker
                         SEQ w=0 FOR SIZE toWorkers
-                          IF 
-                            free.worker[w]
-                              SEQ
-                                --temp! marking worker as not free will block the rest of the pipe!
-                                --free.worker[w] := FALSE
-                                toWorkers[w] ! tag; x; y
-                            TRUE
-                              SKIP
+                          toWorkers[w] ! tag; x; y
+                          --IF 
+                          --  free.workers[w] > 0
+                          --    SEQ
+                          --      free.workers[w] := free.workers[w] - 1
+                          --      toWorkers[w] ! tag; x; y
+                          --  TRUE
+                          --    SKIP
                     TRUE
                       SKIP
               tag = c.stop
@@ -197,6 +198,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                 SEQ
                   in  ? [ buffer FROM 0 FOR size ]
                   out ! [ buffer FROM 0 FOR size ]
+              --free.workers[w] := free.workers[w] + 1
           command = c.stop
             state := closeDown
     :
@@ -212,7 +214,6 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
             workers[w] ? command
               SEQ
                 commandHandler(workers[w])
-                free.worker[w] := TRUE
       out ! c.stop
   :
 
@@ -221,8 +222,9 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   CHAN OF ANY toLocal, localDone, fromLocal :
 
   SEQ
-    PAR i=0 FOR SIZE free.worker
-      free.worker[i] := TRUE
+    PAR i=0 FOR SIZE free.workers
+      free.workers[i] := 0
+    -- TODO send map, wait for mapack
     WHILE TRUE
       PRI PAR
         PAR
