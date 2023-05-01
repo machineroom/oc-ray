@@ -171,7 +171,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
         -- map the size of the network (how many workers down each link)
         sendMap (toWorkers)
         receiveMapAck (fromWorkers)
-        pumpWorldModels ( out, model, patchEdge, buffer [0] )
+        SEQ i=0 FOR SIZE toWorkers
+          pumpWorldModels ( toWorkers[i], model, patchEdge, buffer [0] )
         PAR
           sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
           outputBuffer ( to.farm, out )               -- sends commands to farm
