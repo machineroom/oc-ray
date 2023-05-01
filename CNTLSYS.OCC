@@ -1,5 +1,5 @@
 
-PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection, VAL INT machines )
+PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection )
 
   #INCLUDE "PROTOCOL.INC"
 
@@ -24,8 +24,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
       out ! c.stop
   :
 
+  -- loadBalance ensures that farm isn't overloaded using a count of free workers
   PROC loadBalance ( CHAN OF ANY in, out, return, fb.in,
-                     VAL INT machines,
                      [256] INT buffer )
     BOOL passActive, farmActive :
     INT free, command :
@@ -93,9 +93,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                 IF w=0 FOR SIZE out
                   free.workers[w]>0 
                     out[w] ! command;x;y
-                --out ! command; x; y
           in ? command
-      --out ! command
       SEQ i=0 FOR SIZE out
         out[i] ! command
   :
@@ -161,7 +159,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   :
 
   -- fb.in is patches to framebuffer
-  --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection, VAL INT machines )
+  --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection )
   VAL patchEdge IS 3 :
   [3][256] INT buffer :
   CHAN OF ANY render.commands, to.farm, from.farm :
@@ -181,6 +179,6 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
           sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
           outputBuffer ( to.farm, toWorkers )               -- sends commands to farm
           returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
-          loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
+          loadBalance  ( render.commands, to.farm, from.farm, fb.in, buffer [2] )
 :
 

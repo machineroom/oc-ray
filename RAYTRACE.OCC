@@ -137,16 +137,21 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                         toLocal ! tag; x; y
                         state := busy
                     state = busy
-                      SEQ
-                        IF
-                          -- pass work onto next free worker
-                          IF w=0 FOR SIZE free.workers
-                            free.workers[w] > 0
-                              SEQ
-                                free.workers[w] := free.workers[w] - 1
-                                toWorkers[w] ! tag; x; y
-                          TRUE
-                            SKIP
+                      IF
+                        propogate <> 0
+                          SEQ
+                            IF
+                              -- pass work onto next free worker
+                              IF w=0 FOR SIZE free.workers
+                                free.workers[w] > 0
+                                  SEQ
+                                    free.workers[w] := free.workers[w] - 1
+                                    toWorkers[w] ! tag; x; y
+                              TRUE
+                                SKIP
+                        TRUE
+                          -- not propogate
+                          SKIP
                     TRUE
                       SKIP
               tag = c.stop
@@ -158,8 +163,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                     TRUE
                       SKIP
                   toLocal ! tag
-                  SEQ w=0 FOR SIZE toWorkers
-                    toWorkers[w] ! tag
+                  IF
+                    propogate <> 0
+                      SEQ w=0 FOR SIZE toWorkers
+                        toWorkers[w] ! tag
+                    TRUE
+                      SKIP
                   state := closeDown
               TRUE
                 SEQ
@@ -272,7 +281,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
     IF
       command = c.map
         IF
-          propogate <> 0  --should be n>0
+          propogate <> 0
             SEQ
               sendMap (toWorkers)
               receiveMapAck (fromWorkers)
