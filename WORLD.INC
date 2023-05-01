@@ -244,15 +244,13 @@ scaleFactor   IS runData [5] :
 
 VAL patchSize IS 16 :
 
-PROC pumpWorldModels ( CHAN OF ANY out, CHAN OF INT image, VAL INT patchEdge, [256] INT buffer )
+PROC pumpWorldModels ( CHAN OF ANY out, INT model, VAL INT patchEdge, [256] INT buffer )
   [30] INT temp :
   [30] REAL32 ftemp RETYPES temp :
   VAL root.2 IS 1.414213562 (REAL32):
   VAL root.2.2 IS 0.7071067810 (REAL32):
-  INT model :
 
   SEQ
-    image ? model
     IF
       (model = 1)       --10 sphere selection
         SEQ

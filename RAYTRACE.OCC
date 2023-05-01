@@ -106,7 +106,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   #INCLUDE "RENDERER.INC"
 
   -- accept work from upstream and send it downstream or process locally
-  PROC throughPut ( CHAN OF ANY fromPrev, []CHAN OF ANY toWorkers, CHAN OF ANY toLocal, localDone,
+  PROC throughPut ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY toWorkers, CHAN OF ANY toLocal, localDone,
                     VAL INT propogate )
 
     VAL closeDown     IS 0 :
@@ -116,6 +116,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
     [256] INT buffer :
     INT state, tag :
     INT x, y, size, kick :
+    INT n:
     SEQ
       state := active
       WHILE state <> closeDown
@@ -173,11 +174,10 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                   toLocal ! tag; size; [ buffer FROM 0 FOR size ]
   :
 
-
   -- accept results from one of the workers and push the results upstream
   PROC pixelBypass ( CHAN OF ANY out, CHAN OF ANY local, []CHAN OF ANY workers)
 
-    INT  state, command, x, y, size :
+    INT  state, command, x, y, size, count :
     [256] INT buffer :
 
     VAL closeDown  IS 0 :
@@ -217,18 +217,51 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
       out ! c.stop
   :
 
+  -- send map to workers
+  PROC sendMap ([]CHAN OF ANY toWorkers)
+    SEQ w = 0 FOR SIZE toWorkers
+      SEQ
+        toWorkers[w] ! c.map
+  :
+
+  -- receive mapAck response from workers
+  PROC receiveMapAck ([]CHAN OF ANY fromWorkers)
+    INT command:
+    [256] INT buffer:
+    INT count:
+    ALT
+      ALT w=0 FOR SIZE fromWorkers
+        fromWorkers[w] ? command
+          IF
+            command = c.mapAck
+              SEQ
+                fromWorkers[w] ? count
+                free.workers[w] := count
+  :
  
   --PROC rayTrace ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHAN OF ANY toWorkers,  VAL INT propogate, me )
   CHAN OF ANY toLocal, localDone, fromLocal :
-
+  INT n:
+  INT command:
   SEQ
     PAR i=0 FOR SIZE free.workers
       free.workers[i] := 0
-    -- TODO send map, wait for mapack
+    n := SIZE toWorkers
+    fromPrev ? command
+    IF
+      command = c.map
+        IF
+          propogate <> 0  --should be n>0
+            SEQ
+              sendMap (toWorkers)
+              receiveMapAck (fromWorkers)
+          TRUE
+            SKIP
+    toPrev ! c.mapAck; 1
     WHILE TRUE
       PRI PAR
         PAR
-          throughPut  ( fromPrev, toWorkers, toLocal, localDone,
+          throughPut  ( fromPrev, toPrev, toWorkers, toLocal, localDone,
                         propogate )
           pixelBypass ( toPrev, fromLocal, fromWorkers )
         renderer   ( toLocal, fromLocal, localDone )

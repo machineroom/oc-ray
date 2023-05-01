@@ -9,5 +9,5 @@ VAL c.patch   IS 4 :  -- patch;  x; y; patchSize; [ patchSize][patchSize]
 VAL c.runData IS 5 :  -- ambient light, rendering mode, screen pos etc.
 VAL c.message IS 6 :  -- message; size; [ words ]
 VAL c.map     IS 7 :
-VAL c.mapack  IS 8 :
+VAL c.mapAck  IS 8 :  -- count
 

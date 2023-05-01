@@ -3,6 +3,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
 
   #INCLUDE "PROTOCOL.INC"
 
+  [4]INT free.workers:
+
   PROC writes ( VAL [] BYTE s, [256] INT buffer )
     SEQ
       SEQ i = 0 FOR SIZE s
@@ -112,6 +114,28 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                     fromWorkers[w] ? size; [ buffer FROM 0 FOR size ]
                     out ! command; size; [ buffer FROM 0 FOR size ]
   :
+  
+  -- send map to workers
+  PROC sendMap ([]CHAN OF ANY toWorkers)
+    SEQ w = 0 FOR SIZE toWorkers
+      SEQ
+        toWorkers[w] ! c.map
+  :
+
+  -- receive mapAck response from workers
+  PROC receiveMapAck ([]CHAN OF ANY fromWorkers)
+    INT command:
+    [256] INT buffer:
+    INT count:
+    ALT
+      ALT w=0 FOR SIZE fromWorkers
+        fromWorkers[w] ? command
+          IF
+            command = c.mapAck
+              SEQ
+                fromWorkers[w] ? count
+                free.workers[w] := count
+  :
 
   -- out,back is to/from farm
   -- fb.in is patches to framebuffer
@@ -121,9 +145,14 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   CHAN OF ANY render.commands, to.farm, from.farm :
   -- temp
   CHAN OF ANY out IS toWorkers[0]:
+  INT model:
   WHILE TRUE
     SEQ
-      pumpWorldModels ( out, image.selection, patchEdge, buffer [0] )
+      image.selection ? model
+      -- map the size of the network (how many workers down each link)
+      sendMap (toWorkers)
+      receiveMapAck (fromWorkers)
+      pumpWorldModels ( out, model, patchEdge, buffer [0] )
       PAR
         sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
         outputBuffer ( to.farm, out )               -- sends commands to farm
