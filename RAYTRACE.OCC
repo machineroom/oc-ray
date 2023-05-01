@@ -244,7 +244,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   INT n:
   INT command:
   SEQ
-    PAR i=0 FOR SIZE free.workers
+    -- net mapping
+    SEQ i=0 FOR SIZE free.workers
       free.workers[i] := 0
     n := SIZE toWorkers
     fromPrev ? command
@@ -257,7 +258,12 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
               receiveMapAck (fromWorkers)
           TRUE
             SKIP
-    toPrev ! c.mapAck; 1
+    n := 1  -- local worker
+    SEQ w=0 FOR SIZE free.workers
+      SEQ
+        n := n + free.workers[w]
+    toPrev ! c.mapAck; n
+    -- normal operation
     WHILE TRUE
       PRI PAR
         PAR

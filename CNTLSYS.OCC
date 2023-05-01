@@ -32,7 +32,11 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
     SEQ
       farmActive := TRUE
       passActive := TRUE
-      free := machines
+      -- calculate total workers
+      free := 0
+      SEQ w=0 FOR SIZE free.workers
+        SEQ
+          free := free + free.workers[w]
       WHILE passActive OR farmActive
         PRI ALT
           (free > 0) & in ? command
@@ -146,17 +150,20 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   -- temp
   CHAN OF ANY out IS toWorkers[0]:
   INT model:
-  WHILE TRUE
-    SEQ
-      image.selection ? model
-      -- map the size of the network (how many workers down each link)
-      sendMap (toWorkers)
-      receiveMapAck (fromWorkers)
-      pumpWorldModels ( out, model, patchEdge, buffer [0] )
-      PAR
-        sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
-        outputBuffer ( to.farm, out )               -- sends commands to farm
-        returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
-        loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
+  SEQ
+    SEQ i=0 FOR SIZE free.workers
+      free.workers[i] := 0
+    WHILE TRUE
+      SEQ
+        image.selection ? model
+        -- map the size of the network (how many workers down each link)
+        sendMap (toWorkers)
+        receiveMapAck (fromWorkers)
+        pumpWorldModels ( out, model, patchEdge, buffer [0] )
+        PAR
+          sendPatches  ( render.commands, patchEdge )         -- sends c.render,x,y for all patches
+          outputBuffer ( to.farm, out )               -- sends commands to farm
+          returnBuffer ( fromWorkers, from.farm, buffer [1] )  -- receives patches from farm
+          loadBalance  ( render.commands, to.farm, from.farm, fb.in, machines, buffer [2] )
 :
 
