@@ -139,16 +139,30 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                     state = busy
                       IF
                         propogate <> 0
+                          BOOL cont:
+                          INT w:
+                          INT max:
                           SEQ
-                            IF
-                              -- pass work onto next free worker
-                              IF w=0 FOR SIZE free.workers
-                                free.workers[w] > 0
-                                  SEQ
-                                    free.workers[w] := free.workers[w] - 1
-                                    toWorkers[w] ! tag; x; y
-                              TRUE
-                                SKIP
+                            cont := TRUE
+                            max := SIZE free.workers
+                            w := 0
+                            -- pass work onto next free worker
+                            WHILE cont
+                              SEQ
+                                IF
+                                  free.workers[w] > 0
+                                    SEQ
+                                      free.workers[w] := free.workers[w] - 1
+                                      toWorkers[w] ! tag; x; y
+                                      cont := FALSE
+                                  TRUE
+                                    SKIP
+                                w := w + 1
+                                IF
+                                  w = max
+                                    cont := FALSE
+                                  TRUE
+                                    SKIP
                         TRUE
                           -- not propogate
                           SKIP
