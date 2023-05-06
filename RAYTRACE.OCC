@@ -106,8 +106,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   #INCLUDE "RENDERER.INC"
 
   -- accept work from upstream and send it downstream or process locally
-  PROC throughPut ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY toWorkers, CHAN OF ANY toLocal, localDone,
-                    VAL INT propogate )
+  PROC throughPut ( CHAN OF ANY fromPrev, []CHAN OF ANY toWorkers, CHAN OF ANY toLocal, localDone, debug,
+                    VAL INT propogate, VAL INT me)
 
     VAL closeDown     IS 0 :
     VAL active        IS 1 :
@@ -134,6 +134,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                   IF
                     state = active
                       SEQ
+                        writef (debug, "*N*Clocal %I start %I,%I", me, x, y, 0)
                         toLocal ! tag; x; y
                         state := busy
                     state = busy
@@ -197,7 +198,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   :
 
   -- accept results from local or one of the workers and push the results upstream
-  PROC pixelBypass ( CHAN OF ANY out, CHAN OF ANY local, []CHAN OF ANY workers)
+  PROC pixelBypass ( CHAN OF ANY out, CHAN OF ANY local, []CHAN OF ANY workers, CHAN OF ANY debug)
 
     INT  state, command, x, y, size, count, worker :
     [256] INT buffer :
@@ -225,6 +226,10 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
       state := busy
       WHILE state <> closeDown
         ALT
+          debug ? command
+            IF 
+              command = c.message
+                messageHandler(debug)
           local ? command
             IF 
               command = c.message
@@ -283,7 +288,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
   :
  
   --PROC rayTrace ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHAN OF ANY toWorkers,  VAL INT propogate, me )
-  CHAN OF ANY toLocal, localDone, fromLocal :
+  CHAN OF ANY toLocal, localDone, fromLocal, debug :
   INT n:
   INT command:
   SEQ
@@ -311,9 +316,8 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
     WHILE TRUE
       PRI PAR
         PAR
-          throughPut  ( fromPrev, toPrev, toWorkers, toLocal, localDone,
-                        propogate )
-          pixelBypass ( toPrev, fromLocal, fromWorkers )
+          throughPut  ( fromPrev, toWorkers, toLocal, localDone, debug, propogate, me )
+          pixelBypass ( toPrev, fromLocal, fromWorkers, debug )
         renderer   ( toLocal, fromLocal, localDone, me )
 :
 

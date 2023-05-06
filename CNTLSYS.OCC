@@ -185,7 +185,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
 
   -- fb.in is patches to framebuffer
   --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection )
-  VAL patchEdge IS 3 :
+  VAL patchEdge IS 10 :
   [3][256] INT buffer :
   CHAN OF ANY render.commands, to.farm, from.farm :
   INT model:
