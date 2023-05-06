@@ -57,9 +57,9 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                 INT x, y :
                 SEQ
                   --writes ( "*N*C S c.render to system", buffer)
+                  free := free - 1
                   in  ? x; y
                   out ! command; x; y
-                  free := free - 1
               command = c.stop
                 SEQ
                   writes ( "*N*C R c.stop from pumper", buffer)
@@ -92,30 +92,30 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
 
   -- send render to available worker
   PROC outputBuffer ( CHAN OF ANY in, []CHAN OF ANY out )
-    INT command, max, rr :
+    INT command, max :
     SEQ
-      rr := 0
       in ? command
       WHILE command <> c.stop
         SEQ
           max := SIZE out
           IF
             command = c.render
-              INT x, y :
+              INT x, y, max, target :
               SEQ
-                in  ? x; y
-                --IF w=0 FOR SIZE out
-                --  free.workers[w]>0
-                --    out[w] ! command;x;y
-                -- TODO send to branch with most free workers. for now RR
-                --writes2 ( "*N*C cntlsys send work to worker = ", rr, rr)
-                out[rr] ! command;x;y
-                rr := rr + 1
-                IF
-                  rr = max
-                    rr := 0
-                  TRUE
-                    SKIP
+                -- find branch with most free workers
+                -- (there must be a free worker since the load balancer maintains a global count)
+                max := 0
+                SEQ w=0 FOR SIZE free.workers
+                  IF 
+                    free.workers[w] > max
+                      SEQ
+                        max := free.workers[w]
+                        target := w
+                    TRUE
+                      SKIP
+                in ? x; y
+                out[target] ! command;x;y
+                free.workers[target] := free.workers[target] - 1
           in ? command
       SEQ i=0 FOR SIZE out
         out[i] ! command
@@ -139,6 +139,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                     SEQ
                       fromWorkers[w]  ? [ buffer FROM 0 FOR size ]
                       out ! [ buffer FROM 0 FOR size ]
+                  free.workers[w] := free.workers[w] + 1
               command = c.message
                 INT size :
                 SEQ
@@ -184,7 +185,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
 
   -- fb.in is patches to framebuffer
   --PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF ANY fb.in, CHAN OF INT image.selection )
-  VAL patchEdge IS 10 :
+  VAL patchEdge IS 3 :
   [3][256] INT buffer :
   CHAN OF ANY render.commands, to.farm, from.farm :
   INT model:

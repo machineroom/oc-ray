@@ -256,15 +256,13 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
                 [16][16] INT patch :
                 SEQ
                   fromRenderer ? x; y; size; worker
-                  so.write.string.nl (fs, ts, "")
-                  so.write.string (fs, ts, " p x=")
-                  so.write.int (fs, ts, x, 1)
-                  so.write.string (fs, ts, ",y=")
-                  so.write.int (fs, ts, y, 1)
-                  so.write.string (fs, ts, ",w=")
-                  so.write.int (fs, ts, worker, 1)
-                  --so.write.string (fs, ts, ",size=")
-                  --so.write.int (fs, ts, size, 1)
+                  --so.write.string.nl (fs, ts, "")
+                  --so.write.string (fs, ts, " p x=")
+                  --so.write.int (fs, ts, x, 1)
+                  --so.write.string (fs, ts, ",y=")
+                  --so.write.int (fs, ts, y, 1)
+                  --so.write.string (fs, ts, ",w=")
+                  --so.write.int (fs, ts, worker, 1)
                   SEQ i = 0 FOR size
                     fromRenderer ? [ patch [i] FROM 0 FOR size ]
                   displayPatch ( x, y, size, patch )

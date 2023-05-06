@@ -134,7 +134,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                   IF
                     state = active
                       SEQ
-                        writef (debug, "*N*Clocal %I start %I,%I", me, x, y, 0)
+                        --writef (debug, "*N*Clocal %I start %I,%I", me, x, y, 0)
                         toLocal ! tag; x; y
                         state := busy
                     state = busy
