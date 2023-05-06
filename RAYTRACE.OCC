@@ -128,7 +128,7 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
           fromPrev ? tag
             IF
               tag = c.render
-                INT x, y :
+                INT x, y, target :
                 SEQ
                   fromPrev ? x; y
                   IF
@@ -140,30 +140,22 @@ PROC rayTrace   ( CHAN OF ANY fromPrev, toPrev, []CHAN OF ANY fromWorkers, []CHA
                     state = busy
                       IF
                         propogate <> 0
-                          BOOL cont:
                           INT w:
                           INT max:
                           SEQ
-                            cont := TRUE
-                            max := SIZE free.workers
-                            w := 0
-                            -- pass work onto next free worker
-                            WHILE cont
-                              SEQ
-                                IF
-                                  free.workers[w] > 0
-                                    SEQ
-                                      free.workers[w] := free.workers[w] - 1
-                                      toWorkers[w] ! tag; x; y
-                                      cont := FALSE
-                                  TRUE
-                                    SKIP
-                                w := w + 1
-                                IF
-                                  w = max
-                                    cont := FALSE
-                                  TRUE
-                                    SKIP
+                            -- find branch with most free workers
+                            -- (there must be a free worker since the load balancer maintains a global count)
+                            max := 0
+                            SEQ w=0 FOR SIZE free.workers
+                              IF 
+                                free.workers[w] > max
+                                  SEQ
+                                    max := free.workers[w]
+                                    target := w
+                                TRUE
+                                  SKIP
+                            toWorkers[target] ! tag;x;y
+                            free.workers[target] := free.workers[target] - 1
                         TRUE
                           -- not propogate
                           SKIP
