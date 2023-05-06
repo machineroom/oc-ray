@@ -4,7 +4,6 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   #INCLUDE "PROTOCOL.INC"
 
   [4]INT free.workers:
-  INT rr:
 
   [256] INT message :
   INT mess.p :
@@ -93,9 +92,9 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
 
   -- send render to available worker
   PROC outputBuffer ( CHAN OF ANY in, []CHAN OF ANY out )
-    INT command :
-    INT max:
+    INT command, max, rr :
     SEQ
+      rr := 0
       in ? command
       WHILE command <> c.stop
         SEQ
@@ -190,7 +189,6 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
   CHAN OF ANY render.commands, to.farm, from.farm :
   INT model:
   SEQ
-    rr := 0
     SEQ i=0 FOR SIZE free.workers
       free.workers[i] := 0
     WHILE TRUE
