@@ -299,7 +299,7 @@ VAL notRendered IS mint :  -- top bit set = not rendered
 
 
 
-PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
+PROC renderer ( CHAN OF ANY workIn, pixelsOut, done, VAL INT me )
   [20] INT runData IS grunData :
 
   [3] REAL32 ambient RETYPES [ runData FROM 0 FOR 3 ] :
@@ -2275,7 +2275,7 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
         colour := (x0 + (y0 * patchSize))
   :
 
-  --PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
+  --PROC renderer ( CHAN OF ANY workIn, pixelsOut, done, VAL INT me )
   INT command :
   INT nobj, nlight, njobs :
   BOOL stop :
@@ -2312,7 +2312,7 @@ PROC renderer ( CHAN OF ANY workIn, pixelsOut, done )
                 SEQ y = 0 FOR runPatchSize
                   renderPixels ( x0, y0, x, y, samples, colours [y][x],
                                  runPatchSize, renderingMode, (x=0) AND (y=0))
-              pixelsOut ! c.patch; x0; y0; runPatchSize
+              pixelsOut ! c.patch; x0; y0; runPatchSize; me
               SEQ y = 0 FOR runPatchSize
                 pixelsOut ! [ colours [y] FROM 0 FOR runPatchSize ]
               done ! 42

@@ -69,11 +69,11 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
           return ? command
             IF
               command = c.patch
-                INT x, y, size :
+                INT x, y, size, worker :
                 SEQ
                   --writes ( "*N*C R patch", buffer)
-                  return   ? x; y; size
-                  fb.in ! command; x; y; size
+                  return   ? x; y; size; worker
+                  fb.in ! command; x; y; size; worker
                   SEQ i = 0 FOR size
                     SEQ
                       return   ? [ buffer FROM 0 FOR size ]
@@ -132,10 +132,10 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
           fromWorkers[w] ? command
             IF
               command = c.patch
-                INT x, y, size :
+                INT x, y, size, worker :
                 SEQ
-                  fromWorkers[w]  ? x; y; size
-                  out ! command; x; y; size
+                  fromWorkers[w]  ? x; y; size; worker
+                  out ! command; x; y; size; worker
                   SEQ i = 0 FOR size
                     SEQ
                       fromWorkers[w]  ? [ buffer FROM 0 FOR size ]
