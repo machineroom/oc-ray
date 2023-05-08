@@ -55,9 +55,10 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 
 ## Non-pipe restructure
 Results with virtual router disabled, non-pipe branch (map directly to the WX9020 network)
-|Workers|Type|Scene 1|notes|
+|Workers|Type|Scene 1|Scene 1|notes|
 |--|--|--|--|
 |12 |T425|370||
+|126 |T425|39|39|
 
 
 ## Select processor type
