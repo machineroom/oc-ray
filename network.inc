@@ -30,25 +30,4 @@ NETWORK
     CONNECT System[9][link][1] TO System[11][link][1]
 :
 
---{{{  Mapping
-NODE framebuf.p :
-NODE cntlsys.p :
-[workers]NODE raytrace.p :
-MAPPING
-  DO
-    MAP framebuf.p ONTO Root
-    MAP cntlsys.p ONTO Root
-    MAP raytrace.p[0] ONTO System[0]
-    MAP raytrace.p[1] ONTO System[1]
-    MAP raytrace.p[2] ONTO System[2]
-    MAP raytrace.p[3] ONTO System[3]
-    MAP raytrace.p[4] ONTO System[4]
-    MAP raytrace.p[5] ONTO System[5]
-    MAP raytrace.p[6] ONTO System[6]
-    MAP raytrace.p[7] ONTO System[7]
-    MAP raytrace.p[8] ONTO System[8]
-    MAP raytrace.p[9] ONTO System[9]
-    MAP raytrace.p[10] ONTO System[10]
-    MAP raytrace.p[11] ONTO System[11]
-:
 --}}}

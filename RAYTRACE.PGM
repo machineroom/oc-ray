@@ -8,6 +8,17 @@ ARC Hostlink:
 -- network.inc is written by ispy_to_xxx.py
 #INCLUDE "network.inc"
 
+--{{{  Mapping
+NODE framebuf.p :
+NODE cntlsys.p :
+[workers]NODE raytrace.p :
+MAPPING
+  DO
+    MAP framebuf.p ONTO Root
+    MAP cntlsys.p ONTO Root
+    DO i = 0 FOR workers
+      MAP raytrace.p[i] ONTO System[i]
+:
 
 --{{{  Code
 #INCLUDE "hostio.inc"
