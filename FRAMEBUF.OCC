@@ -12,10 +12,15 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
     
   -- display a 2D patch
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
+    VAL INT xOffset IS (x-128):
+    VAL INT yOffset IS 256-(y-128):
     SEQ
+      INT ptr:
       SEQ j = 0 FOR size
         pLine IS patch [j] :
         SEQ
+          VAL INT lineOffset IS (yOffset+(size-j))*640:
+          ptr := lineOffset + xOffset
           SEQ i = 0 FOR size    -- inner loop in x
             VAL colour IS pLine [i] :
             INT r, g, b :
@@ -26,7 +31,8 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
               g := (colour >> 12) /\ #FF
               b := (colour >> 22) /\ #FF
               c := INT32(((r << 16) BITOR (g << 8)) BITOR b)
-              pokeWords(((((256-(y-128))+(size-j))*(640))+(x-128))+i, 1, c)
+              VRAM[ptr] := c
+              ptr := ptr + 1
   :
 
   PROC MenuSelection (CHAN OF INT image)
