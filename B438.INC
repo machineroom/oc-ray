@@ -144,19 +144,6 @@ PROC pokeWords (VAL INT addr, VAL INT count, VAL INT32 val)
 
 -- Thanks again, Inmos. Somewhere deep in the data sheet is a one liner about the palette being used for
 -- gamma correction in true colour modes. #FFS
-PROC nilGamma ()
-  INT32 gamma :
-  SEQ
-    SEQ c = IMS.332.REGLUTBASE FOR 256
-      SEQ
-        gamma := INT32 (c-IMS.332.REGLUTBASE)
-        gamma := gamma << 8
-        gamma := gamma BITOR (INT32 c)
-        gamma := gamma << 8
-        gamma := gamma BITOR (INT32 c)
-        IMS.332.WriteRegister (c, gamma)
-:
-
 --some sort of gamma correction
 PROC bt709Gamma ()
   INT32 entry, corrected :

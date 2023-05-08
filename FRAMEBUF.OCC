@@ -10,24 +10,12 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
   #INCLUDE "B438.INC"
   #INCLUDE "PROTOCOL.INC"
     
-  ---------------------------- GLOBALS ----------------------------------------
-  [512][512] BYTE screenRAM :  -- buffered 512 x 512 x 8-bit pixels
-
-
   -- display a 2D patch
   PROC displayPatch ( VAL INT x, y, size, [16][16] INT patch )
-    VAL y.y IS (y + y) - 256 :
-    VAL x.x IS (x + x) - 256 :
-    INT ptr :
     SEQ
-      ptr := ((511 - y.y) << 9) + x.x
-
-      [512*512] BYTE iscreen RETYPES screenRAM :
       SEQ j = 0 FOR size
         pLine IS patch [j] :
-        INT lptr :
         SEQ
-          lptr := ptr
           SEQ i = 0 FOR size    -- inner loop in x
             VAL colour IS pLine [i] :
             INT r, g, b :
@@ -39,111 +27,7 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
               b := (colour >> 22) /\ #FF
               c := INT32(((r << 16) BITOR (g << 8)) BITOR b)
               pokeWords(((((256-(y-128))+(size-j))*(640))+(x-128))+i, 1, c)
-              iscreen [     lptr] := BYTE r
-              iscreen [   lptr+1] := BYTE g
-              iscreen [ lptr-512] := BYTE b
-              iscreen [ lptr-511] := BYTE 0
-
-              lptr := lptr + 2
-          ptr := ptr - 1024
   :
-
-  ------------------------------------------------------------------------------------------
-  -- This procedure has been developed to print the image to file called 'ray.mtv'.
-  -- The file is written as Mark VanDeWettering's (mtv) file format.
-  -- The image is a 24 bit colour in 256 * 256 resolution.
-  ------------------------------------------------------------------------------------------ 
-  PROC FileImage (INT32 Status)
-    VAL OutFileName IS "ray.mtv" :
-    VAL OutFileType IS spt.binary :
-    VAL OutFileMode IS spm.output :
-    VAL INT WriteBlock IS (INT ((256*256)-1)) : -- same as 2^16 - 1, max. so.write can send
-
-    [512*512] BYTE screen RETYPES screenRAM :
-    [WriteBlock+1] BYTE filebuffer :
-    INT Rptr, Gptr, Bptr, LRptr, LGptr, LBptr, LenWritten, Fptr :
-    INT32 OutFileId :
-    BYTE FileResult, WriteStatus, CloseStatus :
-
-    SEQ  
-      so.open (fs, ts, OutFileName, OutFileType, OutFileMode, OutFileId, FileResult)
-      IF
-        (FileResult = spr.operation.failed)
-          SEQ
-            so.write.string    (fs, ts, " Open failed for  `")
-            so.write.string    (fs, ts, OutFileName)
-            so.write.string.nl (fs, ts, "`")
-        (FileResult = spr.bad.name)
-          SEQ
-            so.write.string    (fs, ts, " `")
-            so.write.string    (fs, ts, OutFileName)
-            so.write.string.nl (fs, ts, "`  is an invalid file name")
-        (FileResult = spr.bad.type)
-          so.write.string.nl (fs, ts, " Invalid file type")
-        (FileResult = spr.bad.mode)
-          so.write.string.nl (fs, ts, " Invalid file mode")
-        (FileResult = spr.bad.packet.size)
-          so.write.string.nl (fs, ts, " File name too large")
-        TRUE
-          SEQ
-            so.puts (fs, ts, OutFileId, "256 256", WriteStatus)
-            IF
-              (WriteStatus = spr.operation.failed)
-                SEQ
-                  so.write.string    (fs, ts, " The write failed for output file  `")
-                  so.write.string    (fs, ts, OutFileName)
-                  so.write.string.nl (fs, ts, "`")
-              (WriteStatus = spr.bad.packet.size)
-                SEQ
-                  so.write.string    (fs, ts, " Bad packet size for output file  `")
-                  so.write.string    (fs, ts, OutFileName)
-                  so.write.string.nl (fs, ts, "`")
-              (WriteStatus = spr.ok)
-                SEQ
-                  so.write.nl        (fs, ts)
-                  so.write.string    (fs, ts, " PRODUCING  `")
-                  so.write.string    (fs, ts, OutFileName)
-                  so.write.string.nl (fs, ts, "`  as the output file...")
-                  so.write.nl        (fs, ts)
-                  Bptr := 0 + (0 << 9)       -- Blue  screenRAM memory pointer
-                  Gptr := 1 + (1 << 9)       -- Green screenRAM memory pointer
-                  Rptr := 0 + (1 << 9)       -- Red   screenRAM memory pointer
-                  Fptr := 0                  -- file buffer pointer
-                  SEQ i = 0 FOR 256
-                    SEQ                                        -- convert screenRAM pointers...
-                      LBptr, LGptr, LRptr := Bptr, Gptr, Rptr  -- ... to screen memory pointers
-                      SEQ j = 0 FOR 256
-                        SEQ                
-                          IF
-                            (Fptr = WriteBlock)        -- when output limit reached..
-                              SEQ                      -- write out file block.
-                                so.write (fs, ts, OutFileId, [filebuffer FROM 0 FOR WriteBlock], LenWritten)
-                                Fptr := 0              -- reset buffer pointer
-                            TRUE
-                              SKIP                     -- copy screen contents to file buffer
-                          [filebuffer FROM Fptr FOR 1]     := [screen FROM LRptr FOR 1]
-                          [filebuffer FROM (Fptr+1) FOR 1] := [screen FROM LGptr FOR 1]
-                          [filebuffer FROM (Fptr+2) FOR 1] := [screen FROM LBptr FOR 1]
-                          Fptr := Fptr + 3             -- increment file buffer pointer
-                          LBptr, LGptr, LRptr := LBptr + 2, LGptr + 2, LRptr + 2
-                      Bptr, Gptr, Rptr := Bptr + 1024, Gptr + 1024, Rptr + 1024
-                  IF
-                    (Fptr <> 0)                        -- if buffer not empty... then write out remainder
-                      so.write (fs, ts, OutFileId, [filebuffer FROM 0 FOR Fptr], LenWritten)
-                    TRUE
-                      SKIP
-                  so.write.string.nl (fs, ts, " OK, all done!!")
-              TRUE
-                SKIP
-            so.close (fs, ts, OutFileId, CloseStatus)
-      
-      IF 
-        ((FileResult = spr.ok) AND (WriteStatus = spr.ok) AND (CloseStatus = spr.ok))
-          Status := sps.success
-        TRUE
-          Status := sps.failure
-  :
-
 
   PROC MenuSelection (CHAN OF INT image)
     BYTE InKey, Result :
@@ -221,15 +105,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
           command = c.stop
             fromRenderer ! command
     SEQ
-      ---------------------------- MAX COLOUR ------------------------------
-      [512] BYTE line :
-      SEQ
-        SEQ i = 0 FOR 256
-          line [i] := BYTE i
-        [ line FROM 256 FOR 256 ] := [ line FROM 0 FOR 256 ]
-        SEQ y = 0 FOR 512
-          screenRAM [y] := line
-
       ---------------------------- DO THE ACTION ---------------------------
 
       TIMER clock :
@@ -310,7 +185,6 @@ PROC frameBuffer (CHAN OF SP fs, ts, CHAN OF ANY in, CHAN OF INT image.selection
 
       INT32 Status :
       SEQ
-        --FileImage(Status)
         so.exit (fs, ts, Status)      
 :
 
