@@ -57,7 +57,7 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 Results with virtual router disabled, non-pipe branch (map directly to the WX9020 network)
 |Workers|Type|Scene 1|notes|
 |--|--|--|--|
-|12 |T425|370|manual timing|
+|12 |T425|370||
 
 
 ## Select processor type

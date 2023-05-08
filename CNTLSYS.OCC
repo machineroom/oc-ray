@@ -40,7 +40,10 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                      [256] INT buffer )
     BOOL passActive, farmActive :
     INT free, command :
+    VAL INT nWorkers IS SIZE fromWorkers:
+    INT stoppedWorkers:
     SEQ
+      stoppedWorkers := 0
       farmActive := TRUE
       passActive := TRUE
       -- calculate total workers
@@ -62,7 +65,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                   out ! command; x; y
               command = c.stop
                 SEQ
-                  writes ( "*N*C R c.stop from pumper", buffer)
+                  --writes ( "*N*C R cntlsys stopped passthrough", buffer)
                   out ! c.stop
                   passActive := FALSE
           return ? command
@@ -81,23 +84,30 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
               command = c.message
                 INT size :
                 SEQ
-                  return   ? size; [ buffer FROM 0 FOR size ]
+                  return ? size; [ buffer FROM 0 FOR size ]
                   fb.in ! command; size; [ buffer FROM 0 FOR size ]
               command = c.stop
                 SEQ
-                  farmActive := FALSE
-                  writes ( "*N*C received c.stop", buffer)
+                  --writes ( "*N*C received c.stop", buffer)
+                  stoppedWorkers := stoppedWorkers + 1
+                  IF
+                    stoppedWorkers = nWorkers
+                      SEQ
+                        --writes ( "*N*C R cntlsys stopped farm", buffer)
+                        farmActive := FALSE
+                    TRUE
+                      SKIP
       fb.in ! c.stop
   :
 
   -- send render to available worker
   PROC outputBuffer ( CHAN OF ANY in, []CHAN OF ANY out )
-    INT command, max :
+    INT command:
+    VAL INT max IS SIZE out:
     SEQ
-      in ? command
+      command := c.invalid
       WHILE command <> c.stop
         SEQ
-          max := SIZE out
           IF
             command = c.render
               INT x, y, max, target :
@@ -116,7 +126,10 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                 in ? x; y
                 out[target] ! command;x;y
                 free.workers[target] := free.workers[target] - 1
+            TRUE
+              SKIP
           in ? command
+      --send c.stop to all worker branches
       SEQ i=0 FOR SIZE out
         out[i] ! command
   :
@@ -126,7 +139,7 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
     INT command :
     SEQ
       command := c.invalid
-      WHILE command <> c.stop
+      WHILE TRUE
         ALT w=0 FOR SIZE fromWorkers
           fromWorkers[w] ? command
             IF
@@ -145,6 +158,8 @@ PROC controlSystem ( []CHAN OF ANY toWorkers, []CHAN OF ANY fromWorkers, CHAN OF
                 SEQ
                   fromWorkers[w] ? size; [ buffer FROM 0 FOR size ]
                   out ! command; size; [ buffer FROM 0 FOR size ]
+              command = c.stop
+                out ! command
   :
   
   -- send map to workers
