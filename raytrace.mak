@@ -7,7 +7,7 @@ LINKOPT=/Y /I
 OCONFOPT=/NV /Y /I
 COLLECTOPT=
 
-D7305A=$(HOME)/d7305a/install/D7305A
+D7305A=$(HOME)/D7305A/install/D7305A
 
 #note that D7205A toolset runs much of toolchain on a transputer.... I dont have a DOS PC with B008 so this won't work!
 #D7305A is almost all PC hosted but objects to the Occam code. /A cmd line switch disables the offending checks (I assume this enables "D7205 mode")
