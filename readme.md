@@ -45,13 +45,21 @@ Results with virtual router disabled, on simple pipe (achievable with a small nu
 |--|--|--|--|
 |3  |T425|1265|fb on T8, cntlsys on worker T4|
 |5  |T425|760|fb on T8, cntlsys on worker T4|
-|5  |T425||3*3 patches|
+|5  |T425|887|3*3 patches|
 |6  |T425|636|fb & cntlsys on T8|
 |14 |T425|277|fb & cntlsys on T8|
 |92 |T425|67|fb & cntlsys on T8 (using ispy_to_long_pipe.py)|
 |92 |T425|55|4*4 patches (8*8 causes one worker to hold everything up at end!)|
 |92 |T425|52|3*3 patches|
 |92 |T425|56|2*2 patches|
+
+## Non-pipe restructure
+Results with virtual router disabled, non-pipe branch (map directly to the WX9020 network)
+|Workers|Type|Scene 1|notes|
+|--|--|--|--|
+|8 |T425|559||
+|12 |T425|370||
+|126 |T425|39||
 
 
 ## Select processor type
@@ -68,7 +76,7 @@ Can fairly easily build for either T425 or T805. To switch modify the following 
 Generate the network map for the current system
 ```
 sudo /home/james/INMOS_ispy_c011/ispy > ispy.txt
-./ispy_to_long_pipe.py --input ispy.txt --b438 --output network.inc
+./ispy_to_network.py --input ispy.txt --b438
 ```
 Make the code
 ```
@@ -79,7 +87,7 @@ make -f raytrace.mak RAYTRACE.BTL
 ```
 export PATH=$PATH:/home/james/modern_iserver/build/iserver/iserver
 export ICONDB=/home/james/modern_iserver/CONNECT/c011.dat 
-iserver -SL c011 -SB RAYTRACE.BTL`
+iserver -SL c011 -SB RAYTRACE.BTL
 ```
 
 ## MTV file conversion
@@ -90,6 +98,7 @@ ppmtojpeg ray.ppm > ray.jpg
 
 ## TODO
 - Discover the network (like ispy or T-Mandel does) at run-time rather than having to build for the specific network. The BTL also grows in size as more nodes are added (12 nodes= ~100KB, 120+ nodes= ~0.5MB!)
+- Why is is substantially slower with WX HSL cards in word mode (iserver -WM)?! Mandel is slower in this mode too
 
 <br>
 
