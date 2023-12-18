@@ -1,11 +1,8 @@
 OCCAM=oc
-LINK=ilink
-OCONFIG=occonf
-COLLECT=icollect
 OCCOPT=/Y
+
+LINK=ilink
 LINKOPT=/Y /I
-OCONFOPT=/NV /Y /I
-COLLECTOPT=/P raytrace.map
 
 D7305A=$(HOME)/D7305A/install/D7305A
 
@@ -35,6 +32,7 @@ clean:
 RAYTRACE.LKU : FRAMEBUF.T4H CNTLSYS.T4H RAYTRACE.T4H
 	$(DB) -c "$(LINK) /f RAYTRACE.L4H $(CPU) /h /o RAYTRACE.LKU $(LINKOPT) > 2.out" -c "exit"
 	-grep --color "Warning\|Error\|Serious" 2.OUT
+	$(DB) -c "ilist /A /T /C /M /W /I /X RAYTRACE.LKU > raytrace.lst" -c "exit"
 
 FRAMEBUF.T4H : FRAMEBUF.OCC PROTOCOL.INC B438.INC
 	$(DB) -c "$(OCCAM) FRAMEBUF $(CPU) /h /o FRAMEBUF.T4H $(OCCOPT) > 4.out" -c "exit"
