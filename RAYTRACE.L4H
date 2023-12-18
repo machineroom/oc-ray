@@ -1,8 +1,9 @@
---
--- imakef : Version 3.79, 08 December 1992
---
--- linker command file "raytrace.l4h"
---
 raytrace.t4h
+cntlsys.t4h
+framebuf.t4h
+hostio.lib
+convert.lib
+streamio.lib
+snglmath.lib
 occama.lib
 #INCLUDE occama.lnk
